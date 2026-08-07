@@ -4,7 +4,7 @@ import plotly.express as px
 
 # 1. Thiết lập giao diện
 st.set_page_config(page_title="Dashboard Shopdrawing", layout="wide")
-st.markdown("<h1 style='text-align: center; color: #4285F4;'>BẢNG ĐIỀU KHIỂN TIẾN ĐỘ SHOPDRAWING</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #4285F4;'>TIẾN ĐỘ TRIỂN KHAI DỰ ÁN PTK-THIÊN SƠN</h1>", unsafe_allow_html=True)
 st.write("---")
 
 # 2. Đọc và làm sạch dữ liệu
