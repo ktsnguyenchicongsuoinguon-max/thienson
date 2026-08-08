@@ -1,127 +1,173 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
 
-# 1. Thiết lập giao diện trang web (Dùng layout wide để tối ưu không gian)
-st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", layout="wide")
+# ================= 1. THIẾT LẬP GIAO DIỆN & CSS TÙY CHỈNH =================
+st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", layout="wide", initial_sidebar_state="expanded")
 
-# ================= ĐỌC VÀ XỬ LÝ DỮ LIỆU =================
+# CSS Tùy chỉnh để tạo giao diện Card KPI và Nút bấm Sidebar giống ảnh mẫu
+st.markdown("""
+<style>
+    /* Nền trang web */
+    .stApp { background-color: #f4f7f6; }
+    
+    /* Tùy chỉnh thẻ KPI */
+    .kpi-card {
+        background-color: #ffffff;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        border: 1px solid #e0e0e0;
+        border-left: 5px solid #198754; /* Tone Xanh Lục */
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    .kpi-icon {
+        font-size: 2.5rem;
+        margin-right: 15px;
+        background-color: #e8f5e9;
+        padding: 10px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .kpi-details { flex-grow: 1; }
+    .kpi-title {
+        color: #6c757d;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+    .kpi-value {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #2c3e50;
+    }
+    
+    /* Nút bấm giả lập Sidebar */
+    .sidebar-btn {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 10px;
+        background-color: #198754;
+        color: white !important;
+        text-align: center;
+        border-radius: 6px;
+        font-weight: bold;
+        text-decoration: none;
+        transition: 0.3s;
+        border: none;
+    }
+    .sidebar-btn:hover { background-color: #146c43; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    .sidebar-btn.alert { background-color: #dc3545; }
+    .sidebar-btn.alert:hover { background-color: #b02a37; }
+</style>
+""", unsafe_allow_html=True)
+
+
+# ================= 2. ĐỌC VÀ XỬ LÝ DỮ LIỆU =================
 @st.cache_data(ttl=60)
 def load_data():
     sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
     df = pd.read_csv(sheet_url)
     
-    # Đổi tên cột chuẩn hóa
     if 'Đầu Việc' in df.columns: df.rename(columns={'Đầu Việc': 'Hạng Mục'}, inplace=True)
     if 'Đầu Việc Shopdrawing' in df.columns: df.rename(columns={'Đầu Việc Shopdrawing': 'Hạng Mục'}, inplace=True)
     if 'Ghi chú' in df.columns: df.rename(columns={'Ghi chú': 'Vướng Mắc'}, inplace=True)
         
-    # TỰ ĐỘNG ĐIỀN THÔNG TIN BỊ TRỐNG DO GỘP Ô CHO TẤT CẢ CÁC CỘT CHÍNH
     cols_to_fill = ['Mã Dự Án', 'Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục']
     for col in cols_to_fill:
-        if col in df.columns:
-            df[col] = df[col].replace('', pd.NA).ffill()
+        if col in df.columns: df[col] = df[col].replace('', pd.NA).ffill()
             
     df = df.fillna('') 
     return df
 
 df = load_data()
 
-# Tạo bảng màu cố định cho từng Dự án 
-unique_projects = [p for p in df.get('Dự Án', pd.Series()).unique() if p != '']
-color_palette = px.colors.qualitative.Pastel 
-project_colors = {proj: color_palette[i % len(color_palette)] for i, proj in enumerate(unique_projects)}
 
-# ================= THANH BÊN (SIDEBAR) - CHỨA BỘ LỌC GÓC TRÁI =================
-st.sidebar.markdown("## 🔍 BỘ LỌC DỮ LIỆU")
-st.sidebar.write("Chọn các tiêu chí bên dưới để tra cứu chi tiết:")
+# ================= 3. CỘT BÊN TRÁI (SIDEBAR LỌC DỮ LIỆU) =================
+with st.sidebar:
+    st.image("https://cdn-icons-png.flaticon.com/512/10313/10313098.png", width=80) # Icon Logo minh họa
+    st.markdown("### BỘ LỌC DỮ LIỆU")
+    
+    unique_projects = [p for p in df.get('Dự Án', pd.Series()).unique() if p != '']
+    selected_projects = st.multiselect("🏢 DỰ ÁN", options=unique_projects, placeholder="Chọn Tất cả")
 
-# Lọc đa tầng trong Sidebar
-selected_projects = st.sidebar.multiselect("📁 1. Chọn Dự Án:", options=unique_projects)
+    df_temp = df.copy()
+    if selected_projects: df_temp = df_temp[df_temp['Dự Án'].isin(selected_projects)]
 
-# Tạo dataframe tạm để lọc bậc thang (chọn dự án nào thì các bộ lọc dưới chỉ hiện danh sách của dự án đó)
-df_temp = df.copy()
-if selected_projects:
-    df_temp = df_temp[df_temp['Dự Án'].isin(selected_projects)]
+    hd_opts = [x for x in df_temp.get('Hợp Đồng - PLHĐ', pd.Series()).unique() if x != '']
+    selected_hd = st.multiselect("📑 SỐ HỢP ĐỒNG", options=hd_opts, placeholder="Chọn Tất cả")
+    if selected_hd: df_temp = df_temp[df_temp['Hợp Đồng - PLHĐ'].isin(selected_hd)]
 
-# Lấy options dựa trên df_temp
-hd_opts = [x for x in df_temp.get('Hợp Đồng - PLHĐ', pd.Series()).unique() if x != '']
-selected_hd = st.sidebar.multiselect("📜 2. Hợp Đồng - PLHĐ:", options=hd_opts)
-if selected_hd: df_temp = df_temp[df_temp['Hợp Đồng - PLHĐ'].isin(selected_hd)]
+    ql_opts = [x for x in df_temp.get('Cán Bộ Quản Lý', pd.Series()).unique() if x != ''] if 'Cán Bộ Quản Lý' in df_temp.columns else []
+    selected_ql = st.multiselect("👔 CÁN BỘ QUẢN LÝ", options=ql_opts, placeholder="Chọn Tất cả")
 
-hm_opts = [x for x in df_temp.get('Hạng Mục', pd.Series()).unique() if x != '']
-selected_hm = st.sidebar.multiselect("📑 3. Hạng Mục:", options=hm_opts)
-
-ql_opts = [x for x in df_temp.get('Cán Bộ Quản Lý', pd.Series()).unique() if x != ''] if 'Cán Bộ Quản Lý' in df_temp.columns else []
-selected_ql = st.sidebar.multiselect("👔 4. Cán Bộ Quản Lý:", options=ql_opts)
-
-cb_col = 'Cán Bộ Triển Khai - SĐT' if 'Cán Bộ Triển Khai - SĐT' in df_temp.columns else ('Người Triển Khai' if 'Người Triển Khai' in df_temp.columns else None)
-cb_opts = [x for x in df_temp[cb_col].unique() if x != ''] if cb_col else []
-selected_cb = st.sidebar.multiselect("👷 5. Cán Bộ Triển Khai:", options=cb_opts)
+    cb_col = 'Cán Bộ Triển Khai - SĐT' if 'Cán Bộ Triển Khai - SĐT' in df_temp.columns else ('Người Triển Khai' if 'Người Triển Khai' in df_temp.columns else None)
+    cb_opts = [x for x in df_temp[cb_col].unique() if x != ''] if cb_col else []
+    selected_cb = st.multiselect("👷 CÁN BỘ TRIỂN KHAI", options=cb_opts, placeholder="Chọn Tất cả")
+    
+    # Các nút điều hướng (Giả lập UI như ảnh mẫu)
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    st.markdown("<a href='#' class='sidebar-btn'>📁 QUẢN LÝ HỢP ĐỒNG</a>", unsafe_allow_html=True)
+    st.markdown("<a href='#' class='sidebar-btn'>✅ THANH QUYẾT TOÁN</a>", unsafe_allow_html=True)
+    st.markdown("<a href='#' class='sidebar-btn'>🛡️ BẢO HÀNH</a>", unsafe_allow_html=True)
+    st.markdown("<a href='#' class='sidebar-btn alert'>⚠️ VƯỚNG MẮC</a>", unsafe_allow_html=True)
 
 
-# ================= KHU VỰC CHÍNH (MAIN AREA) =================
-st.markdown("<h1 style='text-align: center; color: #4285F4;'>TIẾN ĐỘ TRIỂN KHAI DỰ ÁN PTK-THIÊN SƠN</h1>", unsafe_allow_html=True)
+# ================= 4. KHU VỰC TRUNG TÂM (MAIN BẢNG ĐIỀU KHIỂN) =================
+st.markdown("<h2 style='text-align: center; color: #198754; font-weight: 800; margin-bottom: 30px;'>BÁO CÁO PHÒNG KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</h2>", unsafe_allow_html=True)
 
-# BỘ LỌC TRẠNG THÁI (Nằm ngang ở chính giữa màn hình để click luôn)
-st.write("---")
-status_options = ["Tất cả", "Chưa bắt đầu", "Đang triển khai", "Đã hoàn thành", "Tạm dừng"]
-selected_status = st.radio("📌 **Click chọn nhanh Trạng Thái Công Việc:**", options=status_options, horizontal=True)
-
-# Áp dụng TẤT CẢ các bộ lọc vào dataframe chính để tính toán
+# Lọc Dữ Liệu Thực Tế
 df_display = df.copy()
 if selected_projects: df_display = df_display[df_display['Dự Án'].isin(selected_projects)]
 if selected_hd: df_display = df_display[df_display['Hợp Đồng - PLHĐ'].isin(selected_hd)]
-if selected_hm: df_display = df_display[df_display['Hạng Mục'].isin(selected_hm)]
 if selected_ql: df_display = df_display[df_display['Cán Bộ Quản Lý'].isin(selected_ql)]
 if selected_cb: df_display = df_display[df_display[cb_col].isin(selected_cb)]
+
+# Lọc Trạng Thái (Thanh Ngang)
+status_options = ["Tất cả", "Chưa bắt đầu", "Đang triển khai", "Đã hoàn thành", "Tạm dừng"]
+st.markdown("<div style='background-color: white; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 20px;'>", unsafe_allow_html=True)
+selected_status = st.radio("TÌNH TRẠNG THI CÔNG / TRIỂN KHAI", options=status_options, horizontal=True)
+st.markdown("</div>", unsafe_allow_html=True)
+
 if selected_status != "Tất cả": df_display = df_display[df_display.get('Trạng Thái', '') == selected_status]
 
-# Biến kiểm tra xem người dùng CÓ đang dùng bộ lọc nào không
-is_filtering = bool(selected_projects or selected_hd or selected_hm or selected_ql or selected_cb or selected_status != "Tất cả")
-
-# ================= KPI ĐỘNG (Tự động thay đổi theo dữ liệu lọc) =================
+# Tính Toán Biến Số KPI
 p_total = len(df_display)
+p_projects = df_display.get('Dự Án', pd.Series()).nunique()
 p_done = len(df_display[df_display.get('Trạng Thái', '') == 'Đã hoàn thành'])
 p_paused = len(df_display[df_display.get('Trạng Thái', '') == 'Tạm dừng'])
 p_prog = df_display['Tiến Độ (%)'].mean() if ('Tiến Độ (%)' in df_display.columns and p_total > 0) else 0
 
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("TỔNG CÔNG VIỆC (Đang lọc)", f"{p_total}")
-col2.metric("SỐ CÔNG VIỆC ĐÃ XONG", f"{p_done}")
-col3.metric("TIẾN ĐỘ TRUNG BÌNH", f"{p_prog:.1f}%")
-col4.metric("ĐANG BỊ VƯỚNG MẮC", f"{p_paused}")
+# Hàm Render HTML KPI
+def render_kpi(title, value, icon, border_color="#198754"):
+    return f"""
+    <div class="kpi-card" style="border-left-color: {border_color};">
+        <div class="kpi-icon">{icon}</div>
+        <div class="kpi-details">
+            <div class="kpi-title">{title}</div>
+            <div class="kpi-value">{value}</div>
+        </div>
+    </div>
+    """
 
-st.write("---")
+# Hiển Thị 2 Hàng KPI (4 thẻ mỗi hàng)
+c1, c2, c3, c4 = st.columns(4)
+with c1: st.markdown(render_kpi("Số lượng dự án", p_projects, "🏢"), unsafe_allow_html=True)
+with c2: st.markdown(render_kpi("Tổng số công việc", p_total, "📋"), unsafe_allow_html=True)
+with c3: st.markdown(render_kpi("Công việc hoàn thành", p_done, "✅", "#0dcaf0"), unsafe_allow_html=True)
+with c4: st.markdown(render_kpi("Tiến độ trung bình", f"{p_prog:.1f}%", "⏱️", "#ffc107"), unsafe_allow_html=True)
 
-# ================= ĐIỀU KIỆN HIỂN THỊ (BIỂU ĐỒ vs BẢNG CHI TIẾT) =================
-if is_filtering:
-    # KHI ĐANG LỌC: Ẩn biểu đồ, Hiện bảng thông tin chi tiết chiếm trọn màn hình
-    st.markdown("<h3 style='color: #34A853;'>📊 BÁO CÁO CHI TIẾT THEO TIÊU CHÍ LỌC</h3>", unsafe_allow_html=True)
-else:
-    # KHI CHƯA LỌC GÌ: Hiện biểu đồ tổng quan
-    col_chart1, col_chart2 = st.columns(2)
-    with col_chart1:
-        st.markdown("### Tỉ Lệ Trạng Thái Tổng")
-        if 'Trạng Thái' in df.columns:
-            status_counts = df['Trạng Thái'].value_counts().reset_index()
-            status_counts.columns = ['Trạng Thái', 'Số Lượng']
-            color_map = {'Đã hoàn thành': '#34A853', 'Đang triển khai': '#4285F4', 'Chưa bắt đầu': '#9AA0A6', 'Tạm dừng': '#EA4335'}
-            fig_pie = px.pie(status_counts, values='Số Lượng', names='Trạng Thái', color='Trạng Thái', color_discrete_map=color_map, hole=0.4)
-            st.plotly_chart(fig_pie, use_container_width=True)
-            
-    with col_chart2:
-        st.markdown("### Tiến Độ Theo Dự Án (%)")
-        if 'Dự Án' in df.columns and 'Tiến Độ (%)' in df.columns:
-            proj_prog = df.groupby('Dự Án')['Tiến Độ (%)'].mean().reset_index().sort_values(by='Tiến Độ (%)')
-            dynamic_height = max(400, len(unique_projects) * 40)
-            fig_bar = px.bar(proj_prog, x='Tiến Độ (%)', y='Dự Án', orientation='h', color='Dự Án', color_discrete_map=project_colors, height=dynamic_height)
-            fig_bar.update_layout(xaxis=dict(range=[0, 100]), showlegend=False)
-            st.plotly_chart(fig_bar, use_container_width=True)
-            
-    st.markdown("<h3 style='color: #4285F4; margin-top: 20px;'>📋 BẢNG THEO DÕI TỔNG HỢP (TẤT CẢ)</h3>", unsafe_allow_html=True)
+st.markdown("<br>", unsafe_allow_html=True)
 
-# ================= HIỂN THỊ BẢNG DỮ LIỆU CUỐI CÙNG =================
+
+# ================= 5. KHU VỰC BẢNG THEO DÕI =================
+st.markdown("<h4 style='text-align: center; color: #198754; margin-bottom: 10px;'>BẢNG TỔNG HỢP TIẾN ĐỘ THI CÔNG</h4>", unsafe_allow_html=True)
+
 priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
 
 if 'Trạng Thái' in df_display.columns and 'Tiến Độ (%)' in df_display.columns:
@@ -131,10 +177,15 @@ if 'Trạng Thái' in df_display.columns and 'Tiến Độ (%)' in df_display.co
     df_display = df_display.sort_values(by=sort_cols, ascending=[True] * len(sort_cols))
     df_display = df_display.drop(columns=['Mức Ưu Tiên'])
 
+# Bôi nền tự động
 def color_rows(row):
-    proj = row.get('Dự Án', '')
-    bg_color = project_colors.get(proj, '#ffffff')
-    return [f'background-color: {bg_color}; color: #000000;'] * len(row)
+    status = row.get('Trạng Thái', '')
+    if status == 'Đã hoàn thành': return ['background-color: #e8f5e9; color: #000;'] * len(row)
+    if status == 'Tạm dừng': return ['background-color: #ffebee; color: #000;'] * len(row)
+    if status == 'Chưa bắt đầu': return ['background-color: #f5f5f5; color: #000;'] * len(row)
+    return ['background-color: #ffffff; color: #000;'] * len(row)
 
 styled_df = df_display.style.apply(color_rows, axis=1)
-st.dataframe(styled_df, use_container_width=True, hide_index=True, height=600 if is_filtering else 400)
+
+# Render bảng với độ cao lớn để fill màn hình
+st.dataframe(styled_df, use_container_width=True, hide_index=True, height=650)
