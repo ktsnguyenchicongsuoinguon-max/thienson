@@ -4,7 +4,7 @@ import pandas as pd
 # ================= 1. THIẾT LẬP GIAO DIỆN & CSS TÙY CHỈNH =================
 st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", layout="wide", initial_sidebar_state="expanded")
 
-# CSS Tùy chỉnh để tạo giao diện Card KPI, Sidebar và Nút trạng thái bo cong
+# CSS Tùy chỉnh
 st.markdown("""
 <style>
     /* Nền trang web */
@@ -46,35 +46,49 @@ st.markdown("""
         color: #2c3e50;
     }
     
-    /* TÙY CHỈNH BỘ LỌC TRẠNG THÁI THÀNH DẠNG ICON BO CONG (PILL BADGES) */
+    /* TÙY CHỈNH BỘ LỌC TRẠNG THÁI THÀNH DẠNG NÚT BẤM (BUTTON) DÀN ĐỀU */
     div.row-widget.stRadio > div[role="radiogroup"] {
         display: flex;
-        justify-content: center;
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-between;
         gap: 15px;
-        background-color: #ffffff;
-        padding: 15px;
-        border-radius: 15px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        border: 1px solid #e0e0e0;
-        margin-bottom: 20px;
+        background-color: transparent;
+        padding: 0px;
+        margin-top: 10px;
+        margin-bottom: 25px;
     }
     div.row-widget.stRadio > div[role="radiogroup"] > label {
-        background-color: #f8f9fa;
-        padding: 8px 25px !important;
-        border-radius: 30px !important; /* Bo góc tròn 2 đầu */
-        border: 1px solid #dee2e6;
+        flex: 1; /* Cực kỳ quan trọng: Giúp các ô tự động dàn đều bằng nhau */
+        background-color: #ffffff;
+        padding: 15px 10px !important;
+        border-radius: 12px !important; 
+        border: 1px solid #e0e0e0;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.03);
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease-in-out;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
+    /* Hiệu ứng di chuột (Hover) */
     div.row-widget.stRadio > div[role="radiogroup"] > label:hover {
         background-color: #e8f5e9;
         border-color: #198754;
+        box-shadow: 0 8px 15px rgba(25, 135, 84, 0.15);
+        transform: translateY(-4px); /* Nảy lên như icon */
     }
-    /* Đổi màu text cho nhãn */
+    /* Ẩn dấu chấm tròn radio mặc định của hệ thống */
+    div.row-widget.stRadio > div[role="radiogroup"] > label > div:first-child {
+        display: none;
+    }
+    /* Định dạng chữ và icon bên trong nút */
     div.row-widget.stRadio > div[role="radiogroup"] > label div[data-testid="stMarkdownContainer"] p {
-        font-weight: 600 !important;
+        font-weight: 700 !important;
         color: #495057;
         margin: 0;
+        font-size: 1.1rem;
+        text-align: center;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -133,14 +147,13 @@ if selected_hd: df_display = df_display[df_display['Hợp Đồng - PLHĐ'].isin
 if selected_ql: df_display = df_display[df_display['Cán Bộ Quản Lý'].isin(selected_ql)]
 if selected_cb: df_display = df_display[df_display[cb_col].isin(selected_cb)]
 
-# Tính Toán Biến Số KPI dựa trên bộ lọc Sidebar (Tổng thể)
+# Tính Toán Biến Số KPI
 p_total = len(df_display)
 p_projects = df_display.get('Dự Án', pd.Series()).nunique()
 p_done = len(df_display[df_display.get('Trạng Thái', '') == 'Đã hoàn thành'])
 p_paused = len(df_display[df_display.get('Trạng Thái', '') == 'Tạm dừng'])
 p_prog = df_display['Tiến Độ (%)'].mean() if ('Tiến Độ (%)' in df_display.columns and p_total > 0) else 0
 
-# Hàm Render HTML KPI
 def render_kpi(title, value, icon, border_color="#198754"):
     return f"""
     <div class="kpi-card" style="border-left-color: {border_color};">
@@ -152,7 +165,6 @@ def render_kpi(title, value, icon, border_color="#198754"):
     </div>
     """
 
-# Hiển Thị Hàng KPI
 c1, c2, c3, c4 = st.columns(4)
 with c1: st.markdown(render_kpi("Số lượng dự án", p_projects, "🏢"), unsafe_allow_html=True)
 with c2: st.markdown(render_kpi("Tổng số công việc", p_total, "📋"), unsafe_allow_html=True)
@@ -162,14 +174,31 @@ with c4: st.markdown(render_kpi("Tiến độ trung bình", f"{p_prog:.1f}%", "�
 st.markdown("<br>", unsafe_allow_html=True)
 
 
-# ================= 5. BỘ LỌC TRẠNG THÁI (DẠNG ICON BO CONG ĐẶT DƯỚI KPI) =================
-status_options = ["Tất cả", "Chưa bắt đầu", "Đang triển khai", "Đã hoàn thành", "Tạm dừng"]
-# Label được thiết lập rỗng để chỉ hiển thị các nút bo cong ở giữa
-selected_status = st.radio("", options=status_options, horizontal=True, label_visibility="collapsed")
+# ================= 5. BỘ LỌC TRẠNG THÁI (NÚT BẤM DÀN ĐỀU CÓ ICON) =================
+# Thêm icon trực tiếp vào text để tạo cảm giác bấm vào nút icon
+status_options = [
+    "🌟 Tất cả", 
+    "⏳ Chưa bắt đầu", 
+    "🔄 Đang triển khai", 
+    "✅ Đã hoàn thành", 
+    "⏸️ Tạm dừng"
+]
 
-# Lọc dữ liệu cho bảng hiển thị theo Trạng Thái đã chọn
-if selected_status != "Tất cả": 
-    df_display = df_display[df_display.get('Trạng Thái', '') == selected_status]
+# Ánh xạ ngược lại để máy tính hiểu đúng tên trạng thái thật trong bảng Google Sheets
+status_map = {
+    "🌟 Tất cả": "Tất cả",
+    "⏳ Chưa bắt đầu": "Chưa bắt đầu",
+    "🔄 Đang triển khai": "Đang triển khai",
+    "✅ Đã hoàn thành": "Đã hoàn thành",
+    "⏸️ Tạm dừng": "Tạm dừng"
+}
+
+selected_ui_status = st.radio("", options=status_options, horizontal=True, label_visibility="collapsed")
+actual_status = status_map[selected_ui_status]
+
+# Lọc dữ liệu
+if actual_status != "Tất cả": 
+    df_display = df_display[df_display.get('Trạng Thái', '') == actual_status]
 
 
 # ================= 6. KHU VỰC BẢNG THEO DÕI =================
@@ -184,7 +213,6 @@ if 'Trạng Thái' in df_display.columns and 'Tiến Độ (%)' in df_display.co
     df_display = df_display.sort_values(by=sort_cols, ascending=[True] * len(sort_cols))
     df_display = df_display.drop(columns=['Mức Ưu Tiên'])
 
-# Bôi nền tự động cho các dòng dựa theo Trạng thái
 def color_rows(row):
     status = row.get('Trạng Thái', '')
     if status == 'Đã hoàn thành': return ['background-color: #e8f5e9; color: #000;'] * len(row)
@@ -194,5 +222,4 @@ def color_rows(row):
 
 styled_df = df_display.style.apply(color_rows, axis=1)
 
-# Render bảng với độ cao lớn để fill màn hình
 st.dataframe(styled_df, use_container_width=True, hide_index=True, height=650)
