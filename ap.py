@@ -4,7 +4,7 @@ import pandas as pd
 # ================= 1. THIẾT LẬP GIAO DIỆN & CSS TÙY CHỈNH =================
 st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", layout="wide", initial_sidebar_state="expanded")
 
-# CSS Tùy chỉnh để tạo giao diện Card KPI và Sidebar
+# CSS Tùy chỉnh để tạo giao diện Card KPI, Sidebar và Nút trạng thái bo cong
 st.markdown("""
 <style>
     /* Nền trang web */
@@ -14,10 +14,10 @@ st.markdown("""
     .kpi-card {
         background-color: #ffffff;
         padding: 15px 20px;
-        border-radius: 8px;
+        border-radius: 12px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         border: 1px solid #e0e0e0;
-        border-left: 5px solid #198754; /* Tone Xanh Lục */
+        border-left: 5px solid #198754; 
         display: flex;
         align-items: center;
         margin-bottom: 15px;
@@ -45,6 +45,37 @@ st.markdown("""
         font-weight: 800;
         color: #2c3e50;
     }
+    
+    /* TÙY CHỈNH BỘ LỌC TRẠNG THÁI THÀNH DẠNG ICON BO CONG (PILL BADGES) */
+    div.row-widget.stRadio > div[role="radiogroup"] {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        background-color: #ffffff;
+        padding: 15px;
+        border-radius: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border: 1px solid #e0e0e0;
+        margin-bottom: 20px;
+    }
+    div.row-widget.stRadio > div[role="radiogroup"] > label {
+        background-color: #f8f9fa;
+        padding: 8px 25px !important;
+        border-radius: 30px !important; /* Bo góc tròn 2 đầu */
+        border: 1px solid #dee2e6;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    div.row-widget.stRadio > div[role="radiogroup"] > label:hover {
+        background-color: #e8f5e9;
+        border-color: #198754;
+    }
+    /* Đổi màu text cho nhãn */
+    div.row-widget.stRadio > div[role="radiogroup"] > label div[data-testid="stMarkdownContainer"] p {
+        font-weight: 600 !important;
+        color: #495057;
+        margin: 0;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -71,7 +102,7 @@ df = load_data()
 
 # ================= 3. CỘT BÊN TRÁI (SIDEBAR LỌC DỮ LIỆU) =================
 with st.sidebar:
-    st.image("https://cdn-icons-png.flaticon.com/512/10313/10313098.png", width=80) # Icon Logo minh họa
+    st.image("https://cdn-icons-png.flaticon.com/512/10313/10313098.png", width=80) 
     st.markdown("### BỘ LỌC DỮ LIỆU")
     
     unique_projects = [p for p in df.get('Dự Án', pd.Series()).unique() if p != '']
@@ -92,25 +123,17 @@ with st.sidebar:
     selected_cb = st.multiselect("👷 CÁN BỘ TRIỂN KHAI", options=cb_opts, placeholder="Chọn Tất cả")
     
 
-# ================= 4. KHU VỰC TRUNG TÂM (MAIN BẢNG ĐIỀU KHIỂN) =================
+# ================= 4. KHU VỰC TRUNG TÂM (TIÊU ĐỀ & KPI) =================
 st.markdown("<h2 style='text-align: center; color: #198754; font-weight: 800; margin-bottom: 30px;'>BÁO CÁO PHÒNG KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</h2>", unsafe_allow_html=True)
 
-# Lọc Dữ Liệu Thực Tế
+# Lọc Dữ Liệu Thực Tế (Từ Sidebar)
 df_display = df.copy()
 if selected_projects: df_display = df_display[df_display['Dự Án'].isin(selected_projects)]
 if selected_hd: df_display = df_display[df_display['Hợp Đồng - PLHĐ'].isin(selected_hd)]
 if selected_ql: df_display = df_display[df_display['Cán Bộ Quản Lý'].isin(selected_ql)]
 if selected_cb: df_display = df_display[df_display[cb_col].isin(selected_cb)]
 
-# Lọc Trạng Thái (Thanh Ngang)
-status_options = ["Tất cả", "Chưa bắt đầu", "Đang triển khai", "Đã hoàn thành", "Tạm dừng"]
-st.markdown("<div style='background-color: white; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 20px;'>", unsafe_allow_html=True)
-selected_status = st.radio("TÌNH TRẠNG THI CÔNG / TRIỂN KHAI", options=status_options, horizontal=True)
-st.markdown("</div>", unsafe_allow_html=True)
-
-if selected_status != "Tất cả": df_display = df_display[df_display.get('Trạng Thái', '') == selected_status]
-
-# Tính Toán Biến Số KPI
+# Tính Toán Biến Số KPI dựa trên bộ lọc Sidebar (Tổng thể)
 p_total = len(df_display)
 p_projects = df_display.get('Dự Án', pd.Series()).nunique()
 p_done = len(df_display[df_display.get('Trạng Thái', '') == 'Đã hoàn thành'])
@@ -129,7 +152,7 @@ def render_kpi(title, value, icon, border_color="#198754"):
     </div>
     """
 
-# Hiển Thị 2 Hàng KPI (4 thẻ mỗi hàng)
+# Hiển Thị Hàng KPI
 c1, c2, c3, c4 = st.columns(4)
 with c1: st.markdown(render_kpi("Số lượng dự án", p_projects, "🏢"), unsafe_allow_html=True)
 with c2: st.markdown(render_kpi("Tổng số công việc", p_total, "📋"), unsafe_allow_html=True)
@@ -139,8 +162,18 @@ with c4: st.markdown(render_kpi("Tiến độ trung bình", f"{p_prog:.1f}%", "�
 st.markdown("<br>", unsafe_allow_html=True)
 
 
-# ================= 5. KHU VỰC BẢNG THEO DÕI =================
-st.markdown("<h4 style='text-align: center; color: #198754; margin-bottom: 10px;'>BẢNG TỔNG HỢP TIẾN ĐỘ THI CÔNG</h4>", unsafe_allow_html=True)
+# ================= 5. BỘ LỌC TRẠNG THÁI (DẠNG ICON BO CONG ĐẶT DƯỚI KPI) =================
+status_options = ["Tất cả", "Chưa bắt đầu", "Đang triển khai", "Đã hoàn thành", "Tạm dừng"]
+# Label được thiết lập rỗng để chỉ hiển thị các nút bo cong ở giữa
+selected_status = st.radio("", options=status_options, horizontal=True, label_visibility="collapsed")
+
+# Lọc dữ liệu cho bảng hiển thị theo Trạng Thái đã chọn
+if selected_status != "Tất cả": 
+    df_display = df_display[df_display.get('Trạng Thái', '') == selected_status]
+
+
+# ================= 6. KHU VỰC BẢNG THEO DÕI =================
+st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 10px; margin-bottom: 15px;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
 
 priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
 
@@ -151,7 +184,7 @@ if 'Trạng Thái' in df_display.columns and 'Tiến Độ (%)' in df_display.co
     df_display = df_display.sort_values(by=sort_cols, ascending=[True] * len(sort_cols))
     df_display = df_display.drop(columns=['Mức Ưu Tiên'])
 
-# Bôi nền tự động
+# Bôi nền tự động cho các dòng dựa theo Trạng thái
 def color_rows(row):
     status = row.get('Trạng Thái', '')
     if status == 'Đã hoàn thành': return ['background-color: #e8f5e9; color: #000;'] * len(row)
