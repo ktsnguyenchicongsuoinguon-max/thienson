@@ -4,13 +4,12 @@ import pandas as pd
 # ================= 1. THIẾT LẬP GIAO DIỆN & CSS TÙY CHỈNH =================
 st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", layout="wide", initial_sidebar_state="expanded")
 
-# CSS Tùy chỉnh
+# CSS ÉP DÀN ĐỀU VÀ TẠO Ô TRẠNG THÁI
 st.markdown("""
 <style>
-    /* Nền trang web */
     .stApp { background-color: #f4f7f6; }
     
-    /* Tùy chỉnh thẻ KPI */
+    /* Thẻ KPI */
     .kpi-card {
         background-color: #ffffff;
         padding: 15px 20px;
@@ -46,43 +45,45 @@ st.markdown("""
         color: #2c3e50;
     }
     
-    /* TÙY CHỈNH BỘ LỌC TRẠNG THÁI THÀNH DẠNG NÚT BẤM (BUTTON) DÀN ĐỀU */
+    /* ÉP THANH TRẠNG THÁI DÀN ĐỀU 100% CHIỀU RỘNG */
+    div[data-testid="stRadio"] {
+        width: 100% !important;
+    }
     div.row-widget.stRadio > div[role="radiogroup"] {
         display: flex;
         flex-direction: row;
-        width: 100%;
+        width: 100% !important;
         justify-content: space-between;
         gap: 15px;
         background-color: transparent;
         padding: 0px;
-        margin-top: 10px;
+        margin-top: 15px;
         margin-bottom: 25px;
     }
+    /* Biến các lựa chọn thành các Ô vuông/chữ nhật bằng nhau */
     div.row-widget.stRadio > div[role="radiogroup"] > label {
-        flex: 1; /* Cực kỳ quan trọng: Giúp các ô tự động dàn đều bằng nhau */
+        flex: 1 1 0px !important; /* Dàn đều tuyệt đối */
         background-color: #ffffff;
-        padding: 15px 10px !important;
+        padding: 15px 5px !important;
         border-radius: 12px !important; 
-        border: 1px solid #e0e0e0;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+        border: 1px solid #ced4da;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.04);
         cursor: pointer;
         transition: all 0.2s ease-in-out;
         display: flex;
         justify-content: center;
         align-items: center;
     }
-    /* Hiệu ứng di chuột (Hover) */
     div.row-widget.stRadio > div[role="radiogroup"] > label:hover {
         background-color: #e8f5e9;
         border-color: #198754;
         box-shadow: 0 8px 15px rgba(25, 135, 84, 0.15);
-        transform: translateY(-4px); /* Nảy lên như icon */
+        transform: translateY(-3px);
     }
-    /* Ẩn dấu chấm tròn radio mặc định của hệ thống */
+    /* Ẩn cục tròn Radio */
     div.row-widget.stRadio > div[role="radiogroup"] > label > div:first-child {
         display: none;
     }
-    /* Định dạng chữ và icon bên trong nút */
     div.row-widget.stRadio > div[role="radiogroup"] > label div[data-testid="stMarkdownContainer"] p {
         font-weight: 700 !important;
         color: #495057;
@@ -94,7 +95,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# ================= 2. ĐỌC VÀ XỬ LÝ DỮ LIỆU =================
+# ================= 2. ĐỌC DỮ LIỆU =================
 @st.cache_data(ttl=60)
 def load_data():
     sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
@@ -114,7 +115,7 @@ def load_data():
 df = load_data()
 
 
-# ================= 3. CỘT BÊN TRÁI (SIDEBAR LỌC DỮ LIỆU) =================
+# ================= 3. SIDEBAR BỘ LỌC =================
 with st.sidebar:
     st.image("https://cdn-icons-png.flaticon.com/512/10313/10313098.png", width=80) 
     st.markdown("### BỘ LỌC DỮ LIỆU")
@@ -135,91 +136,97 @@ with st.sidebar:
     cb_col = 'Cán Bộ Triển Khai - SĐT' if 'Cán Bộ Triển Khai - SĐT' in df_temp.columns else ('Người Triển Khai' if 'Người Triển Khai' in df_temp.columns else None)
     cb_opts = [x for x in df_temp[cb_col].unique() if x != ''] if cb_col else []
     selected_cb = st.multiselect("👷 CÁN BỘ TRIỂN KHAI", options=cb_opts, placeholder="Chọn Tất cả")
+
+
+# ================= 4. KHỞI TẠO CÁC CONTAINER ĐỂ SẮP XẾP BỐ CỤC =================
+header_container = st.container()
+kpi_container = st.container()
+status_container = st.container()
+table_container = st.container()
+
+
+# ================= 5. XỬ LÝ LỌC TRẠNG THÁI (Trong Status Container) =================
+with status_container:
+    status_options = ["🌟 Tất cả", "⏳ Chưa bắt đầu", "🔄 Đang triển khai", "✅ Đã hoàn thành", "⏸️ Tạm dừng"]
+    status_map = {
+        "🌟 Tất cả": "Tất cả", "⏳ Chưa bắt đầu": "Chưa bắt đầu", 
+        "🔄 Đang triển khai": "Đang triển khai", "✅ Đã hoàn thành": "Đã hoàn thành", "⏸️ Tạm dừng": "Tạm dừng"
+    }
     
+    selected_ui_status = st.radio("Bộ lọc Trạng Thái", options=status_options, horizontal=True, label_visibility="collapsed")
+    actual_status = status_map[selected_ui_status]
 
-# ================= 4. KHU VỰC TRUNG TÂM (TIÊU ĐỀ & KPI) =================
-st.markdown("<h2 style='text-align: center; color: #198754; font-weight: 800; margin-bottom: 30px;'>BÁO CÁO PHÒNG KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</h2>", unsafe_allow_html=True)
 
-# Lọc Dữ Liệu Thực Tế (Từ Sidebar)
+# ================= 6. TỔNG HỢP DỮ LIỆU CUỐI CÙNG (Tính toán Động) =================
 df_display = df.copy()
+
+# Lọc theo Sidebar
 if selected_projects: df_display = df_display[df_display['Dự Án'].isin(selected_projects)]
 if selected_hd: df_display = df_display[df_display['Hợp Đồng - PLHĐ'].isin(selected_hd)]
 if selected_ql: df_display = df_display[df_display['Cán Bộ Quản Lý'].isin(selected_ql)]
 if selected_cb: df_display = df_display[df_display[cb_col].isin(selected_cb)]
 
-# Tính Toán Biến Số KPI
-p_total = len(df_display)
-p_projects = df_display.get('Dự Án', pd.Series()).nunique()
-p_done = len(df_display[df_display.get('Trạng Thái', '') == 'Đã hoàn thành'])
-p_paused = len(df_display[df_display.get('Trạng Thái', '') == 'Tạm dừng'])
-p_prog = df_display['Tiến Độ (%)'].mean() if ('Tiến Độ (%)' in df_display.columns and p_total > 0) else 0
-
-def render_kpi(title, value, icon, border_color="#198754"):
-    return f"""
-    <div class="kpi-card" style="border-left-color: {border_color};">
-        <div class="kpi-icon">{icon}</div>
-        <div class="kpi-details">
-            <div class="kpi-title">{title}</div>
-            <div class="kpi-value">{value}</div>
-        </div>
-    </div>
-    """
-
-c1, c2, c3, c4 = st.columns(4)
-with c1: st.markdown(render_kpi("Số lượng dự án", p_projects, "🏢"), unsafe_allow_html=True)
-with c2: st.markdown(render_kpi("Tổng số công việc", p_total, "📋"), unsafe_allow_html=True)
-with c3: st.markdown(render_kpi("Công việc hoàn thành", p_done, "✅", "#0dcaf0"), unsafe_allow_html=True)
-with c4: st.markdown(render_kpi("Tiến độ trung bình", f"{p_prog:.1f}%", "⏱️", "#ffc107"), unsafe_allow_html=True)
-
-st.markdown("<br>", unsafe_allow_html=True)
-
-
-# ================= 5. BỘ LỌC TRẠNG THÁI (NÚT BẤM DÀN ĐỀU CÓ ICON) =================
-# Thêm icon trực tiếp vào text để tạo cảm giác bấm vào nút icon
-status_options = [
-    "🌟 Tất cả", 
-    "⏳ Chưa bắt đầu", 
-    "🔄 Đang triển khai", 
-    "✅ Đã hoàn thành", 
-    "⏸️ Tạm dừng"
-]
-
-# Ánh xạ ngược lại để máy tính hiểu đúng tên trạng thái thật trong bảng Google Sheets
-status_map = {
-    "🌟 Tất cả": "Tất cả",
-    "⏳ Chưa bắt đầu": "Chưa bắt đầu",
-    "🔄 Đang triển khai": "Đang triển khai",
-    "✅ Đã hoàn thành": "Đã hoàn thành",
-    "⏸️ Tạm dừng": "Tạm dừng"
-}
-
-selected_ui_status = st.radio("", options=status_options, horizontal=True, label_visibility="collapsed")
-actual_status = status_map[selected_ui_status]
-
-# Lọc dữ liệu
+# Lọc theo thanh Trạng Thái
 if actual_status != "Tất cả": 
     df_display = df_display[df_display.get('Trạng Thái', '') == actual_status]
 
 
-# ================= 6. KHU VỰC BẢNG THEO DÕI =================
-st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 10px; margin-bottom: 15px;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
+# ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI (Theo dữ liệu đã được lọc 100%) =================
+with header_container:
+    st.markdown("<h2 style='text-align: center; color: #198754; font-weight: 800; margin-bottom: 20px;'>BÁO CÁO PHÒNG KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</h2>", unsafe_allow_html=True)
 
-priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
+with kpi_container:
+    # Tính toán thông minh dựa trên Dữ liệu Hiện tại (df_display)
+    p_total = len(df_display)
+    p_projects = df_display.get('Dự Án', pd.Series()).nunique()
+    p_done = len(df_display[df_display.get('Trạng Thái', '') == 'Đã hoàn thành'])
+    p_paused = len(df_display[df_display.get('Trạng Thái', '') == 'Tạm dừng'])
+    p_prog = df_display['Tiến Độ (%)'].mean() if ('Tiến Độ (%)' in df_display.columns and p_total > 0) else 0
 
-if 'Trạng Thái' in df_display.columns and 'Tiến Độ (%)' in df_display.columns:
-    df_display['Mức Ưu Tiên'] = df_display['Trạng Thái'].map(priority_map).fillna(99)
-    sort_cols = ['Mức Ưu Tiên', 'Tiến Độ (%)']
-    if 'Hạng Mục' in df_display.columns: sort_cols = ['Hạng Mục'] + sort_cols
-    df_display = df_display.sort_values(by=sort_cols, ascending=[True] * len(sort_cols))
-    df_display = df_display.drop(columns=['Mức Ưu Tiên'])
+    def render_kpi(title, value, icon, border_color="#198754"):
+        return f"""
+        <div class="kpi-card" style="border-left-color: {border_color};">
+            <div class="kpi-icon">{icon}</div>
+            <div class="kpi-details">
+                <div class="kpi-title">{title}</div>
+                <div class="kpi-value">{value}</div>
+            </div>
+        </div>
+        """
 
-def color_rows(row):
-    status = row.get('Trạng Thái', '')
-    if status == 'Đã hoàn thành': return ['background-color: #e8f5e9; color: #000;'] * len(row)
-    if status == 'Tạm dừng': return ['background-color: #ffebee; color: #000;'] * len(row)
-    if status == 'Chưa bắt đầu': return ['background-color: #f5f5f5; color: #000;'] * len(row)
-    return ['background-color: #ffffff; color: #000;'] * len(row)
+    c1, c2, c3, c4 = st.columns(4)
+    with c1: st.markdown(render_kpi("Dự án hiện diện", p_projects, "🏢"), unsafe_allow_html=True)
+    with c2: st.markdown(render_kpi("Tổng đầu việc", p_total, "📋"), unsafe_allow_html=True)
+    
+    # Đổi chữ linh hoạt cho logic: Nếu đang chọn trạng thái "Vướng mắc", ô thứ 3 sẽ cảnh báo vướng mắc thay vì Đã xong
+    if actual_status == "Tạm dừng":
+        with c3: st.markdown(render_kpi("Đang bị vướng mắc", p_paused, "⚠️", "#dc3545"), unsafe_allow_html=True)
+    else:
+        with c3: st.markdown(render_kpi("Công việc đã xong", p_done, "✅", "#0dcaf0"), unsafe_allow_html=True)
+        
+    with c4: st.markdown(render_kpi("Tiến độ trung bình", f"{p_prog:.1f}%", "⏱️", "#ffc107"), unsafe_allow_html=True)
 
-styled_df = df_display.style.apply(color_rows, axis=1)
 
-st.dataframe(styled_df, use_container_width=True, hide_index=True, height=650)
+# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU (Trong Table Container) =================
+with table_container:
+    st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 5px; margin-bottom: 15px;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
+
+    priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
+
+    if 'Trạng Thái' in df_display.columns and 'Tiến Độ (%)' in df_display.columns:
+        df_display['Mức Ưu Tiên'] = df_display['Trạng Thái'].map(priority_map).fillna(99)
+        sort_cols = ['Mức Ưu Tiên', 'Tiến Độ (%)']
+        if 'Hạng Mục' in df_display.columns: sort_cols = ['Hạng Mục'] + sort_cols
+        df_display = df_display.sort_values(by=sort_cols, ascending=[True] * len(sort_cols))
+        df_display = df_display.drop(columns=['Mức Ưu Tiên'])
+
+    def color_rows(row):
+        status = row.get('Trạng Thái', '')
+        if status == 'Đã hoàn thành': return ['background-color: #e8f5e9; color: #000;'] * len(row)
+        if status == 'Tạm dừng': return ['background-color: #ffebee; color: #000;'] * len(row)
+        if status == 'Chưa bắt đầu': return ['background-color: #f5f5f5; color: #000;'] * len(row)
+        return ['background-color: #ffffff; color: #000;'] * len(row)
+
+    styled_df = df_display.style.apply(color_rows, axis=1)
+
+    st.dataframe(styled_df, use_container_width=True, hide_index=True, height=600)
