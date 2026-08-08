@@ -13,27 +13,27 @@ def load_data():
     sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
     df = pd.read_csv(sheet_url)
     
-    # Chuẩn hóa tên cột
+    # Đổi tên cột theo yêu cầu: Đầu Việc -> Hạng Mục
+    if 'Đầu Việc' in df.columns:
+        df.rename(columns={'Đầu Việc': 'Hạng Mục'}, inplace=True)
     if 'Đầu Việc Shopdrawing' in df.columns:
-        df.rename(columns={'Đầu Việc Shopdrawing': 'Đầu Việc'}, inplace=True)
-    if 'Hạng Mục' in df.columns:
-        df.rename(columns={'Hạng Mục': 'Đầu Việc'}, inplace=True)
+        df.rename(columns={'Đầu Việc Shopdrawing': 'Hạng Mục'}, inplace=True)
     if 'Ghi chú' in df.columns:
         df.rename(columns={'Ghi chú': 'Vướng Mắc'}, inplace=True)
         
-    # Tự động điền tên dự án cho các dòng bị trống bên dưới (ffill)
-    if 'Dự Án' in df.columns:
-        df['Dự Án'] = df['Dự Án'].replace('', pd.NA).ffill()
-    if 'Mã Dự Án' in df.columns:
-        df['Mã Dự Án'] = df['Mã Dự Án'].replace('', pd.NA).ffill()
-        
+    # TỰ ĐỘNG ĐIỀN THÔNG TIN BỊ TRỐNG DO GỘP Ô
+    cols_to_fill = ['Mã Dự Án', 'Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục']
+    for col in cols_to_fill:
+        if col in df.columns:
+            df[col] = df[col].replace('', pd.NA).ffill()
+            
     # Xử lý toàn bộ các ô trống (NaN/None) thành khoảng trắng
     df = df.fillna('') 
     return df
 
 df = load_data()
 
-# 3. Tạo bảng màu cố định cho từng Dự án (Đồng bộ Biểu đồ & Bảng)
+# 3. Tạo bảng màu cố định cho từng Dự án 
 unique_projects = [p for p in df['Dự Án'].unique() if p != '']
 color_palette = px.colors.qualitative.Pastel 
 project_colors = {proj: color_palette[i % len(color_palette)] for i, proj in enumerate(unique_projects)}
@@ -46,8 +46,8 @@ avg_progress = df['Tiến Độ (%)'].mean() if 'Tiến Độ (%)' in df.columns
 
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("TỔNG DỰ ÁN", f"{total_projects}")
-col2.metric("TỔNG CÁC HẠNG MỤC", f"{total_items}")
-col3.metric("SỐ HẠNG MỤC ĐÃ HOÀN THÀNH", f"{done_tasks}") 
+col2.metric("TỔNG CÔNG VIỆC", f"{total_items}")
+col3.metric("SỐ CÔNG VIỆC ĐÃ XONG", f"{done_tasks}") 
 col4.metric("TIẾN ĐỘ TRUNG BÌNH", f"{avg_progress:.1f}%")
 
 st.write("---")
@@ -76,7 +76,6 @@ with col_chart2:
     st.markdown("### Tiến Độ Hoàn Thành Theo Dự Án (%)")
     if 'Dự Án' in df.columns and 'Tiến Độ (%)' in df.columns:
         proj_prog = df.groupby('Dự Án')['Tiến Độ (%)'].mean().reset_index().sort_values(by='Tiến Độ (%)')
-        
         dynamic_height = max(400, len(unique_projects) * 40)
         
         fig_bar = px.bar(proj_prog, x='Tiến Độ (%)', y='Dự Án', orientation='h', 
@@ -86,17 +85,28 @@ with col_chart2:
 
 st.write("---")
 
-# 6. Bảng Dữ Liệu Tổng Hợp Đầy Đủ (Sắp xếp theo yêu cầu và tô màu)
+# 6. Bảng Dữ Liệu Tích Hợp Bộ Lọc 2 Lớp (Dự Án -> Hạng Mục)
 st.markdown("<h3 style='color: #4285F4;'>BẢNG THEO DÕI TỔNG HỢP CÔNG VIỆC</h3>", unsafe_allow_html=True)
 
-# Bộ lọc dự án
-selected_projects = st.multiselect("Lọc nhanh theo Dự Án (Để trống nếu muốn xem tất cả):", options=unique_projects)
-
 df_display = df.copy()
-if selected_projects:
-    df_display = df_display[df_display['Dự Án'].isin(selected_projects)]
 
-# Định nghĩa mức độ ưu tiên theo đúng thứ tự: Chưa bắt đầu -> Đang triển khai -> Đã hoàn thành -> Tạm dừng
+# Hàng bộ lọc
+filter_col1, filter_col2 = st.columns(2)
+
+with filter_col1:
+    selected_projects = st.multiselect("1. Lọc theo Dự Án:", options=unique_projects)
+    if selected_projects:
+        df_display = df_display[df_display['Dự Án'].isin(selected_projects)]
+
+with filter_col2:
+    if 'Hạng Mục' in df_display.columns:
+        # Lấy danh sách hạng mục của các dự án đang được chọn
+        unique_categories = [c for c in df_display['Hạng Mục'].unique() if c != '']
+        selected_categories = st.multiselect("2. Lọc chi tiết theo Hạng Mục:", options=unique_categories)
+        if selected_categories:
+            df_display = df_display[df_display['Hạng Mục'].isin(selected_categories)]
+
+# Định nghĩa mức độ ưu tiên
 priority_map = {
     'Chưa bắt đầu': 1,
     'Đang triển khai': 2,
@@ -107,13 +117,17 @@ priority_map = {
 if 'Trạng Thái' in df_display.columns and 'Tiến Độ (%)' in df_display.columns:
     df_display['Mức Ưu Tiên'] = df_display['Trạng Thái'].map(priority_map)
     
-    # Sắp xếp 2 cấp: Theo 'Mức Ưu Tiên' và 'Tiến Độ (%)'
-    df_display = df_display.sort_values(by=['Mức Ưu Tiên', 'Tiến Độ (%)'], ascending=[True, True])
+    # Sắp xếp 3 cấp: Gom nhóm theo Hạng mục -> Mức Ưu Tiên -> Tiến Độ (%)
+    sort_columns = ['Mức Ưu Tiên', 'Tiến Độ (%)']
+    if 'Hạng Mục' in df_display.columns:
+        sort_columns = ['Hạng Mục'] + sort_columns
+        
+    df_display = df_display.sort_values(by=sort_columns, ascending=[True] * len(sort_columns))
     df_display = df_display.drop(columns=['Mức Ưu Tiên'])
 
 # Hàm tô màu dòng theo màu của dự án
 def color_rows(row):
-    proj = row['Dự Án']
+    proj = row.get('Dự Án', '')
     bg_color = project_colors.get(proj, '#ffffff')
     return [f'background-color: {bg_color}; color: #000000;'] * len(row)
 
