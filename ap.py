@@ -4,7 +4,7 @@ import pandas as pd
 # ================= 1. THIẾT LẬP GIAO DIỆN & CSS TÙY CHỈNH =================
 st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", layout="wide", initial_sidebar_state="expanded")
 
-# CSS Tùy chỉnh để tạo giao diện Card KPI và Nút bấm Sidebar giống ảnh mẫu
+# CSS Tùy chỉnh để tạo giao diện Card KPI và Sidebar
 st.markdown("""
 <style>
     /* Nền trang web */
@@ -45,25 +45,6 @@ st.markdown("""
         font-weight: 800;
         color: #2c3e50;
     }
-    
-    /* Nút bấm giả lập Sidebar */
-    .sidebar-btn {
-        display: block;
-        width: 100%;
-        padding: 12px;
-        margin-bottom: 10px;
-        background-color: #198754;
-        color: white !important;
-        text-align: center;
-        border-radius: 6px;
-        font-weight: bold;
-        text-decoration: none;
-        transition: 0.3s;
-        border: none;
-    }
-    .sidebar-btn:hover { background-color: #146c43; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-    .sidebar-btn.alert { background-color: #dc3545; }
-    .sidebar-btn.alert:hover { background-color: #b02a37; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -110,13 +91,6 @@ with st.sidebar:
     cb_opts = [x for x in df_temp[cb_col].unique() if x != ''] if cb_col else []
     selected_cb = st.multiselect("👷 CÁN BỘ TRIỂN KHAI", options=cb_opts, placeholder="Chọn Tất cả")
     
-    # Các nút điều hướng (Giả lập UI như ảnh mẫu)
-    st.markdown("<br><br>", unsafe_allow_html=True)
-    st.markdown("<a href='#' class='sidebar-btn'>📁 QUẢN LÝ HỢP ĐỒNG</a>", unsafe_allow_html=True)
-    st.markdown("<a href='#' class='sidebar-btn'>✅ THANH QUYẾT TOÁN</a>", unsafe_allow_html=True)
-    st.markdown("<a href='#' class='sidebar-btn'>🛡️ BẢO HÀNH</a>", unsafe_allow_html=True)
-    st.markdown("<a href='#' class='sidebar-btn alert'>⚠️ VƯỚNG MẮC</a>", unsafe_allow_html=True)
-
 
 # ================= 4. KHU VỰC TRUNG TÂM (MAIN BẢNG ĐIỀU KHIỂN) =================
 st.markdown("<h2 style='text-align: center; color: #198754; font-weight: 800; margin-bottom: 30px;'>BÁO CÁO PHÒNG KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</h2>", unsafe_allow_html=True)
