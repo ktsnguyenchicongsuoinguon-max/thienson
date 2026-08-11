@@ -4,19 +4,42 @@ import pandas as pd
 # ================= 1. THIẾT LẬP GIAO DIỆN & CSS TÙY CHỈNH =================
 st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", page_icon="logothienson.png", layout="wide", initial_sidebar_state="expanded")
 
-# CSS ÉP DÀN ĐỀU VÀ TẠO Ô TRẠNG THÁI + 6 THẺ KPI
+# CSS CAN THIỆP SÂU VÀO GIAO DIỆN STREAMLIT
 st.markdown("""
 <style>
+    /* Nền trang web */
     .stApp { background-color: #f4f7f6; }
     
-    /* Thẻ KPI */
+    /* 1. THU HẸP THANH HEADER CHỨA NÚT SHARE VÀ ĐẨY NỘI DUNG LÊN TRÊN */
+    .block-container { 
+        padding-top: 2rem !important; 
+        padding-bottom: 2rem !important;
+    }
+    header[data-testid="stHeader"] { 
+        height: 2.5rem !important; 
+    }
+    
+    /* 2. ĐẨY LOGO TRONG SIDEBAR LÊN CAO NHẤT CÓ THỂ */
+    section[data-testid="stSidebar"] .block-container {
+        padding-top: 1.5rem !important;
+    }
+
+    /* 3. LÀM ĐẬM HEADER CỦA BẢNG TỔNG HỢP */
+    div[data-testid="stDataFrame"] th {
+        background-color: #e2e8f0 !important;
+        color: #0f172a !important;
+        font-weight: 800 !important;
+        font-size: 14px !important;
+    }
+    
+    /* Tùy chỉnh thẻ KPI (Đổi màu viền mặc định sang Đỏ) */
     .kpi-card {
         background-color: #ffffff;
         padding: 12px 10px;
         border-radius: 10px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         border: 1px solid #e0e0e0;
-        border-left: 5px solid #198754; 
+        border-left: 5px solid #dc3545; /* Chuyển sang viền Đỏ */
         display: flex;
         align-items: center;
         margin-bottom: 15px;
@@ -25,7 +48,7 @@ st.markdown("""
     .kpi-icon {
         font-size: 1.8rem;
         margin-right: 10px;
-        background-color: #e8f5e9;
+        background-color: #f8d7da; /* Nền icon hơi hồng nhạt cho hợp tone đỏ */
         padding: 8px;
         border-radius: 50%;
         display: flex;
@@ -80,9 +103,9 @@ st.markdown("""
         align-items: center;
     }
     div.row-widget.stRadio > div[role="radiogroup"] > label:hover {
-        background-color: #e8f5e9;
-        border-color: #198754;
-        box-shadow: 0 8px 15px rgba(25, 135, 84, 0.15);
+        background-color: #fdf2f2;
+        border-color: #dc3545;
+        box-shadow: 0 8px 15px rgba(220, 53, 69, 0.15);
         transform: translateY(-3px);
     }
     div.row-widget.stRadio > div[role="radiogroup"] > label > div:first-child {
@@ -121,13 +144,13 @@ df = load_data()
 
 # ================= 3. SIDEBAR BỘ LỌC =================
 with st.sidebar:
-    # Dùng 3 cột để căn giữa ảnh Logo
+    # Logo vẫn giữ ở giữa Sidebar nhưng đã được CSS đẩy vút lên trên
     col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
     with col_logo2:
         st.image("logothienson.png", use_container_width=True) 
         
-    # Căn giữa cả tiêu đề bộ lọc
-    st.markdown("<h3 style='text-align: center; margin-top: -10px;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
+    # Chữ BỘ LỌC DỮ LIỆU được căn lề trái để thẳng hàng với các Dropdown
+    st.markdown("<h3 style='text-align: left; margin-top: 10px; margin-bottom: 15px; color: #1e293b;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
     
     unique_projects = [p for p in df.get('Dự Án', pd.Series()).unique() if p != '']
     selected_projects = st.multiselect("🏢 DỰ ÁN", options=unique_projects, placeholder="Chọn Tất cả")
@@ -185,7 +208,6 @@ with header_container:
     st.markdown("<h2 style='text-align: center; color: #198754; font-weight: 800; margin-bottom: 20px;'>BÁO CÁO PHÒNG KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</h2>", unsafe_allow_html=True)
 
 with kpi_container:
-    # Tính toán thông minh dựa trên Dữ liệu Hiện tại (df_display)
     p_total = len(df_display)
     p_projects = df_display.get('Dự Án', pd.Series()).nunique()
     p_done = len(df_display[df_display.get('Trạng Thái', '') == 'Đã hoàn thành'])
@@ -193,7 +215,8 @@ with kpi_container:
     p_paused = len(df_display[df_display.get('Trạng Thái', '') == 'Tạm dừng'])
     p_prog = df_display['Tiến Độ (%)'].mean() if ('Tiến Độ (%)' in df_display.columns and p_total > 0) else 0
 
-    def render_kpi(title, value, icon, border_color="#198754"):
+    # Hàm đã được set cứng màu đỏ (#dc3545) cho toàn bộ KPI
+    def render_kpi(title, value, icon, border_color="#dc3545"):
         return f"""
         <div class="kpi-card" style="border-left-color: {border_color};">
             <div class="kpi-icon">{icon}</div>
@@ -204,15 +227,14 @@ with kpi_container:
         </div>
         """
 
-    # 6 thẻ KPI
     c1, c2, c3, c4, c5, c6 = st.columns(6)
     
     with c1: st.markdown(render_kpi("Dự án", p_projects, "🏢"), unsafe_allow_html=True)
     with c2: st.markdown(render_kpi("Tổng việc", p_total, "📋"), unsafe_allow_html=True)
-    with c3: st.markdown(render_kpi("Đã xong", p_done, "✅", "#0dcaf0"), unsafe_allow_html=True)
-    with c4: st.markdown(render_kpi("Đang làm", p_inprogress, "🔄", "#0d6efd"), unsafe_allow_html=True)
-    with c5: st.markdown(render_kpi("Vướng mắc", p_paused, "⚠️", "#dc3545"), unsafe_allow_html=True)
-    with c6: st.markdown(render_kpi("Tiến độ TB", f"{p_prog:.1f}%", "⏱️", "#ffc107"), unsafe_allow_html=True)
+    with c3: st.markdown(render_kpi("Đã xong", p_done, "✅"), unsafe_allow_html=True)
+    with c4: st.markdown(render_kpi("Đang làm", p_inprogress, "🔄"), unsafe_allow_html=True)
+    with c5: st.markdown(render_kpi("Vướng mắc", p_paused, "⚠️"), unsafe_allow_html=True)
+    with c6: st.markdown(render_kpi("Tiến độ TB", f"{p_prog:.1f}%", "⏱️"), unsafe_allow_html=True)
 
 
 # ================= 8. HIỂN THỊ BẢNG DỮ LIỆU (Trong Table Container) =================
@@ -228,6 +250,7 @@ with table_container:
         df_display = df_display.sort_values(by=sort_cols, ascending=[True] * len(sort_cols))
         df_display = df_display.drop(columns=['Mức Ưu Tiên'])
 
+    # Bôi nền các dòng
     def color_rows(row):
         status = row.get('Trạng Thái', '')
         if status == 'Đã hoàn thành': return ['background-color: #e8f5e9; color: #000;'] * len(row)
@@ -235,6 +258,10 @@ with table_container:
         if status == 'Chưa bắt đầu': return ['background-color: #f5f5f5; color: #000;'] * len(row)
         return ['background-color: #ffffff; color: #000;'] * len(row)
 
-    styled_df = df_display.style.apply(color_rows, axis=1)
+    # Sử dụng Pandas Styler để bôi màu nền dòng và setup thêm kiểu dáng cho Header bảng
+    styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
+        'selector': 'th',
+        'props': [('background-color', '#e2e8f0'), ('color', '#0f172a'), ('font-weight', 'bold')]
+    }])
 
     st.dataframe(styled_df, use_container_width=True, hide_index=True, height=600)
