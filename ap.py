@@ -2,14 +2,15 @@ import streamlit as st
 import pandas as pd
 
 # ================= 1. THIẾT LẬP GIAO DIỆN & CSS TÙY CHỈNH =================
-st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", layout="wide", initial_sidebar_state="expanded")
+# Đã cập nhật page_icon thành logothienson.png
+st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", page_icon="logothienson.png", layout="wide", initial_sidebar_state="expanded")
 
 # CSS ÉP DÀN ĐỀU VÀ TẠO Ô TRẠNG THÁI + 6 THẺ KPI
 st.markdown("""
 <style>
     .stApp { background-color: #f4f7f6; }
     
-    /* Thẻ KPI (Tinh chỉnh nhỏ lại để vừa 6 ô trên 1 hàng ngang) */
+    /* Thẻ KPI */
     .kpi-card {
         background-color: #ffffff;
         padding: 12px 10px;
@@ -121,7 +122,8 @@ df = load_data()
 
 # ================= 3. SIDEBAR BỘ LỌC =================
 with st.sidebar:
-    st.image("https://cdn-icons-png.flaticon.com/512/10313/10313098.png", width=80) 
+    # Đã cập nhật ảnh hiển thị thành logothienson.png
+    st.image("logothienson.png", width=120) 
     st.markdown("### BỘ LỌC DỮ LIỆU")
     
     unique_projects = [p for p in df.get('Dự Án', pd.Series()).unique() if p != '']
@@ -199,7 +201,7 @@ with kpi_container:
         </div>
         """
 
-    # Thay đổi thành 6 cột
+    # 6 thẻ KPI
     c1, c2, c3, c4, c5, c6 = st.columns(6)
     
     with c1: st.markdown(render_kpi("Dự án", p_projects, "🏢"), unsafe_allow_html=True)
