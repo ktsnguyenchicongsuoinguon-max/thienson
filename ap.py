@@ -4,43 +4,49 @@ import pandas as pd
 # ================= 1. THIẾT LẬP GIAO DIỆN & CSS TÙY CHỈNH =================
 st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", layout="wide", initial_sidebar_state="expanded")
 
-# CSS ÉP DÀN ĐỀU VÀ TẠO Ô TRẠNG THÁI
+# CSS ÉP DÀN ĐỀU VÀ TẠO Ô TRẠNG THÁI + 6 THẺ KPI
 st.markdown("""
 <style>
     .stApp { background-color: #f4f7f6; }
     
-    /* Thẻ KPI */
+    /* Thẻ KPI (Tinh chỉnh nhỏ lại để vừa 6 ô trên 1 hàng ngang) */
     .kpi-card {
         background-color: #ffffff;
-        padding: 15px 20px;
-        border-radius: 12px;
+        padding: 12px 10px;
+        border-radius: 10px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         border: 1px solid #e0e0e0;
         border-left: 5px solid #198754; 
         display: flex;
         align-items: center;
         margin-bottom: 15px;
+        min-height: 85px;
     }
     .kpi-icon {
-        font-size: 2.5rem;
-        margin-right: 15px;
+        font-size: 1.8rem;
+        margin-right: 10px;
         background-color: #e8f5e9;
-        padding: 10px;
+        padding: 8px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
+        min-width: 50px;
+        height: 50px;
     }
-    .kpi-details { flex-grow: 1; }
+    .kpi-details { flex-grow: 1; overflow: hidden; }
     .kpi-title {
         color: #6c757d;
-        font-size: 0.85rem;
+        font-size: 0.75rem;
         font-weight: 700;
         text-transform: uppercase;
-        margin-bottom: 5px;
+        margin-bottom: 3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .kpi-value {
-        font-size: 1.6rem;
+        font-size: 1.4rem;
         font-weight: 800;
         color: #2c3e50;
     }
@@ -60,9 +66,8 @@ st.markdown("""
         margin-top: 15px;
         margin-bottom: 25px;
     }
-    /* Biến các lựa chọn thành các Ô vuông/chữ nhật bằng nhau */
     div.row-widget.stRadio > div[role="radiogroup"] > label {
-        flex: 1 1 0px !important; /* Dàn đều tuyệt đối */
+        flex: 1 1 0px !important; 
         background-color: #ffffff;
         padding: 15px 5px !important;
         border-radius: 12px !important; 
@@ -80,7 +85,6 @@ st.markdown("""
         box-shadow: 0 8px 15px rgba(25, 135, 84, 0.15);
         transform: translateY(-3px);
     }
-    /* Ẩn cục tròn Radio */
     div.row-widget.stRadio > div[role="radiogroup"] > label > div:first-child {
         display: none;
     }
@@ -171,7 +175,7 @@ if actual_status != "Tất cả":
     df_display = df_display[df_display.get('Trạng Thái', '') == actual_status]
 
 
-# ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI (Theo dữ liệu đã được lọc 100%) =================
+# ================= 7. HIỂN THỊ TIÊU ĐỀ & 6 THẺ KPI ĐỘNG =================
 with header_container:
     st.markdown("<h2 style='text-align: center; color: #198754; font-weight: 800; margin-bottom: 20px;'>BÁO CÁO PHÒNG KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</h2>", unsafe_allow_html=True)
 
@@ -180,6 +184,7 @@ with kpi_container:
     p_total = len(df_display)
     p_projects = df_display.get('Dự Án', pd.Series()).nunique()
     p_done = len(df_display[df_display.get('Trạng Thái', '') == 'Đã hoàn thành'])
+    p_inprogress = len(df_display[df_display.get('Trạng Thái', '') == 'Đang triển khai'])
     p_paused = len(df_display[df_display.get('Trạng Thái', '') == 'Tạm dừng'])
     p_prog = df_display['Tiến Độ (%)'].mean() if ('Tiến Độ (%)' in df_display.columns and p_total > 0) else 0
 
@@ -194,17 +199,15 @@ with kpi_container:
         </div>
         """
 
-    c1, c2, c3, c4 = st.columns(4)
-    with c1: st.markdown(render_kpi("Dự án hiện diện", p_projects, "🏢"), unsafe_allow_html=True)
-    with c2: st.markdown(render_kpi("Tổng đầu việc", p_total, "📋"), unsafe_allow_html=True)
+    # Thay đổi thành 6 cột
+    c1, c2, c3, c4, c5, c6 = st.columns(6)
     
-    # Đổi chữ linh hoạt cho logic: Nếu đang chọn trạng thái "Vướng mắc", ô thứ 3 sẽ cảnh báo vướng mắc thay vì Đã xong
-    if actual_status == "Tạm dừng":
-        with c3: st.markdown(render_kpi("Đang bị vướng mắc", p_paused, "⚠️", "#dc3545"), unsafe_allow_html=True)
-    else:
-        with c3: st.markdown(render_kpi("Công việc đã xong", p_done, "✅", "#0dcaf0"), unsafe_allow_html=True)
-        
-    with c4: st.markdown(render_kpi("Tiến độ trung bình", f"{p_prog:.1f}%", "⏱️", "#ffc107"), unsafe_allow_html=True)
+    with c1: st.markdown(render_kpi("Dự án", p_projects, "🏢"), unsafe_allow_html=True)
+    with c2: st.markdown(render_kpi("Tổng việc", p_total, "📋"), unsafe_allow_html=True)
+    with c3: st.markdown(render_kpi("Đã xong", p_done, "✅", "#0dcaf0"), unsafe_allow_html=True)
+    with c4: st.markdown(render_kpi("Đang làm", p_inprogress, "🔄", "#0d6efd"), unsafe_allow_html=True)
+    with c5: st.markdown(render_kpi("Vướng mắc", p_paused, "⚠️", "#dc3545"), unsafe_allow_html=True)
+    with c6: st.markdown(render_kpi("Tiến độ TB", f"{p_prog:.1f}%", "⏱️", "#ffc107"), unsafe_allow_html=True)
 
 
 # ================= 8. HIỂN THỊ BẢNG DỮ LIỆU (Trong Table Container) =================
