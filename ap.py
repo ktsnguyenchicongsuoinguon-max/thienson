@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 
 # ================= 1. THIẾT LẬP GIAO DIỆN & CSS TÙY CHỈNH =================
-# Đã cập nhật page_icon thành logothienson.png
 st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", page_icon="logothienson.png", layout="wide", initial_sidebar_state="expanded")
 
 # CSS ÉP DÀN ĐỀU VÀ TẠO Ô TRẠNG THÁI + 6 THẺ KPI
@@ -122,9 +121,13 @@ df = load_data()
 
 # ================= 3. SIDEBAR BỘ LỌC =================
 with st.sidebar:
-    # Đã cập nhật ảnh hiển thị thành logothienson.png
-    st.image("logothienson.png", width=120) 
-    st.markdown("### BỘ LỌC DỮ LIỆU")
+    # Dùng 3 cột để căn giữa ảnh Logo
+    col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
+    with col_logo2:
+        st.image("logothienson.png", use_container_width=True) 
+        
+    # Căn giữa cả tiêu đề bộ lọc
+    st.markdown("<h3 style='text-align: center; margin-top: -10px;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
     
     unique_projects = [p for p in df.get('Dự Án', pd.Series()).unique() if p != '']
     selected_projects = st.multiselect("🏢 DỰ ÁN", options=unique_projects, placeholder="Chọn Tất cả")
