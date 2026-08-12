@@ -33,34 +33,35 @@ st.markdown("""
     
     /* ================= TÙY CHỈNH KHỐI KPI (NỔI BẬT & TO HƠN) ================= */
     .kpi-card {
+        width: 100%; /* ĐÃ THÊM: Sửa lỗi bóp méo thẻ KPI */
         background-color: #ffffff;
-        padding: 20px 15px; /* Tăng khoảng cách bên trong */
+        padding: 20px 15px; 
         border-radius: 12px;
-        box-shadow: 0 6px 12px rgba(0,0,0,0.08); /* Đổ bóng đậm hơn để nổi khối */
+        box-shadow: 0 6px 12px rgba(0,0,0,0.08); 
         border: 1px solid #e0e0e0;
-        border-left: 6px solid #C62828; /* Chuyển viền sang Đỏ Chuẩn Logo */
+        border-left: 6px solid #C62828; /* Đỏ Chuẩn Logo */
         display: flex;
         align-items: center;
         margin-bottom: 15px;
-        min-height: 115px; /* Tăng chiều cao của thẻ KPI */
+        min-height: 115px; 
     }
     .kpi-icon {
-        font-size: 2.2rem; /* Phóng to Icon */
+        font-size: 2.2rem; 
         margin-right: 15px;
-        background-color: #FFEBEE; /* Nền icon màu hồng nhạt tương phản với đỏ */
+        background-color: #FFEBEE; 
         padding: 10px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        min-width: 60px; /* Nút icon to hơn */
+        min-width: 60px; 
         height: 60px;
     }
     .kpi-details { flex-grow: 1; overflow: hidden; }
     .kpi-title {
         color: #6c757d;
-        font-size: 0.85rem; /* Tăng size chữ tiêu đề */
-        font-weight: 800; /* Làm chữ đậm hơn */
+        font-size: 0.85rem; 
+        font-weight: 800; 
         text-transform: uppercase;
         margin-bottom: 5px;
         white-space: nowrap;
@@ -68,7 +69,7 @@ st.markdown("""
         text-overflow: ellipsis;
     }
     .kpi-value {
-        font-size: 1.8rem; /* Phóng to hẳn con số KPI */
+        font-size: 1.8rem; 
         font-weight: 900;
         color: #1e293b;
     }
@@ -208,7 +209,6 @@ with kpi_container:
     p_paused = len(df_display[df_display.get('Trạng Thái', '') == 'Tạm dừng'])
     p_prog = df_display['Tiến Độ (%)'].mean() if ('Tiến Độ (%)' in df_display.columns and p_total > 0) else 0
 
-    # Viền đỏ đã được cấu hình cố định bên trong CSS, hàm render sẽ tuân theo CSS
     def render_kpi(title, value, icon):
         return f"""
         <div class="kpi-card">
@@ -232,7 +232,7 @@ with kpi_container:
 
 # ================= 8. HIỂN THỊ BẢNG DỮ LIỆU (Hạ thấp xuống) =================
 with table_container:
-    # Margin-top 50px để hạ thập phần Bảng Tổng hợp xuống phía dưới tạo không gian cho khối KPI tỏa sáng
+    # Margin-top 50px để hạ thấp phần Bảng Tổng hợp xuống phía dưới 
     st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 50px; margin-bottom: 20px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
 
     priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
