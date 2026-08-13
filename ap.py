@@ -26,6 +26,13 @@ st.markdown("""
         font-weight: 800 !important; font-size: 14px !important;
     }
     
+    /* ĐẨY NÚT TẢI EXCEL RA SÁT MÉP PHẢI TUYỆT ĐỐI */
+    div[data-testid="stDownloadButton"] {
+        display: flex;
+        justify-content: flex-end;
+        width: 100%;
+    }
+
     /* ================= TÙY CHỈNH KHỐI KPI ================= */
     .kpi-card {
         width: 100%; padding: 20px 15px; 
@@ -259,15 +266,15 @@ with kpi_container:
     with r2_c4: st.markdown(render_kpi("Vướng mắc", p_paused, "⚠️"), unsafe_allow_html=True)
 
 
-# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & NÚT TẢI EXCEL GÓC PHẢI =================
+# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & NÚT TẢI EXCEL SÁT MÉP PHẢI =================
 with table_container:
-    col_empty_l, col_title, col_btn = st.columns([1, 4, 1])
+    col_empty_l, col_title, col_btn = st.columns([1.2, 3.6, 1.2])
     
     with col_title:
         st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 25px; margin-bottom: 10px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
         
     with col_btn:
-        st.markdown("<div style='margin-top: 20px; text-align: right;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True)
         
         def generate_excel_with_colors(df_data):
             output = io.BytesIO()
