@@ -268,11 +268,11 @@ with table_container:
         df_display = df_display.sort_values(by=sort_cols, ascending=[True] * len(sort_cols))
         df_display = df_display.drop(columns=['Mức Ưu Tiên'])
 
-    # Đã khôi phục lại bảng màu cơ bản (như cũ) - đảm bảo hiển thị rõ chữ 
+    # Điều chỉnh màu nền đậm lên (Đã gỡ bỏ in đậm chữ, sử dụng mã màu Hex đậm hơn)
     def color_rows(row):
         status = row.get('Trạng Thái', '')
-        if status == 'Đã hoàn thành': return ['background-color: #e8f5e9; color: #000;'] * len(row)
-        if status == 'Tạm dừng': return ['background-color: #ffebee; color: #000;'] * len(row)
+        if status == 'Đã hoàn thành': return ['background-color: #a5d6a7; color: #000;'] * len(row) # Xanh lá đậm hơn
+        if status == 'Tạm dừng': return ['background-color: #ef9a9a; color: #000;'] * len(row)      # Đỏ đậm hơn
         if status == 'Chưa bắt đầu': return ['background-color: #f5f5f5; color: #000;'] * len(row)
         return ['background-color: #ffffff; color: #000;'] * len(row)
 
