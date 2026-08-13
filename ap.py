@@ -22,7 +22,7 @@ st.markdown("""
         font-weight: 800 !important; font-size: 14px !important;
     }
     
-    /* TÙY CHỈNH KHỐI KPI (Đã mở rộng cho bố cục 2 hàng) */
+    /* TÙY CHỈNH KHỐI KPI */
     .kpi-card {
         width: 100%; background-color: #ffffff; padding: 20px 15px; 
         border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.08); 
@@ -119,6 +119,11 @@ with st.sidebar:
     selected_hd = st.multiselect("📑 SỐ HỢP ĐỒNG", options=hd_opts, placeholder="Chọn Tất cả")
     if selected_hd: df_temp = df_temp[df_temp['Hợp Đồng - PLHĐ'].isin(selected_hd)]
 
+    # THÊM MỚI: BỘ LỌC HẠNG MỤC (Nằm dưới Hợp Đồng)
+    hm_opts = [x for x in df_temp.get('Hạng Mục', pd.Series()).unique() if x != '']
+    selected_hm = st.multiselect("📁 HẠNG MỤC", options=hm_opts, placeholder="Chọn Tất cả")
+    if selected_hm: df_temp = df_temp[df_temp['Hạng Mục'].isin(selected_hm)]
+
     ql_opts = [x for x in df_temp.get('Cán Bộ Quản Lý', pd.Series()).unique() if x != ''] if 'Cán Bộ Quản Lý' in df_temp.columns else []
     selected_ql = st.multiselect("👔 CÁN BỘ QUẢN LÝ", options=ql_opts, placeholder="Chọn Tất cả")
 
@@ -190,6 +195,7 @@ if start_date and end_date and 'Ngày_Bat_Dau_Obj' in df_display.columns and 'Ng
 
 if selected_projects: df_display = df_display[df_display['Dự Án'].isin(selected_projects)]
 if selected_hd: df_display = df_display[df_display['Hợp Đồng - PLHĐ'].isin(selected_hd)]
+if selected_hm: df_display = df_display[df_display['Hạng Mục'].isin(selected_hm)] # Áp dụng lọc Hạng Mục
 if selected_ql: df_display = df_display[df_display['Cán Bộ Quản Lý'].isin(selected_ql)]
 if selected_cb: df_display = df_display[df_display[cb_col].isin(selected_cb)]
 
