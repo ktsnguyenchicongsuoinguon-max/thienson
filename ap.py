@@ -43,7 +43,7 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-# ================= CSS TÙY CHỈNH (ĐỒNG BỘ ĐỘ TRONG SUỐT VÀ MÀU CHỮ SELECTBOX) =================
+# ================= CSS TÙY CHỈNH (ĐỒNG BỘ FONT WEIGHT CHO Ô LỌC THỜI GIAN & SIDEBAR) =================
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
@@ -97,7 +97,7 @@ st.markdown("""
         color: #198754;
     }
 
-    /* ĐỒNG BỘ ĐỘ TRONG SUỐT VÀ MÀU CHỮ CHO CẢ MULTISELECT VÀ SELECTBOX TRONG SIDEBAR */
+    /* ĐỒNG BỘ ĐỘ TRONG SUỐT VÀ TRỌNG SỐ CHỮ (FONT-WEIGHT) CHO SELECTBOX & MULTISELECT TRONG SIDEBAR */
     section[data-testid="stSidebar"] div[data-baseweb="select"] {
         background-color: transparent !important;
     }
@@ -109,11 +109,13 @@ st.markdown("""
         border-radius: 12px !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
-    /* Ép đồng bộ màu chữ bên trong các ô chọn về #0f172a */
+    
+    /* Ép tất cả chữ bên trong các ô chọn về chung độ đậm (font-weight: 500) và màu sắc chuẩn */
     section[data-testid="stSidebar"] div[data-baseweb="select"] span,
     section[data-testid="stSidebar"] div[data-baseweb="select"] div,
     section[data-testid="stSidebar"] div[data-baseweb="select"] input {
         color: #0f172a !important;
+        font-weight: 500 !important;
     }
 
     /* LINK TẢI EXCEL TÙY CHỈNH: CĂN PHẢI TUYỆT ĐỐI */
