@@ -20,14 +20,14 @@ st.markdown("""
     .block-container { padding-top: 3rem !important; padding-bottom: 2rem !important; }
     section[data-testid="stSidebar"] .block-container { padding-top: 1rem !important; }
 
-    /* LÀM ĐẬM HEADER BẢNG */
+    /* LÀM ĐẬM HEADER BẢNG DỮ LIỆU */
     div[data-testid="stDataFrame"] th {
         background-color: var(--secondary-background-color) !important; 
         color: var(--text-color) !important;
         font-weight: 800 !important; font-size: 14px !important;
     }
     
-    /* LINK TẢI EXCEL TÙY CHỈNH: CĂN PHẢI TUYỆT ĐỐI, CHỮ NHẠT HƠN */
+    /* LINK TẢI EXCEL TÙY CHỈNH: CĂN PHẢI TUYỆT ĐỐI, CHỮ XÁM NHẠT TỰ NHIÊN */
     .custom-download-link {
         display: block;
         float: right; /* Đẩy sát lề phải 100% */
@@ -241,7 +241,7 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
             df_export = df_export.drop(columns=[col])
 
 
-# ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI 2 HÀNG =================
+# ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI =================
 with header_container:
     st.markdown("<h2 style='text-align: center; color: #198754; font-weight: 900; margin-top: 10px; margin-bottom: 25px;'>BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</h2>", unsafe_allow_html=True)
 
@@ -280,12 +280,12 @@ with kpi_container:
     with r2_c4: st.markdown(render_kpi("Vướng mắc", p_paused, "⚠️"), unsafe_allow_html=True)
 
 
-# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU =================
+# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU GỐC & LINK TẢI =================
 with table_container:
     # 1. In Tiêu đề Bảng
     st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 35px; margin-bottom: 25px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
     
-    # 2. Xử lý xuất Excel
+    # 2. Xử lý xuất Excel qua Base64 (Đẩy link "Tải Excel" sát phải màn hình)
     def generate_excel_with_colors(df_data):
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -327,7 +327,6 @@ with table_container:
         wb.save(final_output)
         return final_output.getvalue()
 
-    # Tạo link HTML thẻ <a> (Căn lề phải tuyệt đối)
     try:
         excel_bytes = generate_excel_with_colors(df_export)
         b64 = base64.b64encode(excel_bytes).decode()
@@ -339,10 +338,11 @@ with table_container:
         mime_type = "text/csv"
         filename = "Bao_cao_tien_do_Thien_Son.csv"
 
+    # Hiển thị nút tải
     download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}">Tải Excel</a>'
     st.markdown(download_html, unsafe_allow_html=True)
 
-    # 3. Hiển thị bảng Streamlit gốc (Mượt mà, có đầy đủ công cụ như cũ)
+    # 3. Hiển thị bảng Streamlit mặc định
     priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
 
     if 'Trạng Thái' in df_display.columns and 'Tiến Độ (%)' in df_display.columns:
@@ -352,6 +352,7 @@ with table_container:
         df_display = df_display.sort_values(by=sort_cols, ascending=[True] * len(sort_cols))
         df_display = df_display.drop(columns=['Mức Ưu Tiên'])
 
+    # Chỉ giữ lại background-color và text color do Styler không hỗ trợ kẻ viền lên Canvas
     def color_rows(row):
         status = row.get('Trạng Thái', '')
         if status == 'Đã hoàn thành': return ['background-color: #a5d6a7; color: #000;'] * len(row)
