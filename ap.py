@@ -33,22 +33,32 @@ if bg_base64:
     """
     st.markdown(bg_css, unsafe_allow_html=True)
 else:
-    # Nếu không thấy file ảnh, dùng màu nền xám nhạt dự phòng
-    st.markdown("<style>.stApp { background-color: #FAFAFC; }</style>", unsafe_allow_html=True)
+    # Nếu không thấy file ảnh, dùng ảnh marble mặc định từ web
+    st.markdown("""
+    <style>
+        .stApp { 
+            background-image: url("https://img.freepik.com/free-photo/green-marble-texture-background_23-2150383431.jpg"); 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+    </style>
+    """, unsafe_allow_html=True)
 
 # ================= CSS TÙY CHỈNH (GLASSMORPHISM & MATERIAL ICONS) =================
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* Hiệu ứng kính mờ (Glassmorphism) cho khung chứa nội dung để chữ không bị chìm vào vân đá */
+    /* Nền màu trắng có độ trong suốt (Glassmorphism tổng thể) */
     .block-container { 
         padding-top: 2rem !important; 
         padding-bottom: 2rem !important; 
-        background-color: rgba(255, 255, 255, 0.92) !important; /* Lớp nền trắng hơi trong suốt */
+        background-color: rgba(255, 255, 255, 0.75) !important; /* Trắng trong suốt 75% */
+        backdrop-filter: blur(12px); /* Hiệu ứng kính mờ */
         border-radius: 20px;
         margin-top: 30px;
         margin-bottom: 30px;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.15); /* Đổ bóng tạo chiều sâu */
+        box-shadow: 0 8px 32px rgba(0,0,0,0.15);
     }
 
     /* Hiệu ứng kính mờ cho thanh Sidebar */
@@ -95,7 +105,7 @@ st.markdown("""
         font-size: 13.5px !important;
         font-weight: 600 !important;
         text-decoration: none !important;
-        margin-top: -42px !important; /* Căn ngang hàng với tiêu đề */
+        margin-top: -42px !important; 
         margin-bottom: 15px !important;
         position: relative;
         z-index: 9999;
@@ -106,13 +116,15 @@ st.markdown("""
         text-decoration: underline !important;
     }
 
-    /* ================= TÙY CHỈNH KHỐI KPI ================= */
+    /* ================= TÙY CHỈNH KHỐI KPI (NỀN TRẮNG HƠI TRONG SUỐT) ================= */
     .kpi-card {
         width: 100%; padding: 20px 15px; 
-        border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
-        border: 1px solid rgba(0,0,0,0.05); 
+        border-radius: 12px; 
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+        border: 1px solid rgba(255, 255, 255, 0.5); 
         display: flex; align-items: center; margin-bottom: 15px; min-height: 115px; 
-        background-color: #ffffff; 
+        background-color: rgba(255, 255, 255, 0.6) !important; /* Trắng trong suốt 60% */
+        backdrop-filter: blur(8px); /* Kính mờ nhẹ cho ô KPI */
         transition: transform 0.2s;
     }
     .kpi-card:hover {
@@ -267,14 +279,14 @@ with st.sidebar:
             start_date = end_date = date_range[0]
 
 
-# ================= 4. KHỞI TẠO CÁC CONTAINER =================
+# ================= 4. ĐỊNH TỈ LỆ CONTAINER (CHUYỂN THANH TRẠNG THÁI XUỐNG DƯỚI KPI) =================
 header_container = st.container()
-status_container = st.container()
-kpi_container = st.container()
+kpi_container = st.container()       # Đưa khối KPI lên trước
+status_container = st.container()    # Thanh trạng thái nằm dưới khối KPI
 table_container = st.container()
 
 
-# ================= 5. XỬ LÝ LỌC TRẠNG THÁI =================
+# ================= 5. XỬ LÝ LỌC TRẠNG THÁI (TRỞ VỀ BÊN DƯỚI) =================
 with status_container:
     status_options = ["Tất cả", "Chưa bắt đầu", "Đang triển khai", "Đã hoàn thành", "Tạm dừng"]
     
