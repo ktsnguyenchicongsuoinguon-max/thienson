@@ -49,23 +49,26 @@ else:
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* Nền tổng thể trong suốt hơn nhiều (Giảm từ 75% xuống 45%) */
+    /* Nền tổng thể trong suốt hơn (Giảm xuống 25%), tăng blur để chữ không bị rối */
     .block-container { 
         padding-top: 2rem !important; 
         padding-bottom: 2rem !important; 
-        background-color: rgba(255, 255, 255, 0.45) !important; /* Trắng trong suốt 45% */
-        backdrop-filter: blur(16px); /* Tăng nhẹ kính mờ để làm nổi bật chữ */
-        border-radius: 20px;
+        background-color: rgba(255, 255, 255, 0.25) !important; /* Trắng trong suốt siêu mỏng */
+        backdrop-filter: blur(20px) !important; /* Kính mờ mạnh hơn */
+        -webkit-backdrop-filter: blur(20px) !important;
+        border-radius: 24px;
         margin-top: 30px;
         margin-bottom: 30px;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        border: 1px solid rgba(255, 255, 255, 0.4); /* Viền kính mỏng */
     }
 
-    /* Hiệu ứng kính mờ cho thanh Sidebar cũng trong suốt hơn (Giảm từ 85% xuống 55%) */
+    /* Sidebar cũng trong suốt và mờ ảo tương ứng */
     section[data-testid="stSidebar"] {
-        background-color: rgba(255, 255, 255, 0.55) !important;
-        backdrop-filter: blur(16px);
-        border-right: 1px solid rgba(255, 255, 255, 0.2);
+        background-color: rgba(255, 255, 255, 0.35) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.3);
     }
 
     /* THANH HEADER TÀNG HÌNH */
@@ -74,7 +77,7 @@ st.markdown("""
 
     /* LÀM ĐẬM HEADER BẢNG */
     div[data-testid="stDataFrame"] th {
-        background-color: #E2E8F0 !important; 
+        background-color: rgba(226, 232, 240, 0.9) !important; 
         color: #0F172A !important;
         font-weight: 800 !important; font-size: 14px !important;
     }
@@ -101,7 +104,7 @@ st.markdown("""
         display: block;
         float: right;
         text-align: right;
-        color: #868e96 !important;
+        color: #64748b !important;
         font-size: 13.5px !important;
         font-weight: 600 !important;
         text-decoration: none !important;
@@ -116,28 +119,33 @@ st.markdown("""
         text-decoration: underline !important;
     }
 
-    /* ================= TÙY CHỈNH KHỐI KPI (NỀN TRẮNG HƠI TRONG SUỐT) ================= */
+    /* ================= TÙY CHỈNH KHỐI KPI: BO GÓC NHIỀU, KHÔNG VIỀN, BÓNG ĐỔ MỀM ================= */
     .kpi-card {
-        width: 100%; padding: 20px 15px; 
-        border-radius: 12px; 
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
-        border: 1px solid rgba(255, 255, 255, 0.5); 
-        display: flex; align-items: center; margin-bottom: 15px; min-height: 115px; 
-        background-color: rgba(255, 255, 255, 0.6) !important; /* Trắng trong suốt 60% */
-        backdrop-filter: blur(8px); /* Kính mờ nhẹ cho ô KPI */
-        transition: transform 0.2s;
+        width: 100%; 
+        padding: 20px 18px; 
+        border-radius: 24px; /* Bo góc cực lớn kiểu Widget iOS */
+        border: none; /* KHÔNG SỬ DỤNG MÀU VIỀN */
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* Bóng đổ lan tỏa nhẹ nhàng */
+        display: flex; 
+        align-items: center; 
+        margin-bottom: 15px; 
+        min-height: 120px; 
+        background-color: rgba(255, 255, 255, 0.65) !important; /* Nền KPI hơi trong suốt */
+        backdrop-filter: blur(12px); 
+        -webkit-backdrop-filter: blur(12px);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     .kpi-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        transform: translateY(-5px); /* Bay lên nhẹ khi hover */
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12); /* Bóng đậm hơn chút khi hover */
     }
     .kpi-icon-wrapper {
         width: 65px; 
         height: 65px;
-        border-radius: 50%;
+        border-radius: 20px; /* Bo góc kiểu Squircle (hình vuông bo tròn) đồng điệu với thẻ ngoài */
         display: flex; align-items: center; justify-content: center;
         flex-shrink: 0;
-        margin-right: 15px;
+        margin-right: 18px;
     }
     .kpi-icon-wrapper .material-symbols-rounded {
         font-size: 36px; 
@@ -213,7 +221,7 @@ def load_data():
 df = load_data()
 
 
-# ================= 3. SIDEBAR BỘ LỌC ĐỒNG BỘ VỚI KPI =================
+# ================= 3. SIDEBAR BỘ LỌC =================
 with st.sidebar:
     col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
     with col_logo2:
@@ -279,14 +287,14 @@ with st.sidebar:
             start_date = end_date = date_range[0]
 
 
-# ================= 4. ĐỊNH TỈ LỆ CONTAINER (CHUYỂN THANH TRẠNG THÁI XUỐNG DƯỚI KPI) =================
+# ================= 4. ĐỊNH TỈ LỆ CONTAINER =================
 header_container = st.container()
-kpi_container = st.container()       # Đưa khối KPI lên trước
-status_container = st.container()    # Thanh trạng thái nằm dưới khối KPI
+kpi_container = st.container()       
+status_container = st.container()    
 table_container = st.container()
 
 
-# ================= 5. XỬ LÝ LỌC TRẠNG THÁI (TRỞ VỀ BÊN DƯỚI) =================
+# ================= 5. XỬ LÝ LỌC TRẠNG THÁI =================
 with status_container:
     status_options = ["Tất cả", "Chưa bắt đầu", "Đang triển khai", "Đã hoàn thành", "Tạm dừng"]
     
@@ -323,7 +331,7 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
             df_export = df_export.drop(columns=[col])
 
 
-# ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI ĐẬM =================
+# ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI KÍNH MỜ (BỎ VIỀN, CÓ BÓNG ĐỔ) =================
 with header_container:
     st.markdown("<h2 style='text-align: center; color: #198754; font-weight: 900; margin-top: 10px; margin-bottom: 25px;'>BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</h2>", unsafe_allow_html=True)
 
@@ -338,10 +346,10 @@ with kpi_container:
     p_notstarted = len(df_display[df_display.get('Trạng Thái', '') == 'Chưa bắt đầu'])
     p_paused = len(df_display[df_display.get('Trạng Thái', '') == 'Tạm dừng'])
 
-    # Hàm tạo khối KPI
-    def render_bold_kpi(title, value, icon_name, border_color, bg_color, icon_color):
+    # Hàm render KPI không viền, dùng Glassmorphism
+    def render_glass_kpi(title, value, icon_name, bg_color, icon_color):
         return f"""
-        <div class="kpi-card" style="border-left: 6px solid {border_color};">
+        <div class="kpi-card">
             <div class="kpi-icon-wrapper" style="background-color: {bg_color}; color: {icon_color};">
                 <span class="material-symbols-rounded">{icon_name}</span>
             </div>
@@ -353,16 +361,16 @@ with kpi_container:
         """
 
     r1_c1, r1_c2, r1_c3, r1_c4 = st.columns(4)
-    with r1_c1: st.markdown(render_bold_kpi("Tổng Dự án", p_projects, "domain", "#0d6efd", "#cfe2ff", "#0d6efd"), unsafe_allow_html=True)
-    with r1_c2: st.markdown(render_bold_kpi("Hạng mục", p_categories, "folder_open", "#0d6efd", "#cfe2ff", "#0d6efd"), unsafe_allow_html=True)
-    with r1_c3: st.markdown(render_bold_kpi("Công việc", p_total, "assignment", "#0d6efd", "#cfe2ff", "#0d6efd"), unsafe_allow_html=True)
-    with r1_c4: st.markdown(render_bold_kpi("Tiến độ TB", f"{p_prog:.1f}%", "speed", "#6f42c1", "#e0cffc", "#6f42c1"), unsafe_allow_html=True)
+    with r1_c1: st.markdown(render_glass_kpi("Tổng Dự án", p_projects, "domain", "#cfe2ff", "#0d6efd"), unsafe_allow_html=True)
+    with r1_c2: st.markdown(render_glass_kpi("Hạng mục", p_categories, "folder_open", "#cfe2ff", "#0d6efd"), unsafe_allow_html=True)
+    with r1_c3: st.markdown(render_glass_kpi("Công việc", p_total, "assignment", "#cfe2ff", "#0d6efd"), unsafe_allow_html=True)
+    with r1_c4: st.markdown(render_glass_kpi("Tiến độ TB", f"{p_prog:.1f}%", "speed", "#e0cffc", "#6f42c1"), unsafe_allow_html=True)
     
     r2_c1, r2_c2, r2_c3, r2_c4 = st.columns(4)
-    with r2_c1: st.markdown(render_bold_kpi("Đã hoàn thành", p_done, "check_circle", "#198754", "#d1e7dd", "#198754"), unsafe_allow_html=True)
-    with r2_c2: st.markdown(render_bold_kpi("Đang triển khai", p_inprogress, "sync", "#0dcaf0", "#cff4fc", "#0dcaf0"), unsafe_allow_html=True)
-    with r2_c3: st.markdown(render_bold_kpi("Chưa bắt đầu", p_notstarted, "hourglass_empty", "#6c757d", "#e2e3e5", "#6c757d"), unsafe_allow_html=True)
-    with r2_c4: st.markdown(render_bold_kpi("Vướng mắc", p_paused, "error", "#dc3545", "#f8d7da", "#dc3545"), unsafe_allow_html=True)
+    with r2_c1: st.markdown(render_glass_kpi("Đã hoàn thành", p_done, "check_circle", "#d1e7dd", "#198754"), unsafe_allow_html=True)
+    with r2_c2: st.markdown(render_glass_kpi("Đang triển khai", p_inprogress, "sync", "#cff4fc", "#0dcaf0"), unsafe_allow_html=True)
+    with r2_c3: st.markdown(render_glass_kpi("Chưa bắt đầu", p_notstarted, "hourglass_empty", "#e2e3e5", "#6c757d"), unsafe_allow_html=True)
+    with r2_c4: st.markdown(render_glass_kpi("Vướng mắc", p_paused, "error", "#f8d7da", "#dc3545"), unsafe_allow_html=True)
 
 
 # ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & LINK TẢI SÁT MÉP =================
@@ -370,7 +378,7 @@ with table_container:
     # Tiêu đề bảng căn giữa tuyệt đối
     st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 35px; margin-bottom: 25px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
     
-    # Xử lý xuất Excel qua Base64
+    # Xử lý xuất Excel
     def generate_excel_with_colors(df_data):
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -423,11 +431,11 @@ with table_container:
         mime_type = "text/csv"
         filename = "Bao_cao_tien_do_Thien_Son.csv"
 
-    # Link Tải Excel Text Sạch Sẽ - NẰM SÁT LỀ PHẢI
+    # Link Tải Excel
     download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}">Tải Excel</a>'
     st.markdown(download_html, unsafe_allow_html=True)
 
-    # Hiển thị bảng màu chuẩn xác phiên bản trước
+    # Hiển thị bảng
     priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
 
     if 'Trạng Thái' in df_display.columns and 'Tiến Độ (%)' in df_display.columns:
@@ -446,7 +454,7 @@ with table_container:
 
     styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
         'selector': 'th',
-        'props': [('background-color', '#e2e8f0'), ('color', '#0f172a'), ('font-weight', 'bold')]
+        'props': [('background-color', 'rgba(226, 232, 240, 0.9)'), ('color', '#0f172a'), ('font-weight', 'bold')]
     }])
     
     st.dataframe(styled_df, use_container_width=True, hide_index=True, height=550)
