@@ -14,11 +14,9 @@ def get_base64_image(image_path):
             return base64.b64encode(f.read()).decode()
     return None
 
-# Đọc ảnh nền
 bg_base64 = get_base64_image("background.jpg")
 bg_url = f"data:image/jpeg;base64,{bg_base64}" if bg_base64 else "https://img.freepik.com/free-photo/green-marble-texture-background_23-2150383431.jpg"
 
-# CSS tổng thể (Đã tách khỏi f-string để tránh lỗi ngoặc nhọn)
 st.markdown(f"""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
@@ -60,6 +58,7 @@ st.markdown(f"""
     }
     .sidebar-title .material-symbols-rounded {{ font-size: 20px; color: #198754; }}
 
+    /* Đồng bộ ô chọn trong sidebar và ép chung độ đậm chữ */
     section[data-testid="stSidebar"] div[data-baseweb="select"] > div {{
         background-color: rgba(255, 255, 255, 0.4) !important;
         backdrop-filter: blur(12px) !important;
@@ -67,10 +66,9 @@ st.markdown(f"""
         border-radius: 12px !important;
         box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }}
-    section[data-testid="stSidebar"] div[data-baseweb="select"] span,
-    section[data-testid="stSidebar"] div[data-baseweb="select"] div,
-    section[data-testid="stSidebar"] div[data-baseweb="select"] input {{
-        color: #0f172a !important; font-weight: 500 !important;
+    section[data-testid="stSidebar"] div[data-baseweb="select"] * {{
+        color: #0f172a !important;
+        font-weight: 400 !important;
     }}
 
     .custom-download-link {{
