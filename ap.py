@@ -42,41 +42,32 @@ st.markdown("""
     }
     .kpi-value { font-size: 1.8rem; font-weight: 900; color: #1e293b; }
     
-    /* ================= ÉP THANH TRẠNG THÁI DÀN ĐỀU VÀ BẰNG NHAU ================= */
+    /* ================= THANH TRẠNG THÁI: KHÔNG Ô, CĂN GIỮA, KHÔNG BỊ CẮT CHỮ ================= */
     div[data-testid="stRadio"] { width: 100% !important; }
     div[data-testid="stRadio"] > div[role="radiogroup"] {
-        display: flex; flex-direction: row; width: 100% !important;
-        justify-content: space-between; gap: 12px; background-color: transparent; 
-        padding: 0px; margin-top: 15px; margin-bottom: 10px;
+        display: flex; 
+        flex-direction: row; 
+        justify-content: center; /* Căn giữa các lựa chọn */
+        gap: 35px; /* Khoảng cách rộng rãi giữa các mục */
+        margin-top: 10px; 
+        margin-bottom: 25px;
+        flex-wrap: wrap; /* Tự động xuống dòng nếu màn hình nhỏ, tuyệt đối không cắt chữ */
+        background-color: transparent !important; 
     }
     div[data-testid="stRadio"] > div[role="radiogroup"] > label {
-        flex: 1 1 0px !important; 
-        background-color: #ffffff;
-        height: 48px !important; /* Ép cứng chiều cao 48px cho tất cả các ô */
-        padding: 0px 5px !important; 
-        border-radius: 12px !important; 
-        border: 1px solid #ced4da; 
-        box-shadow: 0 4px 6px rgba(0,0,0,0.04);
-        cursor: pointer; transition: all 0.2s ease-in-out;
-        display: flex; justify-content: center; align-items: center;
-        white-space: nowrap !important; /* Tuyệt đối không cho rớt dòng */
-        overflow: hidden !important;
+        cursor: pointer;
+        /* Xóa hoàn toàn ô, viền và shadow */
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 5px !important;
     }
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label:hover {
-        background-color: #FFEBEE; border-color: #C62828;
-        box-shadow: 0 8px 15px rgba(198, 40, 40, 0.15); transform: translateY(-3px);
-    }
-    
-    /* ẨN CỤC TRÒN RADIO TRIỆT ĐỂ */
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label > div:first-child { 
-        display: none !important; 
-    }
-    
-    /* Ép hiển thị rõ chữ và dàn giữa */
+    /* Chỉnh chữ to, rõ, đậm */
     div[data-testid="stRadio"] > div[role="radiogroup"] > label p {
-        font-weight: 700 !important; color: #495057 !important; margin: 0 !important; 
-        font-size: 0.95rem !important; /* Thu nhỏ font một xíu để luôn vừa 1 dòng */
-        text-align: center;
+        font-weight: 700 !important; 
+        color: #1e293b !important; 
+        margin: 0 !important; 
+        font-size: 1.1rem !important; 
     }
 </style>
 """, unsafe_allow_html=True)
@@ -192,7 +183,7 @@ with status_container:
 # ================= 6. TỔNG HỢP & ÁP DỤNG MỌI BỘ LỌC =================
 df_display = df.copy()
 
-# A. LỌC THỜI GIAN THEO ĐIỂM RƠI (Bắt đầu HOẶC Kết thúc trong khoảng chọn)
+# A. LỌC THỜI GIAN THEO ĐIỂM RƠI
 if start_date and end_date and 'Ngày_Bat_Dau_Obj' in df_display.columns and 'Ngày_Hoan_Thanh_Obj' in df_display.columns:
     start_ts = pd.to_datetime(start_date)
     end_ts = pd.to_datetime(end_date)
