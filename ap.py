@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 # ================= 1. THIẾT LẬP GIAO DIỆN & CSS TÙY CHỈNH =================
 st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", page_icon="logothienson.png", layout="wide", initial_sidebar_state="expanded")
 
-# Nhúng font icon hiện đại của Google
+# Nhúng font icon hiện đại của Google (Đồng bộ cho cả Sidebar và KPI)
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
@@ -29,6 +29,23 @@ st.markdown("""
         font-weight: 800 !important; font-size: 14px !important;
     }
     
+    /* CSS CHO ICON Ở SIDEBAR BỘ LỌC */
+    .sidebar-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-color);
+        margin-bottom: 5px;
+        margin-top: 12px;
+        text-transform: uppercase;
+    }
+    .sidebar-title .material-symbols-rounded {
+        font-size: 20px;
+        color: #198754; /* Màu xanh lá đồng bộ */
+    }
+
     /* LINK TẢI EXCEL TÙY CHỈNH: CĂN PHẢI TUYỆT ĐỐI */
     .custom-download-link {
         display: block;
@@ -62,7 +79,7 @@ st.markdown("""
         transform: translateY(-3px);
     }
     .kpi-icon-wrapper {
-        width: 65px; /* Phóng to khung chứa icon */
+        width: 65px; 
         height: 65px;
         border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
@@ -70,7 +87,7 @@ st.markdown("""
         margin-right: 15px;
     }
     .kpi-icon-wrapper .material-symbols-rounded {
-        font-size: 36px; /* KÍCH THƯỚC ICON TO HƠN */
+        font-size: 36px; 
     }
     .kpi-details { flex-grow: 1; overflow: hidden; }
     .kpi-title {
@@ -143,7 +160,7 @@ def load_data():
 df = load_data()
 
 
-# ================= 3. SIDEBAR BỘ LỌC (GIỮ NGUYÊN BẢN) =================
+# ================= 3. SIDEBAR BỘ LỌC ĐỒNG BỘ VỚI KPI =================
 with st.sidebar:
     col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
     with col_logo2:
@@ -152,31 +169,37 @@ with st.sidebar:
     st.markdown("<h3 style='text-align: left; margin-top: 10px; margin-bottom: 10px;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
     
     unique_projects = [p for p in df.get('Dự Án', pd.Series()).unique() if p != '']
-    selected_projects = st.multiselect("🏢 DỰ ÁN", options=unique_projects, placeholder="Chọn Tất cả")
+    st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">domain</span> DỰ ÁN</div>', unsafe_allow_html=True)
+    selected_projects = st.multiselect("DỰ ÁN", options=unique_projects, placeholder="Chọn Tất cả", label_visibility="collapsed")
 
     df_temp = df.copy()
     if selected_projects: df_temp = df_temp[df_temp['Dự Án'].isin(selected_projects)]
 
     hd_opts = [x for x in df_temp.get('Hợp Đồng - PLHĐ', pd.Series()).unique() if x != '']
-    selected_hd = st.multiselect("📑 SỐ HỢP ĐỒNG", options=hd_opts, placeholder="Chọn Tất cả")
+    st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">description</span> SỐ HỢP ĐỒNG</div>', unsafe_allow_html=True)
+    selected_hd = st.multiselect("SỐ HỢP ĐỒNG", options=hd_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
     if selected_hd: df_temp = df_temp[df_temp['Hợp Đồng - PLHĐ'].isin(selected_hd)]
 
     hm_opts = [x for x in df_temp.get('Hạng Mục', pd.Series()).unique() if x != '']
-    selected_hm = st.multiselect("📁 HẠNG MỤC", options=hm_opts, placeholder="Chọn Tất cả")
+    st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">folder_open</span> HẠNG MỤC</div>', unsafe_allow_html=True)
+    selected_hm = st.multiselect("HẠNG MỤC", options=hm_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
     if selected_hm: df_temp = df_temp[df_temp['Hạng Mục'].isin(selected_hm)]
 
     ql_opts = [x for x in df_temp.get('Cán Bộ Quản Lý', pd.Series()).unique() if x != ''] if 'Cán Bộ Quản Lý' in df_temp.columns else []
-    selected_ql = st.multiselect("👔 CÁN BỘ QUẢN LÝ", options=ql_opts, placeholder="Chọn Tất cả")
+    st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">manage_accounts</span> CÁN BỘ QUẢN LÝ</div>', unsafe_allow_html=True)
+    selected_ql = st.multiselect("CÁN BỘ QUẢN LÝ", options=ql_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
 
     cb_col = 'Cán Bộ Triển Khai - SĐT' if 'Cán Bộ Triển Khai - SĐT' in df_temp.columns else ('Người Triển Khai' if 'Người Triển Khai' in df_temp.columns else None)
     cb_opts = [x for x in df_temp[cb_col].unique() if x != ''] if cb_col else []
-    selected_cb = st.multiselect("👷 CÁN BỘ TRIỂN KHAI", options=cb_opts, placeholder="Chọn Tất cả")
+    st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">engineering</span> CÁN BỘ TRIỂN KHAI</div>', unsafe_allow_html=True)
+    selected_cb = st.multiselect("CÁN BỘ TRIỂN KHAI", options=cb_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
 
     # BỘ LỌC THỜI GIAN
     st.markdown("<br>", unsafe_allow_html=True)
-    
-    time_filter = st.selectbox("📅 KHOẢNG THỜI GIAN", 
-                               ["Tất cả", "Hôm nay", "Tuần này", "Tháng này", "Năm nay", "Tùy chọn khoảng ngày"])
+    st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">calendar_month</span> KHOẢNG THỜI GIAN</div>', unsafe_allow_html=True)
+    time_filter = st.selectbox("KHOẢNG THỜI GIAN", 
+                               ["Tất cả", "Hôm nay", "Tuần này", "Tháng này", "Năm nay", "Tùy chọn khoảng ngày"],
+                               label_visibility="collapsed")
     
     today = datetime.today().date()
     start_date, end_date = None, None
@@ -210,16 +233,13 @@ status_container = st.container()
 table_container = st.container()
 
 
-# ================= 5. XỬ LÝ LỌC TRẠNG THÁI (TRỞ VỀ BỐ CỤC CŨ) =================
+# ================= 5. XỬ LÝ LỌC TRẠNG THÁI (BỎ ICON EMOJI) =================
 with status_container:
-    status_options = ["🌟 Tất cả", "⏳ Chưa bắt đầu", "🔄 Đang triển khai", "✅ Đã hoàn thành", "⏸️ Tạm dừng"]
-    status_map = {
-        "🌟 Tất cả": "Tất cả", "⏳ Chưa bắt đầu": "Chưa bắt đầu", 
-        "🔄 Đang triển khai": "Đang triển khai", "✅ Đã hoàn thành": "Đã hoàn thành", "⏸️ Tạm dừng": "Tạm dừng"
-    }
+    # Chỉ giữ lại chữ tinh gọn
+    status_options = ["Tất cả", "Chưa bắt đầu", "Đang triển khai", "Đã hoàn thành", "Tạm dừng"]
     
     selected_ui_status = st.radio("Bộ lọc Trạng Thái", options=status_options, horizontal=True, label_visibility="collapsed")
-    actual_status = status_map[selected_ui_status]
+    actual_status = selected_ui_status
 
 
 # ================= 6. TỔNG HỢP & ÁP DỤNG MỌI BỘ LỌC =================
@@ -251,7 +271,7 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
             df_export = df_export.drop(columns=[col])
 
 
-# ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI =================
+# ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI ĐẬM =================
 with header_container:
     st.markdown("<h2 style='text-align: center; color: #198754; font-weight: 900; margin-top: 10px; margin-bottom: 25px;'>BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</h2>", unsafe_allow_html=True)
 
@@ -266,7 +286,7 @@ with kpi_container:
     p_notstarted = len(df_display[df_display.get('Trạng Thái', '') == 'Chưa bắt đầu'])
     p_paused = len(df_display[df_display.get('Trạng Thái', '') == 'Tạm dừng'])
 
-    # Tạo khối KPI với Icon hiện đại to hơn và Màu đậm có tính tương phản
+    # Hàm tạo khối KPI
     def render_bold_kpi(title, value, icon_name, border_color, bg_color, icon_color):
         return f"""
         <div class="kpi-card" style="border-left: 6px solid {border_color};">
@@ -281,26 +301,24 @@ with kpi_container:
         """
 
     r1_c1, r1_c2, r1_c3, r1_c4 = st.columns(4)
-    # Tầng 1: Các chỉ số tổng quan (Tương phản mảng Xanh Dương đậm)
     with r1_c1: st.markdown(render_bold_kpi("Tổng Dự án", p_projects, "domain", "#0d6efd", "#cfe2ff", "#0d6efd"), unsafe_allow_html=True)
     with r1_c2: st.markdown(render_bold_kpi("Hạng mục", p_categories, "folder_open", "#0d6efd", "#cfe2ff", "#0d6efd"), unsafe_allow_html=True)
     with r1_c3: st.markdown(render_bold_kpi("Công việc", p_total, "assignment", "#0d6efd", "#cfe2ff", "#0d6efd"), unsafe_allow_html=True)
     with r1_c4: st.markdown(render_bold_kpi("Tiến độ TB", f"{p_prog:.1f}%", "speed", "#6f42c1", "#e0cffc", "#6f42c1"), unsafe_allow_html=True)
     
     r2_c1, r2_c2, r2_c3, r2_c4 = st.columns(4)
-    # Tầng 2: Các trạng thái (Tương phản Xanh Lá - Xanh Ngọc - Xám - Đỏ)
     with r2_c1: st.markdown(render_bold_kpi("Đã hoàn thành", p_done, "check_circle", "#198754", "#d1e7dd", "#198754"), unsafe_allow_html=True)
     with r2_c2: st.markdown(render_bold_kpi("Đang triển khai", p_inprogress, "sync", "#0dcaf0", "#cff4fc", "#0dcaf0"), unsafe_allow_html=True)
     with r2_c3: st.markdown(render_bold_kpi("Chưa bắt đầu", p_notstarted, "hourglass_empty", "#6c757d", "#e2e3e5", "#6c757d"), unsafe_allow_html=True)
     with r2_c4: st.markdown(render_bold_kpi("Vướng mắc", p_paused, "error", "#dc3545", "#f8d7da", "#dc3545"), unsafe_allow_html=True)
 
 
-# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & LINK TẢI =================
+# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & LINK TẢI SÁT MÉP =================
 with table_container:
     # Tiêu đề bảng căn giữa tuyệt đối
     st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 35px; margin-bottom: 25px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
     
-    # Hàm xuất Excel
+    # Xử lý xuất Excel qua Base64
     def generate_excel_with_colors(df_data):
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
