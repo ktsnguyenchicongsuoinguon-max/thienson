@@ -280,7 +280,7 @@ with kpi_container:
     with r2_c4: st.markdown(render_kpi("Vướng mắc", p_paused, "⚠️"), unsafe_allow_html=True)
 
 
-# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU VÀ NÚT TẢI SÁT PHẢI BẰNG HTML/BASE64 =================
+# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & LINK TẢI =================
 with table_container:
     # 1. In Tiêu đề Bảng
     st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 35px; margin-bottom: 25px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
@@ -327,7 +327,7 @@ with table_container:
         wb.save(final_output)
         return final_output.getvalue()
 
-    # Tạo link tải dưới dạng HTML thẻ <a> (Bypass Streamlit Download Button)
+    # Tạo link HTML thẻ <a> (Căn lề phải tuyệt đối)
     try:
         excel_bytes = generate_excel_with_colors(df_export)
         b64 = base64.b64encode(excel_bytes).decode()
@@ -339,7 +339,6 @@ with table_container:
         mime_type = "text/csv"
         filename = "Bao_cao_tien_do_Thien_Son.csv"
 
-    # Nhúng thẻ <a> vào giao diện, thẻ này sẽ nhận CSS `.custom-download-link` và bị đẩy sát mép phải
     download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}">Tải Excel</a>'
     st.markdown(download_html, unsafe_allow_html=True)
 
@@ -353,16 +352,28 @@ with table_container:
         df_display = df_display.sort_values(by=sort_cols, ascending=[True] * len(sort_cols))
         df_display = df_display.drop(columns=['Mức Ưu Tiên'])
 
+    # THÊM THUỘC TÍNH BORDER: 1px solid #94a3b8 ĐỂ LÀM CÁC ĐƯỜNG KẺ BẢNG ĐẬM VÀ RÕ RÀNG HƠN
     def color_rows(row):
         status = row.get('Trạng Thái', '')
-        if status == 'Đã hoàn thành': return ['background-color: #a5d6a7; color: #000;'] * len(row)
-        if status == 'Tạm dừng': return ['background-color: #ef9a9a; color: #000;'] * len(row)
-        if status == 'Chưa bắt đầu': return ['background-color: #f5f5f5; color: #000;'] * len(row)
-        return ['background-color: #ffffff; color: #000;'] * len(row)
+        if status == 'Đã hoàn thành': return ['background-color: #a5d6a7; color: #000; border: 1px solid #94a3b8;'] * len(row)
+        if status == 'Tạm dừng': return ['background-color: #ef9a9a; color: #000; border: 1px solid #94a3b8;'] * len(row)
+        if status == 'Chưa bắt đầu': return ['background-color: #f5f5f5; color: #000; border: 1px solid #94a3b8;'] * len(row)
+        return ['background-color: #ffffff; color: #000; border: 1px solid #94a3b8;'] * len(row)
 
-    styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
-        'selector': 'th',
-        'props': [('background-color', '#e2e8f0'), ('color', '#0f172a'), ('font-weight', 'bold')]
-    }])
+    styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([
+        {
+            'selector': 'th',
+            'props': [
+                ('background-color', '#e2e8f0'), 
+                ('color', '#0f172a'), 
+                ('font-weight', 'bold'), 
+                ('border', '1px solid #94a3b8') /* Viền đậm cho tiêu đề cột */
+            ]
+        },
+        {
+            'selector': 'td',
+            'props': [('border', '1px solid #94a3b8')] /* Đảm bảo áp dụng viền đậm cho toàn bộ ô dữ liệu */
+        }
+    ])
     
     st.dataframe(styled_df, use_container_width=True, hide_index=True, height=550)
