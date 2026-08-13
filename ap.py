@@ -43,7 +43,7 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-# ================= CSS TÙY CHỈNH (ĐỒNG BỘ ĐỘ TRONG SUỐT SIDEBAR & KPI) =================
+# ================= CSS TÙY CHỈNH (ÉP TRONG SUỐT CHO CẢ Ô LỌC SIDEBAR) =================
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
@@ -97,7 +97,10 @@ st.markdown("""
         color: #198754;
     }
 
-    /* ĐỒNG BỘ: CÁC Ô CHỌN TRONG SIDEBAR CÓ ĐỘ TRONG SUỐT 40% NHƯ Ô KPI */
+    /* ĐỒNG BỘ TRIỆT ĐỂ: ÉP CÁC Ô SELECTBOX & MULTISELECT TRONG SIDEBAR TRONG SUỐT 40% */
+    section[data-testid="stSidebar"] div[data-baseweb="select"] {
+        background-color: transparent !important;
+    }
     section[data-testid="stSidebar"] div[data-baseweb="select"] > div {
         background-color: rgba(255, 255, 255, 0.4) !important;
         backdrop-filter: blur(12px) !important;
@@ -141,7 +144,7 @@ st.markdown("""
         align-items: center; 
         margin-bottom: 15px; 
         min-height: 120px; 
-        background-color: rgba(255, 255, 255, 0.4) !important; /* Độ trong suốt 40% đồng bộ với sidebar */
+        background-color: rgba(255, 255, 255, 0.4) !important; 
         backdrop-filter: blur(15px); 
         -webkit-backdrop-filter: blur(15px);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
