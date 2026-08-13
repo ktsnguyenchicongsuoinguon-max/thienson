@@ -7,15 +7,14 @@ st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", page_icon="logothi
 
 st.markdown("""
 <style>
-    /* Nền trang web */
     .stApp { background-color: #f4f7f6; }
     
-    /* 1. XÓA HOÀN TOÀN THANH HEADER SHARE CỦA STREAMLIT ĐỂ KHÔNG BỊ ĐÈ CHỮ */
+    /* 1. XÓA HOÀN TOÀN THANH HEADER SHARE CỦA STREAMLIT */
     header[data-testid="stHeader"] { 
         display: none !important; 
     }
     
-    /* 2. ĐẨY TOÀN BỘ NỘI DUNG XUỐNG DƯỚI CHO CÂN ĐỐI (Hạ chữ Báo Cáo xuống) */
+    /* 2. ĐẨY TOÀN BỘ NỘI DUNG XUỐNG DƯỚI CHO CÂN ĐỐI */
     .block-container { 
         padding-top: 3.5rem !important; 
         padding-bottom: 2rem !important;
@@ -34,7 +33,7 @@ st.markdown("""
         font-size: 14px !important;
     }
     
-    /* TÙY CHỈNH KHỐI KPI */
+    /* TÙY CHỈNH KHỐI KPI (GIỮ NGUYÊN VIỀN ĐỎ) */
     .kpi-card {
         width: 100%; 
         background-color: #ffffff;
@@ -104,7 +103,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# ================= 2. ĐỌC DỮ LIỆU & XỬ LÝ NGÀY THÁNG =================
+# ================= 2. ĐỌC DỮ LIỆU VÀ XỬ LÝ NGÀY THÁNG THÔNG MINH =================
 @st.cache_data(ttl=60)
 def load_data():
     sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
@@ -120,16 +119,16 @@ def load_data():
             
     df = df.fillna('') 
     
-    # Ép kiểu dữ liệu cột Ngày Bắt Đầu để làm bộ lọc thời gian
+    # Ép kiểu thông minh: Nhận diện tự động các định dạng Ngày Bắt Đầu để lọc
     if 'Ngày Bắt Đầu' in df.columns:
-        df['Ngày_Date_Obj'] = pd.to_datetime(df['Ngày Bắt Đầu'], format='%d/%m/%Y', errors='coerce').dt.date
+        df['Ngày_Date_Obj'] = pd.to_datetime(df['Ngày Bắt Đầu'], dayfirst=True, errors='coerce').dt.date
         
     return df
 
 df = load_data()
 
 
-# ================= 3. SIDEBAR BỘ LỌC (CÓ LỌC THỜI GIAN) =================
+# ================= 3. SIDEBAR BỘ LỌC CHÍNH =================
 with st.sidebar:
     col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
     with col_logo2:
@@ -137,40 +136,10 @@ with st.sidebar:
         
     st.markdown("<h3 style='text-align: left; margin-top: 10px; margin-bottom: 10px; color: #1e293b;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
     
-    # ---- TÍNH NĂNG MỚI: BỘ LỌC THỜI GIAN ----
-    time_filter = st.selectbox("📅 THỜI GIAN (Theo Ngày Bắt Đầu)", 
-                               ["Tất cả", "Hôm nay", "Tuần này", "Tháng này", "Năm nay", "Tùy chọn khoảng ngày"])
-    
-    today = datetime.today().date()
-    start_date, end_date = None, None
-    
-    if time_filter == "Hôm nay":
-        start_date = end_date = today
-    elif time_filter == "Tuần này":
-        start_date = today - timedelta(days=today.weekday())
-        end_date = start_date + timedelta(days=6)
-    elif time_filter == "Tháng này":
-        start_date = today.replace(day=1)
-        next_month = today.replace(day=28) + timedelta(days=4)
-        end_date = next_month - timedelta(days=next_month.day)
-    elif time_filter == "Năm nay":
-        start_date = today.replace(month=1, day=1)
-        end_date = today.replace(month=12, day=31)
-    elif time_filter == "Tùy chọn khoảng ngày":
-        date_range = st.date_input("Chọn khoảng thời gian", [today, today])
-        if len(date_range) == 2:
-            start_date, end_date = date_range
-        elif len(date_range) == 1:
-            start_date = end_date = date_range[0]
-            
-    # Lọc Dữ liệu tạm thời theo thời gian trước để gợi ý Dropdown chính xác hơn
-    df_temp = df.copy()
-    if start_date and end_date and 'Ngày_Date_Obj' in df_temp.columns:
-        df_temp = df_temp[(df_temp['Ngày_Date_Obj'] >= start_date) & (df_temp['Ngày_Date_Obj'] <= end_date)]
-    # ----------------------------------------
-    
-    unique_projects = [p for p in df_temp.get('Dự Án', pd.Series()).unique() if p != '']
+    unique_projects = [p for p in df.get('Dự Án', pd.Series()).unique() if p != '']
     selected_projects = st.multiselect("🏢 DỰ ÁN", options=unique_projects, placeholder="Chọn Tất cả")
+
+    df_temp = df.copy()
     if selected_projects: df_temp = df_temp[df_temp['Dự Án'].isin(selected_projects)]
 
     hd_opts = [x for x in df_temp.get('Hợp Đồng - PLHĐ', pd.Series()).unique() if x != '']
@@ -184,6 +153,35 @@ with st.sidebar:
     cb_opts = [x for x in df_temp[cb_col].unique() if x != ''] if cb_col else []
     selected_cb = st.multiselect("👷 CÁN BỘ TRIỂN KHAI", options=cb_opts, placeholder="Chọn Tất cả")
 
+    # ================= ĐƯA BỘ LỌC THỜI GIAN XUỐNG DƯỚI CÙNG =================
+    st.markdown("<br>", unsafe_allow_html=True) # Khoảng trống cho đẹp
+    time_filter = st.selectbox("📅 THỜI GIAN GIAO VIỆC (Ngày bắt đầu)", 
+                               ["Tất cả", "Hôm nay", "Tuần này", "Tháng này", "Năm nay", "Tùy chọn khoảng ngày"])
+    
+    today = datetime.today().date()
+    start_date, end_date = None, None
+    
+    if time_filter == "Hôm nay":
+        start_date = end_date = today
+    elif time_filter == "Tuần này":
+        start_date = today - timedelta(days=today.weekday())
+        end_date = start_date + timedelta(days=6)
+    elif time_filter == "Tháng này":
+        start_date = today.replace(day=1)
+        if today.month == 12:
+            end_date = today.replace(year=today.year+1, month=1, day=1) - timedelta(days=1)
+        else:
+            end_date = today.replace(month=today.month+1, day=1) - timedelta(days=1)
+    elif time_filter == "Năm nay":
+        start_date = today.replace(month=1, day=1)
+        end_date = today.replace(month=12, day=31)
+    elif time_filter == "Tùy chọn khoảng ngày":
+        date_range = st.date_input("Chọn khoảng thời gian:", [today, today])
+        if len(date_range) == 2:
+            start_date, end_date = date_range
+        elif len(date_range) == 1:
+            start_date = end_date = date_range[0]
+
 
 # ================= 4. KHỞI TẠO CÁC CONTAINER =================
 header_container = st.container()
@@ -192,7 +190,7 @@ status_container = st.container()
 table_container = st.container()
 
 
-# ================= 5. XỬ LÝ LỌC TRẠNG THÁI =================
+# ================= 5. XỬ LÝ LỌC TRẠNG THÁI (TRÊN GIAO DIỆN NGANG) =================
 with status_container:
     status_options = ["🌟 Tất cả", "⏳ Chưa bắt đầu", "🔄 Đang triển khai", "✅ Đã hoàn thành", "⏸️ Tạm dừng"]
     status_map = {
@@ -204,18 +202,25 @@ with status_container:
     actual_status = status_map[selected_ui_status]
 
 
-# ================= 6. TỔNG HỢP DỮ LIỆU CUỐI CÙNG (Áp dụng tất cả bộ lọc) =================
+# ================= 6. TỔNG HỢP & ÁP DỤNG MỌI BỘ LỌC =================
 df_display = df.copy()
 
+# A. Lọc theo Thời Gian (Dùng fillna(False) để tránh lỗi với các ô trống)
 if start_date and end_date and 'Ngày_Date_Obj' in df_display.columns:
-    df_display = df_display[(df_display['Ngày_Date_Obj'] >= start_date) & (df_display['Ngày_Date_Obj'] <= end_date)]
+    mask = (df_display['Ngày_Date_Obj'] >= start_date) & (df_display['Ngày_Date_Obj'] <= end_date)
+    df_display = df_display[mask.fillna(False)]
+
+# B. Lọc theo các tiêu chí ở Sidebar
 if selected_projects: df_display = df_display[df_display['Dự Án'].isin(selected_projects)]
 if selected_hd: df_display = df_display[df_display['Hợp Đồng - PLHĐ'].isin(selected_hd)]
 if selected_ql: df_display = df_display[df_display['Cán Bộ Quản Lý'].isin(selected_ql)]
 if selected_cb: df_display = df_display[df_display[cb_col].isin(selected_cb)]
-if actual_status != "Tất cả": df_display = df_display[df_display.get('Trạng Thái', '') == actual_status]
 
-# Xóa cột Date_Obj tạm thời để không hiển thị ra bảng làm rối mắt
+# C. Lọc theo thanh Trạng Thái ngang
+if actual_status != "Tất cả": 
+    df_display = df_display[df_display.get('Trạng Thái', '') == actual_status]
+
+# (Ẩn cột Ngày tạm thời để bảng gọn gàng)
 if 'Ngày_Date_Obj' in df_display.columns:
     df_display = df_display.drop(columns=['Ngày_Date_Obj'])
 
