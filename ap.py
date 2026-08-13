@@ -17,8 +17,8 @@ def get_base64_image(image_path):
 bg_base64 = get_base64_image("background.jpg")
 bg_url = f"data:image/jpeg;base64,{bg_base64}" if bg_base64 else "https://img.freepik.com/free-photo/green-marble-texture-background_23-2150383431.jpg"
 
+# 1. Nhúng ảnh nền riêng biệt bằng f-string an toàn
 st.markdown(f"""
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
     .stApp {{
         background-image: url("{bg_url}");
@@ -26,7 +26,14 @@ st.markdown(f"""
         background-position: center;
         background-attachment: fixed;
     }}
-    .block-container {{
+</style>
+""", unsafe_allow_html=True)
+
+# 2. Nhúng CSS chính bằng chuỗi thông thường (tránh hoàn toàn lỗi ngoặc nhọn)
+st.markdown("""
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
+<style>
+    .block-container {
         padding-top: 2rem !important;
         padding-bottom: 2rem !important;
         background-color: rgba(255, 255, 255, 0.35) !important;
@@ -37,75 +44,74 @@ st.markdown(f"""
         box-shadow: 0 10px 40px rgba(0,0,0,0.15);
         border: 1px solid rgba(255, 255, 255, 0.4);
     }
-    section[data-testid="stSidebar"] {{
+    section[data-testid="stSidebar"] {
         background-color: rgba(255, 255, 255, 0.45) !important;
         backdrop-filter: blur(20px) !important;
         border-right: 1px solid rgba(255, 255, 255, 0.3);
-    }}
-    header[data-testid="stHeader"] {{ background: transparent !important; }}
-    .stAppDeployButton {{ display: none !important; }}
+    }
+    header[data-testid="stHeader"] { background: transparent !important; }
+    .stAppDeployButton { display: none !important; }
     
-    div[data-testid="stDataFrame"] th {{
+    div[data-testid="stDataFrame"] th {
         background-color: rgba(226, 232, 240, 0.9) !important;
         color: #0F172A !important;
         font-weight: 800 !important; font-size: 14px !important;
-    }}
+    }
     
-    .sidebar-title {{
+    .sidebar-title {
         display: flex; align-items: center; gap: 8px;
         font-size: 14px; font-weight: 700; color: #0f172a;
         margin-bottom: 5px; margin-top: 12px; text-transform: uppercase;
     }
-    .sidebar-title .material-symbols-rounded {{ font-size: 20px; color: #198754; }}
+    .sidebar-title .material-symbols-rounded { font-size: 20px; color: #198754; }
 
-    /* Đồng bộ ô chọn trong sidebar và ép chung độ đậm chữ */
-    section[data-testid="stSidebar"] div[data-baseweb="select"] > div {{
+    section[data-testid="stSidebar"] div[data-baseweb="select"] > div {
         background-color: rgba(255, 255, 255, 0.4) !important;
         backdrop-filter: blur(12px) !important;
         border: 1px solid rgba(255, 255, 255, 0.5) !important;
         border-radius: 12px !important;
         box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }}
-    section[data-testid="stSidebar"] div[data-baseweb="select"] * {{
+    }
+    section[data-testid="stSidebar"] div[data-baseweb="select"] * {
         color: #0f172a !important;
         font-weight: 400 !important;
-    }}
+    }
 
-    .custom-download-link {{
+    .custom-download-link {
         display: block; float: right; text-align: right;
         color: #64748b !important; font-size: 13.5px !important; font-weight: 600 !important;
         text-decoration: none !important; margin-top: -42px !important; margin-bottom: 15px !important;
         position: relative; z-index: 9999; cursor: pointer;
-    }}
-    .custom-download-link:hover {{ color: #198754 !important; text-decoration: underline !important; }}
+    }
+    .custom-download-link:hover { color: #198754 !important; text-decoration: underline !important; }
 
-    .kpi-card {{
+    .kpi-card {
         width: 100%; padding: 20px 18px; border-radius: 24px; border: none !important;
         box-shadow: 0 20px 40px rgba(0,0,0,0.2), 0 8px 16px rgba(0,0,0,0.1);
         display: flex; align-items: center; margin-bottom: 15px; min-height: 120px;
         background-color: rgba(255, 255, 255, 0.4) !important;
         backdrop-filter: blur(15px); transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }}
-    .kpi-card:hover {{ transform: translateY(-5px); box-shadow: 0 25px 50px rgba(0,0,0,0.25); }}
-    .kpi-icon-wrapper {{
+    }
+    .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 25px 50px rgba(0,0,0,0.25); }
+    .kpi-icon-wrapper {
         width: 65px; height: 65px; border-radius: 20px;
         display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 18px;
-    }}
-    .kpi-icon-wrapper .material-symbols-rounded {{ font-size: 36px; }}
-    .kpi-details {{ flex-grow: 1; overflow: hidden; }}
-    .kpi-title {{
+    }
+    .kpi-icon-wrapper .material-symbols-rounded { font-size: 36px; }
+    .kpi-details { flex-grow: 1; overflow: hidden; }
+    .kpi-title {
         font-size: 0.85rem; font-weight: 800; opacity: 0.85;
         text-transform: uppercase; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #0f172a;
-    }}
-    .kpi-value {{ font-size: 1.8rem; font-weight: 900; color: #0f172a; }}
+    }
+    .kpi-value { font-size: 1.8rem; font-weight: 900; color: #0f172a; }
 
-    div[data-testid="stRadio"] {{ width: 100% !important; }}
-    div[data-testid="stRadio"] > div[role="radiogroup"] {{
+    div[data-testid="stRadio"] { width: 100% !important; }
+    div[data-testid="stRadio"] > div[role="radiogroup"] {
         display: flex; flex-direction: row; justify-content: center; gap: 35px;
         margin-top: 10px; margin-bottom: 25px; flex-wrap: wrap; background-color: transparent !important;
-    }}
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label {{ cursor: pointer; background: transparent !important; border: none !important; padding: 5px !important; }}
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label p {{ font-weight: 500 !important; color: #0f172a !important; margin: 0 !important; font-size: 1rem !important; }}
+    }
+    div[data-testid="stRadio"] > div[role="radiogroup"] > label { cursor: pointer; background: transparent !important; border: none !important; padding: 5px !important; }
+    div[data-testid="stRadio"] > div[role="radiogroup"] > label p { font-weight: 500 !important; color: #0f172a !important; margin: 0 !important; font-size: 1rem !important; }
 </style>
 """, unsafe_allow_html=True)
 
