@@ -22,7 +22,7 @@ st.markdown("""
         font-weight: 800 !important; font-size: 14px !important;
     }
     
-    /* TÙY CHỈNH KHỐI KPI */
+    /* TÙY CHỈNH KHỐI KPI (Đã mở rộng cho bố cục 2 hàng) */
     .kpi-card {
         width: 100%; background-color: #ffffff; padding: 20px 15px; 
         border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.08); 
@@ -42,7 +42,7 @@ st.markdown("""
     }
     .kpi-value { font-size: 1.8rem; font-weight: 900; color: #1e293b; }
     
-    /* ================= THANH TRẠNG THÁI: CHỮ NHỎ LẠI & BỚT ĐẬM ================= */
+    /* ================= THANH TRẠNG THÁI ================= */
     div[data-testid="stRadio"] { width: 100% !important; }
     div[data-testid="stRadio"] > div[role="radiogroup"] {
         display: flex; 
@@ -61,7 +61,6 @@ st.markdown("""
         box-shadow: none !important;
         padding: 5px !important;
     }
-    /* Chỉnh chữ nhỏ hơn (1rem) và độ đậm vừa phải (500) */
     div[data-testid="stRadio"] > div[role="radiogroup"] > label p {
         font-weight: 500 !important; 
         color: #1e293b !important; 
@@ -72,7 +71,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# ================= 2. ĐỌC DỮ LIỆU & XỬ LÝ 2 CỘT NGÀY THÁNG =================
+# ================= 2. ĐỌC DỮ LIỆU =================
 @st.cache_data(ttl=60)
 def load_data():
     sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
@@ -90,11 +89,9 @@ def load_data():
             
     df = df.fillna('') 
     
-    # 1. Ép kiểu Ngày Bắt Đầu
     if 'Ngày Bắt Đầu' in df.columns:
         df['Ngày_Bat_Dau_Obj'] = pd.to_datetime(df['Ngày Bắt Đầu'].astype(str).str.strip(), format='%d/%m/%Y', errors='coerce')
         
-    # 2. Ép kiểu Ngày hoàn thành
     col_ht = 'Ngày hoàn thành' if 'Ngày hoàn thành' in df.columns else ('Ngày Hoàn Thành' if 'Ngày Hoàn Thành' in df.columns else None)
     if col_ht:
         df['Ngày_Hoan_Thanh_Obj'] = pd.to_datetime(df[col_ht].astype(str).str.strip(), format='%d/%m/%Y', errors='coerce')
@@ -129,7 +126,7 @@ with st.sidebar:
     cb_opts = [x for x in df_temp[cb_col].unique() if x != ''] if cb_col else []
     selected_cb = st.multiselect("👷 CÁN BỘ TRIỂN KHAI", options=cb_opts, placeholder="Chọn Tất cả")
 
-    # ================= BỘ LỌC THỜI GIAN THÔNG MINH =================
+    # ================= BỘ LỌC THỜI GIAN =================
     st.markdown("<br>", unsafe_allow_html=True)
     
     time_filter = st.selectbox("📅 KHOẢNG THỜI GIAN", 
@@ -182,7 +179,6 @@ with status_container:
 # ================= 6. TỔNG HỢP & ÁP DỤNG MỌI BỘ LỌC =================
 df_display = df.copy()
 
-# A. LỌC THỜI GIAN THEO ĐIỂM RƠI
 if start_date and end_date and 'Ngày_Bat_Dau_Obj' in df_display.columns and 'Ngày_Hoan_Thanh_Obj' in df_display.columns:
     start_ts = pd.to_datetime(start_date)
     end_ts = pd.to_datetime(end_date)
@@ -192,33 +188,34 @@ if start_date and end_date and 'Ngày_Bat_Dau_Obj' in df_display.columns and 'Ng
     
     df_display = df_display[cond_start | cond_end]
 
-# B. Lọc Sidebar
 if selected_projects: df_display = df_display[df_display['Dự Án'].isin(selected_projects)]
 if selected_hd: df_display = df_display[df_display['Hợp Đồng - PLHĐ'].isin(selected_hd)]
 if selected_ql: df_display = df_display[df_display['Cán Bộ Quản Lý'].isin(selected_ql)]
 if selected_cb: df_display = df_display[df_display[cb_col].isin(selected_cb)]
 
-# C. Lọc Trạng thái
 if actual_status != "Tất cả": 
     df_display = df_display[df_display.get('Trạng Thái', '') == actual_status]
 
-# Ẩn 2 cột ngày_obj đã dùng để tính toán để giao diện sạch sẽ
 for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
     if col in df_display.columns:
         df_display = df_display.drop(columns=[col])
 
 
-# ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI =================
+# ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI 2 HÀNG =================
 with header_container:
     st.markdown("<h2 style='text-align: center; color: #198754; font-weight: 900; margin-top: 10px; margin-bottom: 25px;'>BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</h2>", unsafe_allow_html=True)
 
 with kpi_container:
-    p_total = len(df_display)
+    # --- TÍNH TOÁN CÁC CHỈ SỐ KPI ---
     p_projects = df_display.get('Dự Án', pd.Series()).nunique()
+    p_categories = df_display.get('Hạng Mục', pd.Series()).nunique()
+    p_total = len(df_display)
+    p_prog = df_display['Tiến Độ (%)'].mean() if ('Tiến Độ (%)' in df_display.columns and p_total > 0) else 0
+    
     p_done = len(df_display[df_display.get('Trạng Thái', '') == 'Đã hoàn thành'])
     p_inprogress = len(df_display[df_display.get('Trạng Thái', '') == 'Đang triển khai'])
+    p_notstarted = len(df_display[df_display.get('Trạng Thái', '') == 'Chưa bắt đầu'])
     p_paused = len(df_display[df_display.get('Trạng Thái', '') == 'Tạm dừng'])
-    p_prog = df_display['Tiến Độ (%)'].mean() if ('Tiến Độ (%)' in df_display.columns and p_total > 0) else 0
 
     def render_kpi(title, value, icon):
         return f"""
@@ -231,19 +228,25 @@ with kpi_container:
         </div>
         """
 
-    c1, c2, c3, c4, c5, c6 = st.columns(6)
+    # --- TẠO BỐ CỤC 2 HÀNG (Mỗi hàng 4 cột) ---
+    # Hàng 1
+    r1_c1, r1_c2, r1_c3, r1_c4 = st.columns(4)
+    with r1_c1: st.markdown(render_kpi("Tổng Dự án", p_projects, "🏢"), unsafe_allow_html=True)
+    with r1_c2: st.markdown(render_kpi("Hạng mục", p_categories, "📁"), unsafe_allow_html=True)
+    with r1_c3: st.markdown(render_kpi("Công việc triển khai", p_total, "📋"), unsafe_allow_html=True)
+    with r1_c4: st.markdown(render_kpi("Tiến độ TB", f"{p_prog:.1f}%", "⏱️"), unsafe_allow_html=True)
     
-    with c1: st.markdown(render_kpi("Dự án", p_projects, "🏢"), unsafe_allow_html=True)
-    with c2: st.markdown(render_kpi("Tổng việc", p_total, "📋"), unsafe_allow_html=True)
-    with c3: st.markdown(render_kpi("Đã xong", p_done, "✅"), unsafe_allow_html=True)
-    with c4: st.markdown(render_kpi("Đang làm", p_inprogress, "🔄"), unsafe_allow_html=True)
-    with c5: st.markdown(render_kpi("Vướng mắc", p_paused, "⚠️"), unsafe_allow_html=True)
-    with c6: st.markdown(render_kpi("Tiến độ TB", f"{p_prog:.1f}%", "⏱️"), unsafe_allow_html=True)
+    # Hàng 2
+    r2_c1, r2_c2, r2_c3, r2_c4 = st.columns(4)
+    with r2_c1: st.markdown(render_kpi("Đã hoàn thành", p_done, "✅"), unsafe_allow_html=True)
+    with r2_c2: st.markdown(render_kpi("Đang triển khai", p_inprogress, "🔄"), unsafe_allow_html=True)
+    with r2_c3: st.markdown(render_kpi("Chưa bắt đầu", p_notstarted, "⏳"), unsafe_allow_html=True)
+    with r2_c4: st.markdown(render_kpi("Vướng mắc", p_paused, "⚠️"), unsafe_allow_html=True)
 
 
 # ================= 8. HIỂN THỊ BẢNG DỮ LIỆU =================
 with table_container:
-    st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 50px; margin-bottom: 20px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 35px; margin-bottom: 20px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
 
     priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
 
