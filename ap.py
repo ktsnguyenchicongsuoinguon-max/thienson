@@ -26,7 +26,11 @@ st.markdown("""
         font-weight: 800 !important; font-size: 14px !important;
     }
     
-    /* TÙY CHỈNH NÚT TẢI EXCEL: BỎ VIỀN, LÀM NHỎ, DẠNG TEXT */
+    /* TÙY CHỈNH NÚT TẢI EXCEL: BỎ VIỀN, NHỎ GỌN, CĂN PHẢI */
+    div[data-testid="stDownloadButton"] {
+        display: flex;
+        justify-content: flex-end;
+    }
     div[data-testid="stDownloadButton"] > button {
         background-color: transparent !important;
         border: none !important;
@@ -37,7 +41,6 @@ st.markdown("""
         padding: 0 !important;
         height: auto !important;
         min-height: unset !important;
-        justify-content: flex-start !important;
     }
     div[data-testid="stDownloadButton"] > button:hover {
         background-color: transparent !important;
@@ -278,12 +281,16 @@ with kpi_container:
     with r2_c4: st.markdown(render_kpi("Vướng mắc", p_paused, "⚠️"), unsafe_allow_html=True)
 
 
-# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & NÚT "Tải Excel" NẰM BÊN TRÁI CÙNG HÀNG VỚI TIÊU ĐỀ =================
+# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & NÚT "Tải Excel" GÓC PHẢI =================
 with table_container:
-    col_btn, col_title, col_empty = st.columns([1.2, 4, 0.5])
+    col_title, col_btn = st.columns([4, 1.2])
     
+    with col_title:
+        st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 25px; margin-bottom: 10px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
+        
     with col_btn:
         st.markdown("<div style='margin-top: 22px;'></div>", unsafe_allow_html=True)
+        
         def generate_excel_with_colors(df_data):
             output = io.BytesIO()
             with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -328,7 +335,7 @@ with table_container:
         try:
             excel_bytes = generate_excel_with_colors(df_export)
             st.download_button(
-                label="📥 Tải Excel",
+                label="Tải Excel",
                 data=excel_bytes,
                 file_name="Bao_cao_tien_do_Thien_Son.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -336,14 +343,11 @@ with table_container:
         except Exception:
             csv_bytes = df_export.to_csv(index=False).encode('utf-8-sig')
             st.download_button(
-                label="📥 Tải Excel",
+                label="Tải Excel",
                 data=csv_bytes,
                 file_name="Bao_cao_tien_do_Thien_Son.csv",
                 mime="text/csv"
             )
-
-    with col_title:
-        st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 25px; margin-bottom: 10px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
 
     priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
 
