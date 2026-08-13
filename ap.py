@@ -20,7 +20,6 @@ background_image_path = "background.jpg"
 bg_base64 = get_base64_image(background_image_path)
 
 if bg_base64:
-    # Nếu tìm thấy file ảnh trong thư mục, nhúng vào CSS
     bg_css = f"""
     <style>
         .stApp {{
@@ -33,7 +32,6 @@ if bg_base64:
     """
     st.markdown(bg_css, unsafe_allow_html=True)
 else:
-    # Nếu không thấy file ảnh, dùng ảnh marble mặc định từ web
     st.markdown("""
     <style>
         .stApp { 
@@ -45,7 +43,7 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-# ================= CSS TÙY CHỈNH (GLASSMORPHISM & ĐỘ TRONG SUỐT ĐỒNG BỘ) =================
+# ================= CSS TÙY CHỈNH (ĐỒNG BỘ ĐỘ TRONG SUỐT SIDEBAR & KPI) =================
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
@@ -99,14 +97,17 @@ st.markdown("""
         color: #198754;
     }
 
-    /* ĐỒNG BỘ: CÁC Ô NHẬP LIỆU / CHỌN TRONG SIDEBAR CÓ ĐỘ TRONG SUỐT GIỐNG Ô KPI */
-    section[data-testid="stSidebar"] div[data-baseweb="select"] > div,
-    section[data-testid="stSidebar"] div[data-baseweb="input"] > div {
-        background-color: rgba(255, 255, 255, 0.25) !important;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    /* ĐỒNG BỘ: CÁC Ô CHỌN TRONG SIDEBAR CÓ ĐỘ TRONG SUỐT 40% NHƯ Ô KPI */
+    section[data-testid="stSidebar"] div[data-baseweb="select"] > div {
+        background-color: rgba(255, 255, 255, 0.4) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.5) !important;
         border-radius: 12px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    section[data-testid="stSidebar"] div[data-baseweb="select"] span {
+        color: #0f172a !important;
     }
 
     /* LINK TẢI EXCEL TÙY CHỈNH: CĂN PHẢI TUYỆT ĐỐI */
@@ -129,19 +130,18 @@ st.markdown("""
         text-decoration: underline !important;
     }
 
-    /* ================= KHỐI KPI: NỀN TRẮNG TRONG SUỐT CAO (25%) & SHADOW ĐẬM NÉT ================= */
+    /* ================= KHỐI KPI: NỀN TRẮNG TRONG SUỐT 40% & SHADOW ĐẬM NÉT ================= */
     .kpi-card {
         width: 100%; 
         padding: 20px 18px; 
         border-radius: 24px; 
         border: none !important; 
-        /* Đổ bóng đa lớp giúp khối KPI nổi bật rõ rệt trên nền trong suốt */
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.05); 
         display: flex; 
         align-items: center; 
         margin-bottom: 15px; 
         min-height: 120px; 
-        background-color: rgba(255, 255, 255, 0.25) !important; /* Độ trong suốt cao, để lộ vân đá rõ nét */
+        background-color: rgba(255, 255, 255, 0.4) !important; /* Độ trong suốt 40% đồng bộ với sidebar */
         backdrop-filter: blur(15px); 
         -webkit-backdrop-filter: blur(15px);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -357,7 +357,6 @@ with kpi_container:
     p_notstarted = len(df_display[df_display.get('Trạng Thái', '') == 'Chưa bắt đầu'])
     p_paused = len(df_display[df_display.get('Trạng Thái', '') == 'Tạm dừng'])
 
-    # Hàm tạo khối KPI với nền trong suốt (40%) và shadow đậm
     def render_transparent_shadow_kpi(title, value, icon_name, bg_color, icon_color):
         return f"""
         <div class="kpi-card">
@@ -386,10 +385,8 @@ with kpi_container:
 
 # ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & LINK TẢI SÁT MÉP =================
 with table_container:
-    # Tiêu đề bảng căn giữa tuyệt đối
     st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 35px; margin-bottom: 25px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
     
-    # Xử lý xuất Excel
     def generate_excel_with_colors(df_data):
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -442,11 +439,9 @@ with table_container:
         mime_type = "text/csv"
         filename = "Bao_cao_tien_do_Thien_Son.csv"
 
-    # Link Tải Excel Text Sạch Sẽ - NẰM SÁT LỀ PHẢI
     download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}">Tải Excel</a>'
     st.markdown(download_html, unsafe_allow_html=True)
 
-    # Hiển thị bảng màu chuẩn xác phiên bản trước
     priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
 
     if 'Trạng Thái' in df_display.columns and 'Tiến Độ (%)' in df_display.columns:
