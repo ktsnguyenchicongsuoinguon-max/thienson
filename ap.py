@@ -29,8 +29,25 @@ st.markdown("""
     /* ĐẨY NÚT TẢI EXCEL RA SÁT MÉP PHẢI TUYỆT ĐỐI */
     div[data-testid="stDownloadButton"] {
         display: flex;
-        justify-content: flex-end;
+        justify-content: flex-end !important;
         width: 100%;
+    }
+    div[data-testid="stDownloadButton"] > button {
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        color: #198754 !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        height: auto !important;
+        min-height: unset !important;
+    }
+    div[data-testid="stDownloadButton"] > button:hover {
+        color: #14532d !important;
+        text-decoration: underline !important;
+        background-color: transparent !important;
     }
 
     /* ================= TÙY CHỈNH KHỐI KPI ================= */
@@ -268,13 +285,14 @@ with kpi_container:
 
 # ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & NÚT TẢI EXCEL SÁT MÉP PHẢI =================
 with table_container:
-    col_empty_l, col_title, col_btn = st.columns([1.2, 3.6, 1.2])
+    # Tỷ lệ 1-10-1 giúp tiêu đề luôn nằm ở tâm màn hình tuyệt đối, và nút nằm ở rìa phải
+    col_l, col_c, col_r = st.columns([1, 10, 1])
     
-    with col_title:
+    with col_c:
         st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 25px; margin-bottom: 10px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
         
-    with col_btn:
-        st.markdown("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True)
+    with col_r:
+        st.markdown("<div style='margin-top: 25px;'></div>", unsafe_allow_html=True)
         
         def generate_excel_with_colors(df_data):
             output = io.BytesIO()
