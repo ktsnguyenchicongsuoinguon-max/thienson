@@ -8,19 +8,16 @@ from datetime import datetime, timedelta
 # ================= 1. THIẾT LẬP GIAO DIỆN =================
 st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", page_icon="logothienson.png", layout="wide", initial_sidebar_state="expanded")
 
-# ================= HÀM ĐỌC ẢNH LOCAL LÀM BACKGROUND =================
 def get_base64_image(image_path):
     if os.path.exists(image_path):
         with open(image_path, "rb") as img_file:
             return base64.b64encode(img_file.read()).decode()
     return None
 
-# BẠN THAY TÊN FILE ẢNH Ở ĐÂY NẾU CẦN (Phải để cùng thư mục với app.py)
 background_image_path = "background.jpg" 
 bg_base64 = get_base64_image(background_image_path)
 
 if bg_base64:
-    # Nếu tìm thấy file ảnh trong thư mục, nhúng vào CSS
     bg_css = f"""
     <style>
         .stApp {{
@@ -33,7 +30,6 @@ if bg_base64:
     """
     st.markdown(bg_css, unsafe_allow_html=True)
 else:
-    # Nếu không thấy file ảnh, dùng ảnh marble mặc định từ web
     st.markdown("""
     <style>
         .stApp { 
@@ -141,7 +137,7 @@ st.markdown("""
         align-items: center; 
         margin-bottom: 15px; 
         min-height: 120px; 
-        background-color: rgba(255, 255, 255, 0.25) !important; /* Độ trong suốt cao, để lộ vân đá rõ nét */
+        background-color: rgba(255, 255, 255, 0.25) !important; 
         backdrop-filter: blur(15px); 
         -webkit-backdrop-filter: blur(15px);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -344,7 +340,7 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
 
 # ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI SHADOW =================
 with header_container:
-    st.markdown("<h2 style='text-align: center; color: #198754; font-weight: 900; margin-top: 10px; margin-bottom: 25px;'>BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center; color: #198754; font-weight: 900; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin-top: 10px; margin-bottom: 25px;'>BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</h2>", unsafe_allow_html=True)
 
 with kpi_container:
     p_projects = df_display.get('Dự Án', pd.Series()).nunique()
@@ -357,7 +353,6 @@ with kpi_container:
     p_notstarted = len(df_display[df_display.get('Trạng Thái', '') == 'Chưa bắt đầu'])
     p_paused = len(df_display[df_display.get('Trạng Thái', '') == 'Tạm dừng'])
 
-    # Hàm tạo khối KPI với nền trong suốt (40%) và shadow đậm
     def render_transparent_shadow_kpi(title, value, icon_name, bg_color, icon_color):
         return f"""
         <div class="kpi-card">
@@ -386,8 +381,8 @@ with kpi_container:
 
 # ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & LINK TẢI SÁT MÉP =================
 with table_container:
-    # Tiêu đề bảng căn giữa tuyệt đối
-    st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 35px; margin-bottom: 25px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
+    # Tiêu đề bảng căn giữa tuyệt đối, độ đậm cực cao và có hiệu ứng shadow
+    st.markdown("<h4 style='text-align: center; color: #198754; font-weight: 900; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin-top: 35px; margin-bottom: 25px;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
     
     # Xử lý xuất Excel
     def generate_excel_with_colors(df_data):
