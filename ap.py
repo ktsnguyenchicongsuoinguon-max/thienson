@@ -45,7 +45,7 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-# ================= CSS TÙY CHỈNH (GLASSMORPHISM & SHADOW LAN TỎA) =================
+# ================= CSS TÙY CHỈNH (GLASSMORPHISM & SHADOW ĐẬM NÉT) =================
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
@@ -53,7 +53,7 @@ st.markdown("""
     .block-container { 
         padding-top: 2rem !important; 
         padding-bottom: 2rem !important; 
-        background-color: rgba(255, 255, 255, 0.35) !important; /* Trắng trong suốt 35% */
+        background-color: rgba(255, 255, 255, 0.35) !important; 
         backdrop-filter: blur(20px) !important; 
         -webkit-backdrop-filter: blur(20px) !important;
         border-radius: 24px;
@@ -119,26 +119,26 @@ st.markdown("""
         text-decoration: underline !important;
     }
 
-    /* ================= KHỐI KPI: KHÔNG VIỀN, BÓNG ĐỔ LAN TỎA MỀM MẠI ================= */
+    /* ================= KHỐI KPI: NỀN TRẮNG TRONG SUỐT (70%) & SHADOW ĐẬM NÉT ================= */
     .kpi-card {
         width: 100%; 
         padding: 20px 18px; 
         border-radius: 24px; 
-        border: none !important; /* HOÀN TOÀN KHÔNG DÙNG VIỀN */
-        /* Hiệu ứng shadow lan tỏa rộng và mềm mại */
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.05); 
+        border: none !important; 
+        /* Hiệu ứng đổ bóng đa lớp rất đậm và rõ rệt để khối KPI nổi bật hẳn lên */
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.05); 
         display: flex; 
         align-items: center; 
         margin-bottom: 15px; 
         min-height: 120px; 
-        background-color: rgba(255, 255, 255, 0.8) !important; 
-        backdrop-filter: blur(12px); 
-        -webkit-backdrop-filter: blur(12px);
+        background-color: rgba(255, 255, 255, 0.7) !important; /* Nền trắng có độ trong suốt nhẹ (70%) */
+        backdrop-filter: blur(15px); 
+        -webkit-backdrop-filter: blur(15px);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     .kpi-card:hover {
         transform: translateY(-5px); 
-        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.15), 0 8px 20px rgba(0, 0, 0, 0.08); 
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25), 0 10px 20px rgba(0, 0, 0, 0.12); 
     }
     .kpi-icon-wrapper {
         width: 65px; 
@@ -153,7 +153,7 @@ st.markdown("""
     }
     .kpi-details { flex-grow: 1; overflow: hidden; }
     .kpi-title {
-        font-size: 0.85rem; font-weight: 800; opacity: 0.8;
+        font-size: 0.85rem; font-weight: 800; opacity: 0.85;
         text-transform: uppercase; margin-bottom: 5px; white-space: nowrap;
         overflow: hidden; text-overflow: ellipsis;
         color: #0f172a;
@@ -347,8 +347,8 @@ with kpi_container:
     p_notstarted = len(df_display[df_display.get('Trạng Thái', '') == 'Chưa bắt đầu'])
     p_paused = len(df_display[df_display.get('Trạng Thái', '') == 'Tạm dừng'])
 
-    # Hàm tạo khối KPI không dùng viền, dùng hiệu ứng shadow lan tỏa mạnh
-    def render_shadow_kpi(title, value, icon_name, bg_color, icon_color):
+    # Hàm tạo khối KPI với hiệu ứng shadow đậm nét và nền trong suốt nhẹ
+    def render_strong_shadow_kpi(title, value, icon_name, bg_color, icon_color):
         return f"""
         <div class="kpi-card">
             <div class="kpi-icon-wrapper" style="background-color: {bg_color}; color: {icon_color};">
@@ -362,16 +362,16 @@ with kpi_container:
         """
 
     r1_c1, r1_c2, r1_c3, r1_c4 = st.columns(4)
-    with r1_c1: st.markdown(render_shadow_kpi("Tổng Dự án", p_projects, "domain", "#cfe2ff", "#0d6efd"), unsafe_allow_html=True)
-    with r1_c2: st.markdown(render_shadow_kpi("Hạng mục", p_categories, "folder_open", "#cfe2ff", "#0d6efd"), unsafe_allow_html=True)
-    with r1_c3: st.markdown(render_shadow_kpi("Công việc", p_total, "assignment", "#cfe2ff", "#0d6efd"), unsafe_allow_html=True)
-    with r1_c4: st.markdown(render_shadow_kpi("Tiến độ TB", f"{p_prog:.1f}%", "speed", "#e0cffc", "#6f42c1"), unsafe_allow_html=True)
+    with r1_c1: st.markdown(render_strong_shadow_kpi("Tổng Dự án", p_projects, "domain", "#cfe2ff", "#0d6efd"), unsafe_allow_html=True)
+    with r1_c2: st.markdown(render_strong_shadow_kpi("Hạng mục", p_categories, "folder_open", "#cfe2ff", "#0d6efd"), unsafe_allow_html=True)
+    with r1_c3: st.markdown(render_strong_shadow_kpi("Công việc", p_total, "assignment", "#cfe2ff", "#0d6efd"), unsafe_allow_html=True)
+    with r1_c4: st.markdown(render_strong_shadow_kpi("Tiến độ TB", f"{p_prog:.1f}%", "speed", "#e0cffc", "#6f42c1"), unsafe_allow_html=True)
     
     r2_c1, r2_c2, r2_c3, r2_c4 = st.columns(4)
-    with r2_c1: st.markdown(render_shadow_kpi("Đã hoàn thành", p_done, "check_circle", "#d1e7dd", "#198754"), unsafe_allow_html=True)
-    with r2_c2: st.markdown(render_shadow_kpi("Đang triển khai", p_inprogress, "sync", "#cff4fc", "#0dcaf0"), unsafe_allow_html=True)
-    with r2_c3: st.markdown(render_shadow_kpi("Chưa bắt đầu", p_notstarted, "hourglass_empty", "#e2e3e5", "#6c757d"), unsafe_allow_html=True)
-    with r2_c4: st.markdown(render_shadow_kpi("Vướng mắc", p_paused, "error", "#f8d7da", "#dc3545"), unsafe_allow_html=True)
+    with r2_c1: st.markdown(render_strong_shadow_kpi("Đã hoàn thành", p_done, "check_circle", "#d1e7dd", "#198754"), unsafe_allow_html=True)
+    with r2_c2: st.markdown(render_strong_shadow_kpi("Đang triển khai", p_inprogress, "sync", "#cff4fc", "#0dcaf0"), unsafe_allow_html=True)
+    with r2_c3: st.markdown(render_strong_shadow_kpi("Chưa bắt đầu", p_notstarted, "hourglass_empty", "#e2e3e5", "#6c757d"), unsafe_allow_html=True)
+    with r2_c4: st.markdown(render_strong_shadow_kpi("Vướng mắc", p_paused, "error", "#f8d7da", "#dc3545"), unsafe_allow_html=True)
 
 
 # ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & LINK TẢI SÁT MÉP =================
