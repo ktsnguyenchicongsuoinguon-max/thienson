@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import io
+import base64
 from datetime import datetime, timedelta
 
 # ================= 1. THIẾT LẬP GIAO DIỆN & CSS TÙY CHỈNH =================
@@ -26,32 +27,24 @@ st.markdown("""
         font-weight: 800 !important; font-size: 14px !important;
     }
     
-    /* ĐẨY NÚT TẢI EXCEL RA SÁT MÉP PHẢI TUYỆT ĐỐI VÀ LÀM NHẠT MÀU CHỮ */
-    div[data-testid="stDownloadButton"] {
-        display: flex !important;
-        justify-content: flex-end !important; /* Ép nội dung sang phải */
-        width: 100% !important; /* Phủ kín chiều ngang để đẩy được sát lề */
-        margin-top: -40px !important; /* Kéo lên ngang hàng với tiêu đề bảng */
-        margin-bottom: 10px !important;
-        z-index: 999 !important;
-        position: relative !important;
-    }
-    div[data-testid="stDownloadButton"] > button {
-        background-color: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        color: #6c757d !important; /* Màu chữ xám nhạt tinh tế hơn */
+    /* LINK TẢI EXCEL TÙY CHỈNH: CĂN PHẢI TUYỆT ĐỐI, CHỮ NHẠT HƠN */
+    .custom-download-link {
+        display: block;
+        float: right; /* Đẩy sát lề phải 100% */
+        text-align: right;
+        color: #868e96 !important; /* Màu xám nhạt tinh tế */
         font-size: 13.5px !important;
         font-weight: 600 !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        height: auto !important;
-        min-height: unset !important;
+        text-decoration: none !important;
+        margin-top: -42px !important; /* Kéo ngang hàng với tiêu đề bảng */
+        margin-bottom: 15px !important;
+        position: relative;
+        z-index: 9999;
+        cursor: pointer;
     }
-    div[data-testid="stDownloadButton"] > button:hover {
+    .custom-download-link:hover {
         color: #198754 !important; /* Sáng lên màu xanh khi rê chuột */
         text-decoration: underline !important;
-        background-color: transparent !important;
     }
 
     /* ================= TÙY CHỈNH KHỐI KPI ================= */
@@ -287,10 +280,10 @@ with kpi_container:
     with r2_c4: st.markdown(render_kpi("Vướng mắc", p_paused, "⚠️"), unsafe_allow_html=True)
 
 
-# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU =================
+# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU VÀ NÚT TẢI SÁT PHẢI BẰNG HTML/BASE64 =================
 with table_container:
-    # 1. In Tiêu đề Bảng (Tự động căn giữa)
-    st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 35px; margin-bottom: 20px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
+    # 1. In Tiêu đề Bảng
+    st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 35px; margin-bottom: 25px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
     
     # 2. Xử lý xuất Excel
     def generate_excel_with_colors(df_data):
@@ -334,22 +327,21 @@ with table_container:
         wb.save(final_output)
         return final_output.getvalue()
 
+    # Tạo link tải dưới dạng HTML thẻ <a> (Bypass Streamlit Download Button)
     try:
         excel_bytes = generate_excel_with_colors(df_export)
-        st.download_button(
-            label="Tải Excel",
-            data=excel_bytes,
-            file_name="Bao_cao_tien_do_Thien_Son.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
+        b64 = base64.b64encode(excel_bytes).decode()
+        mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        filename = "Bao_cao_tien_do_Thien_Son.xlsx"
     except Exception:
         csv_bytes = df_export.to_csv(index=False).encode('utf-8-sig')
-        st.download_button(
-            label="Tải Excel",
-            data=csv_bytes,
-            file_name="Bao_cao_tien_do_Thien_Son.csv",
-            mime="text/csv"
-        )
+        b64 = base64.b64encode(csv_bytes).decode()
+        mime_type = "text/csv"
+        filename = "Bao_cao_tien_do_Thien_Son.csv"
+
+    # Nhúng thẻ <a> vào giao diện, thẻ này sẽ nhận CSS `.custom-download-link` và bị đẩy sát mép phải
+    download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}">Tải Excel</a>'
+    st.markdown(download_html, unsafe_allow_html=True)
 
     # 3. Hiển thị bảng
     priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
