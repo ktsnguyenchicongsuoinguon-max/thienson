@@ -7,37 +7,36 @@ st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", page_icon="logothi
 
 st.markdown("""
 <style>
-    /* Cho phép nền tự động thay đổi theo Light/Dark Mode của hệ thống */
-    
     /* 1. THANH HEADER TÀNG HÌNH (TRONG SUỐT) - GIỮ LẠI ICON VÀ 3 CHẤM */
     header[data-testid="stHeader"] { 
         background: transparent !important; 
         background-color: transparent !important;
     }
-    
-    /* Ẩn nút Share/Deploy rườm rà */
     .stAppDeployButton { display: none !important; }
     
     /* ĐẨY NỘI DUNG XUỐNG DƯỚI ĐỂ KHÔNG BỊ ĐÈ */
     .block-container { padding-top: 3rem !important; padding-bottom: 2rem !important; }
     section[data-testid="stSidebar"] .block-container { padding-top: 1rem !important; }
 
-    /* LÀM ĐẬM HEADER BẢNG - Tương thích nền */
+    /* LÀM ĐẬM HEADER BẢNG - TỰ ĐỘNG THÍCH ỨNG SÁNG/TỐI */
     div[data-testid="stDataFrame"] th {
+        background-color: var(--secondary-background-color) !important; 
+        color: var(--text-color) !important;
         font-weight: 800 !important; font-size: 14px !important;
     }
     
-    /* TÙY CHỈNH KHỐI KPI */
+    /* ================= TÙY CHỈNH KHỐI KPI - TỰ ĐỘNG THÍCH ỨNG ================= */
     .kpi-card {
         width: 100%; padding: 20px 15px; 
-        border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.08); 
-        border-left: 6px solid #C62828; 
+        border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+        border: 1px solid var(--border-color); /* Viền tự động mờ theo theme */
+        border-left: 6px solid #C62828; /* Luôn giữ viền trái màu đỏ */
         display: flex; align-items: center; margin-bottom: 15px; min-height: 115px; 
-        /* Thêm hiệu ứng màu nền để tự thích ứng Dark Mode */
-        background-color: color-mix(in srgb, currentColor 5%, transparent);
+        background-color: var(--secondary-background-color); /* Màu nền khối nổi bật trong Dark Mode */
     }
     .kpi-icon {
-        font-size: 2.2rem; margin-right: 15px; background-color: #FFEBEE; 
+        font-size: 2.2rem; margin-right: 15px; 
+        background-color: rgba(198, 40, 40, 0.15); /* Nền đỏ trong suốt thích ứng tốt cả 2 mode */
         padding: 10px; border-radius: 50%; display: flex; align-items: center;
         justify-content: center; min-width: 60px; height: 60px;
     }
@@ -46,8 +45,12 @@ st.markdown("""
         font-size: 0.85rem; font-weight: 800; opacity: 0.7;
         text-transform: uppercase; margin-bottom: 5px; white-space: nowrap;
         overflow: hidden; text-overflow: ellipsis;
+        color: var(--text-color);
     }
-    .kpi-value { font-size: 1.8rem; font-weight: 900; }
+    .kpi-value { 
+        font-size: 1.8rem; font-weight: 900; 
+        color: var(--text-color);
+    }
     
     /* ================= THANH TRẠNG THÁI ================= */
     div[data-testid="stRadio"] { width: 100% !important; }
@@ -68,9 +71,10 @@ st.markdown("""
         box-shadow: none !important;
         padding: 5px !important;
     }
-    /* Gỡ bỏ việc ép cứng màu đen để chữ tự chuyển trắng trong Dark Mode */
+    /* Chữ thanh trạng thái tự đổi trắng/đen */
     div[data-testid="stRadio"] > div[role="radiogroup"] > label p {
         font-weight: 500 !important; 
+        color: var(--text-color) !important; 
         margin: 0 !important; 
         font-size: 1rem !important; 
     }
@@ -218,7 +222,6 @@ with header_container:
     st.markdown("<h2 style='text-align: center; color: #198754; font-weight: 900; margin-top: 10px; margin-bottom: 25px;'>BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</h2>", unsafe_allow_html=True)
 
 with kpi_container:
-    # --- TÍNH TOÁN CÁC CHỈ SỐ KPI ---
     p_projects = df_display.get('Dự Án', pd.Series()).nunique()
     p_categories = df_display.get('Hạng Mục', pd.Series()).nunique()
     p_total = len(df_display)
@@ -240,7 +243,6 @@ with kpi_container:
         </div>
         """
 
-    # --- TẠO BỐ CỤC 2 HÀNG (Mỗi hàng 4 cột) ---
     r1_c1, r1_c2, r1_c3, r1_c4 = st.columns(4)
     with r1_c1: st.markdown(render_kpi("Tổng Dự án", p_projects, "🏢"), unsafe_allow_html=True)
     with r1_c2: st.markdown(render_kpi("Hạng mục", p_categories, "📁"), unsafe_allow_html=True)
@@ -267,13 +269,13 @@ with table_container:
         df_display = df_display.sort_values(by=sort_cols, ascending=[True] * len(sort_cols))
         df_display = df_display.drop(columns=['Mức Ưu Tiên'])
 
+    # THÊM !IMPORTANT VÀO MÀU CHỮ ĐỂ DARK MODE ĐỌC ĐƯỢC
     def color_rows(row):
         status = row.get('Trạng Thái', '')
-        # Loại bỏ set cứng màu chữ "#000" để Dark Mode tự xử lý màu chữ trong bảng
-        if status == 'Đã hoàn thành': return ['background-color: #e8f5e9;'] * len(row)
-        if status == 'Tạm dừng': return ['background-color: #ffebee;'] * len(row)
-        if status == 'Chưa bắt đầu': return ['background-color: #f5f5f5; color: #333;'] * len(row)
-        return [''] * len(row)
+        if status == 'Đã hoàn thành': return ['background-color: #c8e6c9 !important; color: #1b5e20 !important;'] * len(row)
+        if status == 'Tạm dừng': return ['background-color: #ffcdd2 !important; color: #b71c1c !important;'] * len(row)
+        if status == 'Chưa bắt đầu': return ['background-color: #e2e3e5 !important; color: #212121 !important;'] * len(row)
+        return [''] * len(row) # Đang triển khai để trống (chạy theo mặc định nền đen chữ trắng của Dark Mode)
 
     styled_df = df_display.style.apply(color_rows, axis=1)
     
