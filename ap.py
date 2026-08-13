@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import io
 from datetime import datetime, timedelta
 
 # ================= 1. THIẾT LẬP GIAO DIỆN & CSS TÙY CHỈNH =================
@@ -212,12 +211,9 @@ if selected_cb: df_display = df_display[df_display[cb_col].isin(selected_cb)]
 if actual_status != "Tất cả": 
     df_display = df_display[df_display.get('Trạng Thái', '') == actual_status]
 
-df_export = df_display.copy()
 for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
     if col in df_display.columns:
         df_display = df_display.drop(columns=[col])
-        if col in df_export.columns:
-            df_export = df_export.drop(columns=[col])
 
 
 # ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI 2 HÀNG =================
@@ -259,79 +255,9 @@ with kpi_container:
     with r2_c4: st.markdown(render_kpi("Vướng mắc", p_paused, "⚠️"), unsafe_allow_html=True)
 
 
-# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & NÚT TẢI EXCEL GIỮ NGUYÊN MÀU =================
+# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU =================
 with table_container:
-    col_title, col_btn = st.columns([3, 1])
-    
-    with col_title:
-        st.markdown("<h4 style='color: #198754; margin-top: 25px; margin-bottom: 10px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
-        
-    with col_btn:
-        st.markdown("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True)
-        
-        # Hàm tạo file Excel tô màu chuẩn
-        def generate_excel_with_colors(df_data):
-            output = io.BytesIO()
-            with pd.ExcelWriter(output, engine='openpyxl') as writer:
-                df_data.to_excel(writer, index=False, sheet_name='TienDo')
-            
-            output.seek(0)
-            import openpyxl
-            from openpyxl.styles import PatternFill
-            
-            wb = openpyxl.load_workbook(output)
-            ws = wb.active
-
-            # Khai báo màu trùng khớp với giao diện web
-            green_fill = PatternFill(start_color="A5D6A7", end_color="A5D6A7", fill_type="solid")
-            red_fill = PatternFill(start_color="EF9A9A", end_color="EF9A9A", fill_type="solid")
-            gray_fill = PatternFill(start_color="F5F5F5", end_color="F5F5F5", fill_type="solid")
-
-            # Tìm vị trí cột Trạng Thái
-            status_col_idx = None
-            for col_idx, col_name in enumerate(df_data.columns, 1):
-                if col_name == 'Trạng Thái':
-                    status_col_idx = col_idx
-                    break
-
-            if status_col_idx:
-                for row_idx in range(2, ws.max_row + 1):
-                    status_val = str(ws.cell(row=row_idx, column=status_col_idx).value).strip()
-                    fill_to_use = None
-                    if status_val == 'Đã hoàn thành':
-                        fill_to_use = green_fill
-                    elif status_val == 'Tạm dừng':
-                        fill_to_use = red_fill
-                    elif status_val == 'Chưa bắt đầu':
-                        fill_to_use = gray_fill
-                    
-                    if fill_to_use:
-                        for col in range(1, ws.max_column + 1):
-                            ws.cell(row=row_idx, column=col).fill = fill_to_use
-
-            final_output = io.BytesIO()
-            wb.save(final_output)
-            return final_output.getvalue()
-
-        try:
-            excel_bytes = generate_excel_with_colors(df_export)
-            st.download_button(
-                label="📥 Tải xuống Excel",
-                data=excel_bytes,
-                file_name="Bao_cao_tien_do_Thien_Son.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                use_container_width=True
-            )
-        except Exception:
-            # Dự phòng nếu chưa cập nhật requirements.txt
-            csv_bytes = df_export.to_csv(index=False).encode('utf-8-sig')
-            st.download_button(
-                label="📥 Tải xuống CSV",
-                data=csv_bytes,
-                file_name="Bao_cao_tien_do_Thien_Son.csv",
-                mime="text/csv",
-                use_container_width=True
-            )
+    st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 35px; margin-bottom: 20px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
 
     priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
 
