@@ -90,7 +90,7 @@ def load_data():
     if 'Ngày Bắt Đầu' in df.columns:
         df['Ngày_Bat_Dau_Obj'] = pd.to_datetime(df['Ngày Bắt Đầu'].astype(str).str.strip(), format='%d/%m/%Y', errors='coerce')
         
-    # 2. Ép kiểu Ngày hoàn thành (Xử lý chữ hoa chữ thường)
+    # 2. Ép kiểu Ngày hoàn thành
     col_ht = 'Ngày hoàn thành' if 'Ngày hoàn thành' in df.columns else ('Ngày Hoàn Thành' if 'Ngày Hoàn Thành' in df.columns else None)
     if col_ht:
         df['Ngày_Hoan_Thanh_Obj'] = pd.to_datetime(df[col_ht].astype(str).str.strip(), format='%d/%m/%Y', errors='coerce')
@@ -125,11 +125,8 @@ with st.sidebar:
     cb_opts = [x for x in df_temp[cb_col].unique() if x != ''] if cb_col else []
     selected_cb = st.multiselect("👷 CÁN BỘ TRIỂN KHAI", options=cb_opts, placeholder="Chọn Tất cả")
 
-    # ================= BỘ LỌC THỜI GIAN THÔNG MINH =================
+    # ================= BỘ LỌC THỜI GIAN THÔNG MINH (ĐÃ GỘP) =================
     st.markdown("<br>", unsafe_allow_html=True)
-    
-    # Cho phép người dùng chọn đang muốn lọc theo Ngày bắt đầu hay Ngày hoàn thành
-    tieu_chi_ngay = st.selectbox("📌 LỌC THEO CỘT NGÀY", ["Ngày Bắt Đầu", "Ngày hoàn thành"])
     
     time_filter = st.selectbox("📅 KHOẢNG THỜI GIAN", 
                                ["Tất cả", "Hôm nay", "Tuần này", "Tháng này", "Năm nay", "Tùy chọn khoảng ngày"])
@@ -181,18 +178,26 @@ with status_container:
 # ================= 6. TỔNG HỢP & ÁP DỤNG MỌI BỘ LỌC =================
 df_display = df.copy()
 
-# A. LỌC THỜI GIAN LINH HOẠT THEO CỘT ĐÃ CHỌN
-if start_date and end_date:
+# A. LỌC THỜI GIAN GỘP CHUNG (Lọc các việc CÓ DIỄN RA trong khoảng thời gian)
+if start_date and end_date and 'Ngày_Bat_Dau_Obj' in df_display.columns and 'Ngày_Hoan_Thanh_Obj' in df_display.columns:
     start_ts = pd.to_datetime(start_date)
     end_ts = pd.to_datetime(end_date)
     
-    if tieu_chi_ngay == "Ngày Bắt Đầu" and 'Ngày_Bat_Dau_Obj' in df_display.columns:
-        mask = df_display['Ngày_Bat_Dau_Obj'].notna() & (df_display['Ngày_Bat_Dau_Obj'] >= start_ts) & (df_display['Ngày_Bat_Dau_Obj'] <= end_ts)
-        df_display = df_display[mask]
-        
-    elif tieu_chi_ngay == "Ngày hoàn thành" and 'Ngày_Hoan_Thanh_Obj' in df_display.columns:
-        mask = df_display['Ngày_Hoan_Thanh_Obj'].notna() & (df_display['Ngày_Hoan_Thanh_Obj'] >= start_ts) & (df_display['Ngày_Hoan_Thanh_Obj'] <= end_ts)
-        df_display = df_display[mask]
+    has_start = df_display['Ngày_Bat_Dau_Obj'].notna()
+    has_end = df_display['Ngày_Hoan_Thanh_Obj'].notna()
+    
+    # 1. Việc có đủ 2 ngày: Xét giao thoa (Bắt đầu <= Ngày cuối lọc VÀ Kết thúc >= Ngày đầu lọc)
+    mask_both = has_start & has_end & (df_display['Ngày_Bat_Dau_Obj'] <= end_ts) & (df_display['Ngày_Hoan_Thanh_Obj'] >= start_ts)
+    
+    # 2. Chỉ có ngày bắt đầu: Chỉ xét mốc bắt đầu có lọt thỏm vào khoảng chọn không
+    mask_start_only = has_start & ~has_end & (df_display['Ngày_Bat_Dau_Obj'] >= start_ts) & (df_display['Ngày_Bat_Dau_Obj'] <= end_ts)
+    
+    # 3. Chỉ có ngày kết thúc: Chỉ xét mốc kết thúc có lọt thỏm vào khoảng chọn không
+    mask_end_only = ~has_start & has_end & (df_display['Ngày_Hoan_Thanh_Obj'] >= start_ts) & (df_display['Ngày_Hoan_Thanh_Obj'] <= end_ts)
+    
+    # Gộp 3 trường hợp lại
+    mask_total = mask_both | mask_start_only | mask_end_only
+    df_display = df_display[mask_total]
 
 # B. Lọc Sidebar
 if selected_projects: df_display = df_display[df_display['Dự Án'].isin(selected_projects)]
