@@ -9,11 +9,11 @@ st.markdown("""
 <style>
     .stApp { background-color: #f4f7f6; }
     
-    /* XÓA THANH HEADER SHARE */
-    header[data-testid="stHeader"] { display: none !important; }
+    /* ẨN NÚT SHARE/DEPLOY NHƯNG GIỮ LẠI MENU ĐỔI MÀU GIAO DIỆN */
+    .stAppDeployButton { display: none !important; }
     
-    /* ĐẨY NỘI DUNG XUỐNG DƯỚI */
-    .block-container { padding-top: 3.5rem !important; padding-bottom: 2rem !important; }
+    /* ĐẨY NỘI DUNG XUỐNG DƯỚI ĐỂ KHÔNG BỊ ĐÈ */
+    .block-container { padding-top: 3rem !important; padding-bottom: 2rem !important; }
     section[data-testid="stSidebar"] .block-container { padding-top: 1rem !important; }
 
     /* LÀM ĐẬM HEADER BẢNG */
@@ -42,32 +42,31 @@ st.markdown("""
     }
     .kpi-value { font-size: 1.8rem; font-weight: 900; color: #1e293b; }
     
-    /* ================= THANH TRẠNG THÁI: KHÔNG Ô, CĂN GIỮA, KHÔNG BỊ CẮT CHỮ ================= */
+    /* ================= THANH TRẠNG THÁI: CHỮ NHỎ LẠI & BỚT ĐẬM ================= */
     div[data-testid="stRadio"] { width: 100% !important; }
     div[data-testid="stRadio"] > div[role="radiogroup"] {
         display: flex; 
         flex-direction: row; 
-        justify-content: center; /* Căn giữa các lựa chọn */
-        gap: 35px; /* Khoảng cách rộng rãi giữa các mục */
+        justify-content: center; 
+        gap: 35px; 
         margin-top: 10px; 
         margin-bottom: 25px;
-        flex-wrap: wrap; /* Tự động xuống dòng nếu màn hình nhỏ, tuyệt đối không cắt chữ */
+        flex-wrap: wrap; 
         background-color: transparent !important; 
     }
     div[data-testid="stRadio"] > div[role="radiogroup"] > label {
         cursor: pointer;
-        /* Xóa hoàn toàn ô, viền và shadow */
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
         padding: 5px !important;
     }
-    /* Chỉnh chữ to, rõ, đậm */
+    /* Chỉnh chữ nhỏ hơn (1rem) và độ đậm vừa phải (500) */
     div[data-testid="stRadio"] > div[role="radiogroup"] > label p {
-        font-weight: 700 !important; 
+        font-weight: 500 !important; 
         color: #1e293b !important; 
         margin: 0 !important; 
-        font-size: 1.1rem !important; 
+        font-size: 1rem !important; 
     }
 </style>
 """, unsafe_allow_html=True)
