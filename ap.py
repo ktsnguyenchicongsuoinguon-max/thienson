@@ -45,7 +45,7 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-# ================= CSS TÙY CHỈNH (GLASSMORPHISM & KPI TRONG SUỐT HƠN) =================
+# ================= CSS TÙY CHỈNH (GLASSMORPHISM & ĐỘ TRONG SUỐT ĐỒNG BỘ) =================
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
@@ -99,6 +99,16 @@ st.markdown("""
         color: #198754;
     }
 
+    /* ĐỒNG BỘ: CÁC Ô NHẬP LIỆU / CHỌN TRONG SIDEBAR CÓ ĐỘ TRONG SUỐT GIỐNG Ô KPI */
+    section[data-testid="stSidebar"] div[data-baseweb="select"] > div,
+    section[data-testid="stSidebar"] div[data-baseweb="input"] > div {
+        background-color: rgba(255, 255, 255, 0.25) !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.4) !important;
+        border-radius: 12px !important;
+    }
+
     /* LINK TẢI EXCEL TÙY CHỈNH: CĂN PHẢI TUYỆT ĐỐI */
     .custom-download-link {
         display: block;
@@ -119,7 +129,7 @@ st.markdown("""
         text-decoration: underline !important;
     }
 
-    /* ================= KHỐI KPI: NỀN TRẮNG TRONG SUỐT HƠN (40%) & SHADOW ĐẬM NÉT ================= */
+    /* ================= KHỐI KPI: NỀN TRẮNG TRONG SUỐT CAO (25%) & SHADOW ĐẬM NÉT ================= */
     .kpi-card {
         width: 100%; 
         padding: 20px 18px; 
@@ -131,7 +141,7 @@ st.markdown("""
         align-items: center; 
         margin-bottom: 15px; 
         min-height: 120px; 
-        background-color: rgba(255, 255, 255, 0.4) !important; /* Đã giảm độ đục xuống 40% để lộ vân đá rõ hơn */
+        background-color: rgba(255, 255, 255, 0.25) !important; /* Độ trong suốt cao, để lộ vân đá rõ nét */
         backdrop-filter: blur(15px); 
         -webkit-backdrop-filter: blur(15px);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
