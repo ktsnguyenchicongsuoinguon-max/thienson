@@ -259,7 +259,7 @@ with kpi_container:
     with r2_c4: st.markdown(render_kpi("Vướng mắc", p_paused, "⚠️"), unsafe_allow_html=True)
 
 
-# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & NÚT TẢI EXCEL GÓC PHẢI =================
+# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & NÚT "Tải Excel" GÓC PHẢI =================
 with table_container:
     col_l, col_c, col_r = st.columns([1, 4, 1])
     
@@ -313,7 +313,7 @@ with table_container:
         try:
             excel_bytes = generate_excel_with_colors(df_export)
             st.download_button(
-                label="📥 Tải Excel",
+                label="Tải Excel",
                 data=excel_bytes,
                 file_name="Bao_cao_tien_do_Thien_Son.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -322,7 +322,7 @@ with table_container:
         except Exception:
             csv_bytes = df_export.to_csv(index=False).encode('utf-8-sig')
             st.download_button(
-                label="📥 Tải CSV",
+                label="Tải Excel",
                 data=csv_bytes,
                 file_name="Bao_cao_tien_do_Thien_Son.csv",
                 mime="text/csv",
