@@ -7,25 +7,47 @@ from datetime import datetime, timedelta
 # ================= 1. THIẾT LẬP GIAO DIỆN & CSS TÙY CHỈNH =================
 st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", page_icon="logothienson.png", layout="wide", initial_sidebar_state="expanded")
 
-# Nhúng font icon hiện đại của Google (Đồng bộ cho cả Sidebar và KPI)
+# Nhúng font icon hiện đại của Google
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* 1. THANH HEADER TÀNG HÌNH (TRONG SUỐT) - GIỮ LẠI ICON VÀ 3 CHẤM */
+    /* ================= NỀN TỔNG THỂ MAP ĐÁ MARBLE XANH NGỌC ================= */
+    .stApp { 
+        /* Bạn có thể thay link ảnh trong ngoặc kép bằng link ảnh map đá của riêng bạn */
+        background-image: url("https://img.freepik.com/free-photo/green-marble-texture-background_23-2150383431.jpg"); 
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+
+    /* Hiệu ứng kính mờ (Glassmorphism) cho khung chứa nội dung để chữ không bị chìm vào vân đá */
+    .block-container { 
+        padding-top: 2rem !important; 
+        padding-bottom: 2rem !important; 
+        background-color: rgba(255, 255, 255, 0.92) !important; /* Lớp nền trắng hơi trong suốt */
+        border-radius: 20px;
+        margin-top: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.15); /* Đổ bóng tạo chiều sâu */
+    }
+
+    /* Hiệu ứng kính mờ cho thanh Sidebar */
+    section[data-testid="stSidebar"] {
+        background-color: rgba(255, 255, 255, 0.85) !important;
+        backdrop-filter: blur(10px);
+        border-right: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    /* THANH HEADER TÀNG HÌNH */
     header[data-testid="stHeader"] { 
         background: transparent !important; 
-        background-color: transparent !important;
     }
     .stAppDeployButton { display: none !important; }
-    
-    /* ĐẨY NỘI DUNG XUỐNG DƯỚI ĐỂ KHÔNG BỊ ĐÈ */
-    .block-container { padding-top: 3rem !important; padding-bottom: 2rem !important; }
-    section[data-testid="stSidebar"] .block-container { padding-top: 1rem !important; }
 
     /* LÀM ĐẬM HEADER BẢNG */
     div[data-testid="stDataFrame"] th {
-        background-color: var(--secondary-background-color) !important; 
-        color: var(--text-color) !important;
+        background-color: #E2E8F0 !important; 
+        color: #0F172A !important;
         font-weight: 800 !important; font-size: 14px !important;
     }
     
@@ -36,14 +58,14 @@ st.markdown("""
         gap: 8px;
         font-size: 14px;
         font-weight: 700;
-        color: var(--text-color);
+        color: #0f172a;
         margin-bottom: 5px;
         margin-top: 12px;
         text-transform: uppercase;
     }
     .sidebar-title .material-symbols-rounded {
         font-size: 20px;
-        color: #198754; /* Màu xanh lá đồng bộ */
+        color: #198754;
     }
 
     /* LINK TẢI EXCEL TÙY CHỈNH: CĂN PHẢI TUYỆT ĐỐI */
@@ -66,17 +88,18 @@ st.markdown("""
         text-decoration: underline !important;
     }
 
-    /* ================= TÙY CHỈNH KHỐI KPI MÀU ĐẬM, ICON TO ================= */
+    /* ================= TÙY CHỈNH KHỐI KPI ================= */
     .kpi-card {
         width: 100%; padding: 20px 15px; 
-        border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
-        border: 1px solid var(--border-color); 
+        border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+        border: 1px solid rgba(0,0,0,0.05); 
         display: flex; align-items: center; margin-bottom: 15px; min-height: 115px; 
-        background-color: var(--secondary-background-color); 
+        background-color: #ffffff; 
         transition: transform 0.2s;
     }
     .kpi-card:hover {
         transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.1);
     }
     .kpi-icon-wrapper {
         width: 65px; 
@@ -94,11 +117,11 @@ st.markdown("""
         font-size: 0.85rem; font-weight: 800; opacity: 0.8;
         text-transform: uppercase; margin-bottom: 5px; white-space: nowrap;
         overflow: hidden; text-overflow: ellipsis;
-        color: var(--text-color);
+        color: #0f172a;
     }
     .kpi-value { 
         font-size: 1.8rem; font-weight: 900; 
-        color: var(--text-color);
+        color: #0f172a;
     }
     
     /* ================= THANH TRẠNG THÁI NGUYÊN BẢN ================= */
@@ -121,8 +144,8 @@ st.markdown("""
         padding: 5px !important;
     }
     div[data-testid="stRadio"] > div[role="radiogroup"] > label p {
-        font-weight: 500 !important; 
-        color: var(--text-color) !important; 
+        font-weight: 600 !important; 
+        color: #0f172a !important; 
         margin: 0 !important; 
         font-size: 1rem !important; 
     }
@@ -166,7 +189,7 @@ with st.sidebar:
     with col_logo2:
         st.image("logothienson.png", use_container_width=True) 
         
-    st.markdown("<h3 style='text-align: left; margin-top: 10px; margin-bottom: 10px;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: left; margin-top: 10px; margin-bottom: 10px; color: #0f172a;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
     
     unique_projects = [p for p in df.get('Dự Án', pd.Series()).unique() if p != '']
     st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">domain</span> DỰ ÁN</div>', unsafe_allow_html=True)
@@ -235,7 +258,6 @@ table_container = st.container()
 
 # ================= 5. XỬ LÝ LỌC TRẠNG THÁI (BỎ ICON EMOJI) =================
 with status_container:
-    # Chỉ giữ lại chữ tinh gọn
     status_options = ["Tất cả", "Chưa bắt đầu", "Đang triển khai", "Đã hoàn thành", "Tạm dừng"]
     
     selected_ui_status = st.radio("Bộ lọc Trạng Thái", options=status_options, horizontal=True, label_visibility="collapsed")
@@ -318,7 +340,7 @@ with table_container:
     # Tiêu đề bảng căn giữa tuyệt đối
     st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 35px; margin-bottom: 25px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
     
-    # Xử lý xuất Excel qua Base64
+    # Xử lý xuất Excel
     def generate_excel_with_colors(df_data):
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -375,7 +397,7 @@ with table_container:
     download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}">Tải Excel</a>'
     st.markdown(download_html, unsafe_allow_html=True)
 
-    # Hiển thị bảng màu chuẩn xác phiên bản trước
+    # Hiển thị bảng màu chuẩn xác
     priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
 
     if 'Trạng Thái' in df_display.columns and 'Tiến Độ (%)' in df_display.columns:
