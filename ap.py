@@ -9,80 +9,45 @@ st.markdown("""
 <style>
     .stApp { background-color: #f4f7f6; }
     
-    /* 1. XÓA HOÀN TOÀN THANH HEADER SHARE CỦA STREAMLIT */
-    header[data-testid="stHeader"] { 
-        display: none !important; 
-    }
+    /* XÓA THANH HEADER SHARE */
+    header[data-testid="stHeader"] { display: none !important; }
     
-    /* 2. ĐẨY TOÀN BỘ NỘI DUNG XUỐNG DƯỚI CHO CÂN ĐỐI */
-    .block-container { 
-        padding-top: 3.5rem !important; 
-        padding-bottom: 2rem !important;
-    }
-    
-    /* ĐẨY LOGO TRONG SIDEBAR LÊN CAO */
-    section[data-testid="stSidebar"] .block-container {
-        padding-top: 1rem !important;
-    }
+    /* ĐẨY NỘI DUNG XUỐNG DƯỚI */
+    .block-container { padding-top: 3.5rem !important; padding-bottom: 2rem !important; }
+    section[data-testid="stSidebar"] .block-container { padding-top: 1rem !important; }
 
-    /* LÀM ĐẬM HEADER CỦA BẢNG TỔNG HỢP */
+    /* LÀM ĐẬM HEADER BẢNG */
     div[data-testid="stDataFrame"] th {
-        background-color: #e2e8f0 !important;
-        color: #0f172a !important;
-        font-weight: 800 !important;
-        font-size: 14px !important;
+        background-color: #e2e8f0 !important; color: #0f172a !important;
+        font-weight: 800 !important; font-size: 14px !important;
     }
     
-    /* TÙY CHỈNH KHỐI KPI (GIỮ NGUYÊN VIỀN ĐỎ) */
+    /* TÙY CHỈNH KHỐI KPI */
     .kpi-card {
-        width: 100%; 
-        background-color: #ffffff;
-        padding: 20px 15px; 
-        border-radius: 12px;
-        box-shadow: 0 6px 12px rgba(0,0,0,0.08); 
-        border: 1px solid #e0e0e0;
-        border-left: 6px solid #C62828; 
-        display: flex;
-        align-items: center;
-        margin-bottom: 15px;
-        min-height: 115px; 
+        width: 100%; background-color: #ffffff; padding: 20px 15px; 
+        border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.08); 
+        border: 1px solid #e0e0e0; border-left: 6px solid #C62828; 
+        display: flex; align-items: center; margin-bottom: 15px; min-height: 115px; 
     }
     .kpi-icon {
-        font-size: 2.2rem; 
-        margin-right: 15px;
-        background-color: #FFEBEE; 
-        padding: 10px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 60px; 
-        height: 60px;
+        font-size: 2.2rem; margin-right: 15px; background-color: #FFEBEE; 
+        padding: 10px; border-radius: 50%; display: flex; align-items: center;
+        justify-content: center; min-width: 60px; height: 60px;
     }
     .kpi-details { flex-grow: 1; overflow: hidden; }
     .kpi-title {
-        color: #6c757d;
-        font-size: 0.85rem; 
-        font-weight: 800; 
-        text-transform: uppercase;
-        margin-bottom: 5px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        color: #6c757d; font-size: 0.85rem; font-weight: 800; 
+        text-transform: uppercase; margin-bottom: 5px; white-space: nowrap;
+        overflow: hidden; text-overflow: ellipsis;
     }
-    .kpi-value {
-        font-size: 1.8rem; 
-        font-weight: 900;
-        color: #1e293b;
-    }
+    .kpi-value { font-size: 1.8rem; font-weight: 900; color: #1e293b; }
     
-    /* ÉP THANH TRẠNG THÁI DÀN ĐỀU 100% CHIỀU RỘNG */
+    /* ÉP THANH TRẠNG THÁI DÀN ĐỀU */
     div[data-testid="stRadio"] { width: 100% !important; }
     div.row-widget.stRadio > div[role="radiogroup"] {
         display: flex; flex-direction: row; width: 100% !important;
-        justify-content: space-between; gap: 15px;
-        background-color: transparent; padding: 0px;
-        margin-top: 15px; margin-bottom: 10px;
+        justify-content: space-between; gap: 15px; background-color: transparent; 
+        padding: 0px; margin-top: 15px; margin-bottom: 10px;
     }
     div.row-widget.stRadio > div[role="radiogroup"] > label {
         flex: 1 1 0px !important; background-color: #ffffff;
@@ -103,11 +68,13 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# ================= 2. ĐỌC DỮ LIỆU VÀ XỬ LÝ NGÀY THÁNG THÔNG MINH =================
+# ================= 2. ĐỌC DỮ LIỆU & XỬ LÝ 2 CỘT NGÀY THÁNG =================
 @st.cache_data(ttl=60)
 def load_data():
     sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
     df = pd.read_csv(sheet_url)
+    
+    df.columns = df.columns.str.strip()
     
     if 'Đầu Việc' in df.columns: df.rename(columns={'Đầu Việc': 'Hạng Mục'}, inplace=True)
     if 'Đầu Việc Shopdrawing' in df.columns: df.rename(columns={'Đầu Việc Shopdrawing': 'Hạng Mục'}, inplace=True)
@@ -119,16 +86,21 @@ def load_data():
             
     df = df.fillna('') 
     
-    # Ép kiểu thông minh: Nhận diện tự động các định dạng Ngày Bắt Đầu để lọc
+    # 1. Ép kiểu Ngày Bắt Đầu
     if 'Ngày Bắt Đầu' in df.columns:
-        df['Ngày_Date_Obj'] = pd.to_datetime(df['Ngày Bắt Đầu'], dayfirst=True, errors='coerce').dt.date
+        df['Ngày_Bat_Dau_Obj'] = pd.to_datetime(df['Ngày Bắt Đầu'].astype(str).str.strip(), format='%d/%m/%Y', errors='coerce')
+        
+    # 2. Ép kiểu Ngày hoàn thành (Xử lý chữ hoa chữ thường)
+    col_ht = 'Ngày hoàn thành' if 'Ngày hoàn thành' in df.columns else ('Ngày Hoàn Thành' if 'Ngày Hoàn Thành' in df.columns else None)
+    if col_ht:
+        df['Ngày_Hoan_Thanh_Obj'] = pd.to_datetime(df[col_ht].astype(str).str.strip(), format='%d/%m/%Y', errors='coerce')
         
     return df
 
 df = load_data()
 
 
-# ================= 3. SIDEBAR BỘ LỌC CHÍNH =================
+# ================= 3. SIDEBAR BỘ LỌC =================
 with st.sidebar:
     col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
     with col_logo2:
@@ -153,9 +125,13 @@ with st.sidebar:
     cb_opts = [x for x in df_temp[cb_col].unique() if x != ''] if cb_col else []
     selected_cb = st.multiselect("👷 CÁN BỘ TRIỂN KHAI", options=cb_opts, placeholder="Chọn Tất cả")
 
-    # ================= ĐƯA BỘ LỌC THỜI GIAN XUỐNG DƯỚI CÙNG =================
-    st.markdown("<br>", unsafe_allow_html=True) # Khoảng trống cho đẹp
-    time_filter = st.selectbox("📅 THỜI GIAN GIAO VIỆC (Ngày bắt đầu)", 
+    # ================= BỘ LỌC THỜI GIAN THÔNG MINH =================
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Cho phép người dùng chọn đang muốn lọc theo Ngày bắt đầu hay Ngày hoàn thành
+    tieu_chi_ngay = st.selectbox("📌 LỌC THEO CỘT NGÀY", ["Ngày Bắt Đầu", "Ngày hoàn thành"])
+    
+    time_filter = st.selectbox("📅 KHOẢNG THỜI GIAN", 
                                ["Tất cả", "Hôm nay", "Tuần này", "Tháng này", "Năm nay", "Tùy chọn khoảng ngày"])
     
     today = datetime.today().date()
@@ -190,7 +166,7 @@ status_container = st.container()
 table_container = st.container()
 
 
-# ================= 5. XỬ LÝ LỌC TRẠNG THÁI (TRÊN GIAO DIỆN NGANG) =================
+# ================= 5. XỬ LÝ LỌC TRẠNG THÁI =================
 with status_container:
     status_options = ["🌟 Tất cả", "⏳ Chưa bắt đầu", "🔄 Đang triển khai", "✅ Đã hoàn thành", "⏸️ Tạm dừng"]
     status_map = {
@@ -205,27 +181,36 @@ with status_container:
 # ================= 6. TỔNG HỢP & ÁP DỤNG MỌI BỘ LỌC =================
 df_display = df.copy()
 
-# A. Lọc theo Thời Gian (Dùng fillna(False) để tránh lỗi với các ô trống)
-if start_date and end_date and 'Ngày_Date_Obj' in df_display.columns:
-    mask = (df_display['Ngày_Date_Obj'] >= start_date) & (df_display['Ngày_Date_Obj'] <= end_date)
-    df_display = df_display[mask.fillna(False)]
+# A. LỌC THỜI GIAN LINH HOẠT THEO CỘT ĐÃ CHỌN
+if start_date and end_date:
+    start_ts = pd.to_datetime(start_date)
+    end_ts = pd.to_datetime(end_date)
+    
+    if tieu_chi_ngay == "Ngày Bắt Đầu" and 'Ngày_Bat_Dau_Obj' in df_display.columns:
+        mask = df_display['Ngày_Bat_Dau_Obj'].notna() & (df_display['Ngày_Bat_Dau_Obj'] >= start_ts) & (df_display['Ngày_Bat_Dau_Obj'] <= end_ts)
+        df_display = df_display[mask]
+        
+    elif tieu_chi_ngay == "Ngày hoàn thành" and 'Ngày_Hoan_Thanh_Obj' in df_display.columns:
+        mask = df_display['Ngày_Hoan_Thanh_Obj'].notna() & (df_display['Ngày_Hoan_Thanh_Obj'] >= start_ts) & (df_display['Ngày_Hoan_Thanh_Obj'] <= end_ts)
+        df_display = df_display[mask]
 
-# B. Lọc theo các tiêu chí ở Sidebar
+# B. Lọc Sidebar
 if selected_projects: df_display = df_display[df_display['Dự Án'].isin(selected_projects)]
 if selected_hd: df_display = df_display[df_display['Hợp Đồng - PLHĐ'].isin(selected_hd)]
 if selected_ql: df_display = df_display[df_display['Cán Bộ Quản Lý'].isin(selected_ql)]
 if selected_cb: df_display = df_display[df_display[cb_col].isin(selected_cb)]
 
-# C. Lọc theo thanh Trạng Thái ngang
+# C. Lọc Trạng thái
 if actual_status != "Tất cả": 
     df_display = df_display[df_display.get('Trạng Thái', '') == actual_status]
 
-# (Ẩn cột Ngày tạm thời để bảng gọn gàng)
-if 'Ngày_Date_Obj' in df_display.columns:
-    df_display = df_display.drop(columns=['Ngày_Date_Obj'])
+# Ẩn 2 cột ngày_obj đã dùng để tính toán để giao diện sạch sẽ
+for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
+    if col in df_display.columns:
+        df_display = df_display.drop(columns=[col])
 
 
-# ================= 7. HIỂN THỊ TIÊU ĐỀ & 6 THẺ KPI ĐỘNG =================
+# ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI =================
 with header_container:
     st.markdown("<h2 style='text-align: center; color: #198754; font-weight: 900; margin-top: 10px; margin-bottom: 25px;'>BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</h2>", unsafe_allow_html=True)
 
