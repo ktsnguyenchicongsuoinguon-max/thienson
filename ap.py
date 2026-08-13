@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from datetime import datetime, timedelta
 
 # ================= 1. THIẾT LẬP GIAO DIỆN & CSS TÙY CHỈNH =================
 st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", page_icon="logothienson.png", layout="wide", initial_sidebar_state="expanded")
@@ -9,16 +10,18 @@ st.markdown("""
     /* Nền trang web */
     .stApp { background-color: #f4f7f6; }
     
-    /* THU HẸP THANH HEADER CHỨA NÚT SHARE VÀ ĐẨY NỘI DUNG LÊN TRÊN */
-    .block-container { 
-        padding-top: 1.5rem !important; 
-        padding-bottom: 2rem !important;
-    }
+    /* 1. XÓA HOÀN TOÀN THANH HEADER SHARE CỦA STREAMLIT ĐỂ KHÔNG BỊ ĐÈ CHỮ */
     header[data-testid="stHeader"] { 
-        height: 2.5rem !important; 
+        display: none !important; 
     }
     
-    /* ĐẨY LOGO TRONG SIDEBAR LÊN CAO NHẤT CÓ THỂ */
+    /* 2. ĐẨY TOÀN BỘ NỘI DUNG XUỐNG DƯỚI CHO CÂN ĐỐI (Hạ chữ Báo Cáo xuống) */
+    .block-container { 
+        padding-top: 3.5rem !important; 
+        padding-bottom: 2rem !important;
+    }
+    
+    /* ĐẨY LOGO TRONG SIDEBAR LÊN CAO */
     section[data-testid="stSidebar"] .block-container {
         padding-top: 1rem !important;
     }
@@ -31,15 +34,15 @@ st.markdown("""
         font-size: 14px !important;
     }
     
-    /* ================= TÙY CHỈNH KHỐI KPI (NỔI BẬT & TO HƠN) ================= */
+    /* TÙY CHỈNH KHỐI KPI */
     .kpi-card {
-        width: 100%; /* ĐÃ THÊM: Sửa lỗi bóp méo thẻ KPI */
+        width: 100%; 
         background-color: #ffffff;
         padding: 20px 15px; 
         border-radius: 12px;
         box-shadow: 0 6px 12px rgba(0,0,0,0.08); 
         border: 1px solid #e0e0e0;
-        border-left: 6px solid #C62828; /* Đỏ Chuẩn Logo */
+        border-left: 6px solid #C62828; 
         display: flex;
         align-items: center;
         margin-bottom: 15px;
@@ -75,54 +78,33 @@ st.markdown("""
     }
     
     /* ÉP THANH TRẠNG THÁI DÀN ĐỀU 100% CHIỀU RỘNG */
-    div[data-testid="stRadio"] {
-        width: 100% !important;
-    }
+    div[data-testid="stRadio"] { width: 100% !important; }
     div.row-widget.stRadio > div[role="radiogroup"] {
-        display: flex;
-        flex-direction: row;
-        width: 100% !important;
-        justify-content: space-between;
-        gap: 15px;
-        background-color: transparent;
-        padding: 0px;
-        margin-top: 15px;
-        margin-bottom: 10px;
+        display: flex; flex-direction: row; width: 100% !important;
+        justify-content: space-between; gap: 15px;
+        background-color: transparent; padding: 0px;
+        margin-top: 15px; margin-bottom: 10px;
     }
     div.row-widget.stRadio > div[role="radiogroup"] > label {
-        flex: 1 1 0px !important; 
-        background-color: #ffffff;
-        padding: 15px 5px !important;
-        border-radius: 12px !important; 
-        border: 1px solid #ced4da;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.04);
-        cursor: pointer;
-        transition: all 0.2s ease-in-out;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        flex: 1 1 0px !important; background-color: #ffffff;
+        padding: 15px 5px !important; border-radius: 12px !important; 
+        border: 1px solid #ced4da; box-shadow: 0 4px 6px rgba(0,0,0,0.04);
+        cursor: pointer; transition: all 0.2s ease-in-out;
+        display: flex; justify-content: center; align-items: center;
     }
     div.row-widget.stRadio > div[role="radiogroup"] > label:hover {
-        background-color: #FFEBEE;
-        border-color: #C62828;
-        box-shadow: 0 8px 15px rgba(198, 40, 40, 0.15);
-        transform: translateY(-3px);
+        background-color: #FFEBEE; border-color: #C62828;
+        box-shadow: 0 8px 15px rgba(198, 40, 40, 0.15); transform: translateY(-3px);
     }
-    div.row-widget.stRadio > div[role="radiogroup"] > label > div:first-child {
-        display: none;
-    }
+    div.row-widget.stRadio > div[role="radiogroup"] > label > div:first-child { display: none; }
     div.row-widget.stRadio > div[role="radiogroup"] > label div[data-testid="stMarkdownContainer"] p {
-        font-weight: 700 !important;
-        color: #495057;
-        margin: 0;
-        font-size: 1.1rem;
-        text-align: center;
+        font-weight: 700 !important; color: #495057; margin: 0; font-size: 1.1rem; text-align: center;
     }
 </style>
 """, unsafe_allow_html=True)
 
 
-# ================= 2. ĐỌC DỮ LIỆU =================
+# ================= 2. ĐỌC DỮ LIỆU & XỬ LÝ NGÀY THÁNG =================
 @st.cache_data(ttl=60)
 def load_data():
     sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
@@ -137,23 +119,58 @@ def load_data():
         if col in df.columns: df[col] = df[col].replace('', pd.NA).ffill()
             
     df = df.fillna('') 
+    
+    # Ép kiểu dữ liệu cột Ngày Bắt Đầu để làm bộ lọc thời gian
+    if 'Ngày Bắt Đầu' in df.columns:
+        df['Ngày_Date_Obj'] = pd.to_datetime(df['Ngày Bắt Đầu'], format='%d/%m/%Y', errors='coerce').dt.date
+        
     return df
 
 df = load_data()
 
 
-# ================= 3. SIDEBAR BỘ LỌC =================
+# ================= 3. SIDEBAR BỘ LỌC (CÓ LỌC THỜI GIAN) =================
 with st.sidebar:
     col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
     with col_logo2:
         st.image("logothienson.png", use_container_width=True) 
         
-    st.markdown("<h3 style='text-align: left; margin-top: 10px; margin-bottom: 15px; color: #1e293b;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: left; margin-top: 10px; margin-bottom: 10px; color: #1e293b;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
     
-    unique_projects = [p for p in df.get('Dự Án', pd.Series()).unique() if p != '']
-    selected_projects = st.multiselect("🏢 DỰ ÁN", options=unique_projects, placeholder="Chọn Tất cả")
-
+    # ---- TÍNH NĂNG MỚI: BỘ LỌC THỜI GIAN ----
+    time_filter = st.selectbox("📅 THỜI GIAN (Theo Ngày Bắt Đầu)", 
+                               ["Tất cả", "Hôm nay", "Tuần này", "Tháng này", "Năm nay", "Tùy chọn khoảng ngày"])
+    
+    today = datetime.today().date()
+    start_date, end_date = None, None
+    
+    if time_filter == "Hôm nay":
+        start_date = end_date = today
+    elif time_filter == "Tuần này":
+        start_date = today - timedelta(days=today.weekday())
+        end_date = start_date + timedelta(days=6)
+    elif time_filter == "Tháng này":
+        start_date = today.replace(day=1)
+        next_month = today.replace(day=28) + timedelta(days=4)
+        end_date = next_month - timedelta(days=next_month.day)
+    elif time_filter == "Năm nay":
+        start_date = today.replace(month=1, day=1)
+        end_date = today.replace(month=12, day=31)
+    elif time_filter == "Tùy chọn khoảng ngày":
+        date_range = st.date_input("Chọn khoảng thời gian", [today, today])
+        if len(date_range) == 2:
+            start_date, end_date = date_range
+        elif len(date_range) == 1:
+            start_date = end_date = date_range[0]
+            
+    # Lọc Dữ liệu tạm thời theo thời gian trước để gợi ý Dropdown chính xác hơn
     df_temp = df.copy()
+    if start_date and end_date and 'Ngày_Date_Obj' in df_temp.columns:
+        df_temp = df_temp[(df_temp['Ngày_Date_Obj'] >= start_date) & (df_temp['Ngày_Date_Obj'] <= end_date)]
+    # ----------------------------------------
+    
+    unique_projects = [p for p in df_temp.get('Dự Án', pd.Series()).unique() if p != '']
+    selected_projects = st.multiselect("🏢 DỰ ÁN", options=unique_projects, placeholder="Chọn Tất cả")
     if selected_projects: df_temp = df_temp[df_temp['Dự Án'].isin(selected_projects)]
 
     hd_opts = [x for x in df_temp.get('Hợp Đồng - PLHĐ', pd.Series()).unique() if x != '']
@@ -175,7 +192,7 @@ status_container = st.container()
 table_container = st.container()
 
 
-# ================= 5. XỬ LÝ LỌC TRẠNG THÁI (NẰM TRONG STATUS) =================
+# ================= 5. XỬ LÝ LỌC TRẠNG THÁI =================
 with status_container:
     status_options = ["🌟 Tất cả", "⏳ Chưa bắt đầu", "🔄 Đang triển khai", "✅ Đã hoàn thành", "⏸️ Tạm dừng"]
     status_map = {
@@ -187,19 +204,25 @@ with status_container:
     actual_status = status_map[selected_ui_status]
 
 
-# ================= 6. TỔNG HỢP DỮ LIỆU CUỐI CÙNG =================
+# ================= 6. TỔNG HỢP DỮ LIỆU CUỐI CÙNG (Áp dụng tất cả bộ lọc) =================
 df_display = df.copy()
 
+if start_date and end_date and 'Ngày_Date_Obj' in df_display.columns:
+    df_display = df_display[(df_display['Ngày_Date_Obj'] >= start_date) & (df_display['Ngày_Date_Obj'] <= end_date)]
 if selected_projects: df_display = df_display[df_display['Dự Án'].isin(selected_projects)]
 if selected_hd: df_display = df_display[df_display['Hợp Đồng - PLHĐ'].isin(selected_hd)]
 if selected_ql: df_display = df_display[df_display['Cán Bộ Quản Lý'].isin(selected_ql)]
 if selected_cb: df_display = df_display[df_display[cb_col].isin(selected_cb)]
 if actual_status != "Tất cả": df_display = df_display[df_display.get('Trạng Thái', '') == actual_status]
 
+# Xóa cột Date_Obj tạm thời để không hiển thị ra bảng làm rối mắt
+if 'Ngày_Date_Obj' in df_display.columns:
+    df_display = df_display.drop(columns=['Ngày_Date_Obj'])
+
 
 # ================= 7. HIỂN THỊ TIÊU ĐỀ & 6 THẺ KPI ĐỘNG =================
 with header_container:
-    st.markdown("<h2 style='text-align: center; color: #198754; font-weight: 900; margin-bottom: 25px;'>BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center; color: #198754; font-weight: 900; margin-top: 10px; margin-bottom: 25px;'>BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</h2>", unsafe_allow_html=True)
 
 with kpi_container:
     p_total = len(df_display)
@@ -230,9 +253,8 @@ with kpi_container:
     with c6: st.markdown(render_kpi("Tiến độ TB", f"{p_prog:.1f}%", "⏱️"), unsafe_allow_html=True)
 
 
-# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU (Hạ thấp xuống) =================
+# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU =================
 with table_container:
-    # Margin-top 50px để hạ thấp phần Bảng Tổng hợp xuống phía dưới 
     st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 50px; margin-bottom: 20px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
 
     priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
