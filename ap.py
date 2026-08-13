@@ -18,11 +18,12 @@ st.markdown("""
     .block-container { padding-top: 3rem !important; padding-bottom: 2rem !important; }
     section[data-testid="stSidebar"] .block-container { padding-top: 1rem !important; }
 
-    /* LÀM ĐẬM HEADER BẢNG */
+    /* LÀM ĐẬM HEADER BẢNG - MÀU GHI ĐẬM CHỮ TRẮNG */
     div[data-testid="stDataFrame"] th {
-        background-color: var(--secondary-background-color) !important; 
-        color: var(--text-color) !important;
-        font-weight: 800 !important; font-size: 14px !important;
+        background-color: #495057 !important; /* Màu ghi đậm */
+        color: #ffffff !important; /* Chữ trắng */
+        font-weight: 800 !important; 
+        font-size: 14px !important;
     }
     
     /* ================= TÙY CHỈNH KHỐI KPI ================= */
@@ -268,17 +269,17 @@ with table_container:
         df_display = df_display.sort_values(by=sort_cols, ascending=[True] * len(sort_cols))
         df_display = df_display.drop(columns=['Mức Ưu Tiên'])
 
-    # Điều chỉnh màu nền đậm lên (Đã gỡ bỏ in đậm chữ, sử dụng mã màu Hex đậm hơn)
     def color_rows(row):
         status = row.get('Trạng Thái', '')
-        if status == 'Đã hoàn thành': return ['background-color: #a5d6a7; color: #000;'] * len(row) # Xanh lá đậm hơn
-        if status == 'Tạm dừng': return ['background-color: #ef9a9a; color: #000;'] * len(row)      # Đỏ đậm hơn
+        if status == 'Đã hoàn thành': return ['background-color: #a5d6a7; color: #000;'] * len(row) 
+        if status == 'Tạm dừng': return ['background-color: #ef9a9a; color: #000;'] * len(row)      
         if status == 'Chưa bắt đầu': return ['background-color: #f5f5f5; color: #000;'] * len(row)
         return ['background-color: #ffffff; color: #000;'] * len(row)
 
+    # ĐỒNG BỘ MÀU GHI ĐẬM CHỮ TRẮNG Ở PANDAS STYLER
     styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
         'selector': 'th',
-        'props': [('background-color', '#e2e8f0'), ('color', '#0f172a'), ('font-weight', 'bold')]
+        'props': [('background-color', '#495057'), ('color', '#ffffff'), ('font-weight', 'bold')]
     }])
     
     st.dataframe(styled_df, use_container_width=True, hide_index=True, height=550)
