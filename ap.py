@@ -7,27 +7,34 @@ st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", page_icon="logothi
 
 st.markdown("""
 <style>
-    .stApp { background-color: #f4f7f6; }
+    /* Cho phép nền tự động thay đổi theo Light/Dark Mode của hệ thống */
     
-    /* ẨN NÚT SHARE/DEPLOY NHƯNG GIỮ LẠI MENU ĐỔI MÀU GIAO DIỆN */
+    /* 1. THANH HEADER TÀNG HÌNH (TRONG SUỐT) - GIỮ LẠI ICON VÀ 3 CHẤM */
+    header[data-testid="stHeader"] { 
+        background: transparent !important; 
+        background-color: transparent !important;
+    }
+    
+    /* Ẩn nút Share/Deploy rườm rà */
     .stAppDeployButton { display: none !important; }
     
     /* ĐẨY NỘI DUNG XUỐNG DƯỚI ĐỂ KHÔNG BỊ ĐÈ */
     .block-container { padding-top: 3rem !important; padding-bottom: 2rem !important; }
     section[data-testid="stSidebar"] .block-container { padding-top: 1rem !important; }
 
-    /* LÀM ĐẬM HEADER BẢNG */
+    /* LÀM ĐẬM HEADER BẢNG - Tương thích nền */
     div[data-testid="stDataFrame"] th {
-        background-color: #e2e8f0 !important; color: #0f172a !important;
         font-weight: 800 !important; font-size: 14px !important;
     }
     
     /* TÙY CHỈNH KHỐI KPI */
     .kpi-card {
-        width: 100%; background-color: #ffffff; padding: 20px 15px; 
+        width: 100%; padding: 20px 15px; 
         border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.08); 
-        border: 1px solid #e0e0e0; border-left: 6px solid #C62828; 
+        border-left: 6px solid #C62828; 
         display: flex; align-items: center; margin-bottom: 15px; min-height: 115px; 
+        /* Thêm hiệu ứng màu nền để tự thích ứng Dark Mode */
+        background-color: color-mix(in srgb, currentColor 5%, transparent);
     }
     .kpi-icon {
         font-size: 2.2rem; margin-right: 15px; background-color: #FFEBEE; 
@@ -36,11 +43,11 @@ st.markdown("""
     }
     .kpi-details { flex-grow: 1; overflow: hidden; }
     .kpi-title {
-        color: #6c757d; font-size: 0.85rem; font-weight: 800; 
+        font-size: 0.85rem; font-weight: 800; opacity: 0.7;
         text-transform: uppercase; margin-bottom: 5px; white-space: nowrap;
         overflow: hidden; text-overflow: ellipsis;
     }
-    .kpi-value { font-size: 1.8rem; font-weight: 900; color: #1e293b; }
+    .kpi-value { font-size: 1.8rem; font-weight: 900; }
     
     /* ================= THANH TRẠNG THÁI ================= */
     div[data-testid="stRadio"] { width: 100% !important; }
@@ -61,9 +68,9 @@ st.markdown("""
         box-shadow: none !important;
         padding: 5px !important;
     }
+    /* Gỡ bỏ việc ép cứng màu đen để chữ tự chuyển trắng trong Dark Mode */
     div[data-testid="stRadio"] > div[role="radiogroup"] > label p {
         font-weight: 500 !important; 
-        color: #1e293b !important; 
         margin: 0 !important; 
         font-size: 1rem !important; 
     }
@@ -107,7 +114,7 @@ with st.sidebar:
     with col_logo2:
         st.image("logothienson.png", use_container_width=True) 
         
-    st.markdown("<h3 style='text-align: left; margin-top: 10px; margin-bottom: 10px; color: #1e293b;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: left; margin-top: 10px; margin-bottom: 10px;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
     
     unique_projects = [p for p in df.get('Dự Án', pd.Series()).unique() if p != '']
     selected_projects = st.multiselect("🏢 DỰ ÁN", options=unique_projects, placeholder="Chọn Tất cả")
@@ -119,7 +126,6 @@ with st.sidebar:
     selected_hd = st.multiselect("📑 SỐ HỢP ĐỒNG", options=hd_opts, placeholder="Chọn Tất cả")
     if selected_hd: df_temp = df_temp[df_temp['Hợp Đồng - PLHĐ'].isin(selected_hd)]
 
-    # THÊM MỚI: BỘ LỌC HẠNG MỤC (Nằm dưới Hợp Đồng)
     hm_opts = [x for x in df_temp.get('Hạng Mục', pd.Series()).unique() if x != '']
     selected_hm = st.multiselect("📁 HẠNG MỤC", options=hm_opts, placeholder="Chọn Tất cả")
     if selected_hm: df_temp = df_temp[df_temp['Hạng Mục'].isin(selected_hm)]
@@ -195,7 +201,7 @@ if start_date and end_date and 'Ngày_Bat_Dau_Obj' in df_display.columns and 'Ng
 
 if selected_projects: df_display = df_display[df_display['Dự Án'].isin(selected_projects)]
 if selected_hd: df_display = df_display[df_display['Hợp Đồng - PLHĐ'].isin(selected_hd)]
-if selected_hm: df_display = df_display[df_display['Hạng Mục'].isin(selected_hm)] # Áp dụng lọc Hạng Mục
+if selected_hm: df_display = df_display[df_display['Hạng Mục'].isin(selected_hm)]
 if selected_ql: df_display = df_display[df_display['Cán Bộ Quản Lý'].isin(selected_ql)]
 if selected_cb: df_display = df_display[df_display[cb_col].isin(selected_cb)]
 
@@ -235,14 +241,12 @@ with kpi_container:
         """
 
     # --- TẠO BỐ CỤC 2 HÀNG (Mỗi hàng 4 cột) ---
-    # Hàng 1
     r1_c1, r1_c2, r1_c3, r1_c4 = st.columns(4)
     with r1_c1: st.markdown(render_kpi("Tổng Dự án", p_projects, "🏢"), unsafe_allow_html=True)
     with r1_c2: st.markdown(render_kpi("Hạng mục", p_categories, "📁"), unsafe_allow_html=True)
     with r1_c3: st.markdown(render_kpi("Công việc triển khai", p_total, "📋"), unsafe_allow_html=True)
     with r1_c4: st.markdown(render_kpi("Tiến độ TB", f"{p_prog:.1f}%", "⏱️"), unsafe_allow_html=True)
     
-    # Hàng 2
     r2_c1, r2_c2, r2_c3, r2_c4 = st.columns(4)
     with r2_c1: st.markdown(render_kpi("Đã hoàn thành", p_done, "✅"), unsafe_allow_html=True)
     with r2_c2: st.markdown(render_kpi("Đang triển khai", p_inprogress, "🔄"), unsafe_allow_html=True)
@@ -265,14 +269,12 @@ with table_container:
 
     def color_rows(row):
         status = row.get('Trạng Thái', '')
-        if status == 'Đã hoàn thành': return ['background-color: #e8f5e9; color: #000;'] * len(row)
-        if status == 'Tạm dừng': return ['background-color: #ffebee; color: #000;'] * len(row)
-        if status == 'Chưa bắt đầu': return ['background-color: #f5f5f5; color: #000;'] * len(row)
-        return ['background-color: #ffffff; color: #000;'] * len(row)
+        # Loại bỏ set cứng màu chữ "#000" để Dark Mode tự xử lý màu chữ trong bảng
+        if status == 'Đã hoàn thành': return ['background-color: #e8f5e9;'] * len(row)
+        if status == 'Tạm dừng': return ['background-color: #ffebee;'] * len(row)
+        if status == 'Chưa bắt đầu': return ['background-color: #f5f5f5; color: #333;'] * len(row)
+        return [''] * len(row)
 
-    styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
-        'selector': 'th',
-        'props': [('background-color', '#e2e8f0'), ('color', '#0f172a'), ('font-weight', 'bold')]
-    }])
-
+    styled_df = df_display.style.apply(color_rows, axis=1)
+    
     st.dataframe(styled_df, use_container_width=True, hide_index=True, height=550)
