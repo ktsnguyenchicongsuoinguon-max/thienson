@@ -20,6 +20,13 @@ st.markdown("""
     .block-container { padding-top: 3rem !important; padding-bottom: 2rem !important; }
     section[data-testid="stSidebar"] .block-container { padding-top: 1rem !important; }
 
+    /* LÀM ĐẬM HEADER BẢNG */
+    div[data-testid="stDataFrame"] th {
+        background-color: var(--secondary-background-color) !important; 
+        color: var(--text-color) !important;
+        font-weight: 800 !important; font-size: 14px !important;
+    }
+    
     /* LINK TẢI EXCEL TÙY CHỈNH: CĂN PHẢI TUYỆT ĐỐI, CHỮ NHẠT HƠN */
     .custom-download-link {
         display: block;
@@ -38,52 +45,6 @@ st.markdown("""
     .custom-download-link:hover {
         color: #198754 !important; /* Sáng lên màu xanh khi rê chuột */
         text-decoration: underline !important;
-    }
-
-    /* ================= BẢNG HTML TÙY CHỈNH KẺ ĐƯỜNG ĐẬM ================= */
-    .custom-table-container {
-        max-height: 550px;
-        overflow-y: auto;
-        border: 2px solid #475569; /* Viền ngoài cùng của bảng cực đậm */
-        border-radius: 4px;
-        margin-top: 10px;
-        background-color: white;
-    }
-    .custom-table-container table {
-        width: 100%;
-        border-collapse: collapse;
-        font-family: sans-serif;
-        font-size: 14px;
-    }
-    .custom-table-container thead th {
-        position: sticky;
-        top: 0;
-        background-color: #e2e8f0 !important;
-        color: #0f172a !important;
-        font-weight: 800 !important;
-        border: 1px solid #475569 !important; /* ĐƯỜNG KẺ TIÊU ĐỀ ĐẬM NÉT */
-        padding: 10px;
-        z-index: 10;
-        white-space: nowrap;
-        text-align: center !important;
-    }
-    .custom-table-container tbody td {
-        border: 1px solid #64748b !important; /* ĐƯỜNG KẺ Ô DỮ LIỆU ĐẬM VÀ RÕ */
-        padding: 8px 10px;
-        text-align: left;
-    }
-    
-    /* Tinh chỉnh thanh cuộn cho bảng mượt và đẹp hơn */
-    .custom-table-container::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-    }
-    .custom-table-container::-webkit-scrollbar-thumb {
-        background: #94a3b8; 
-        border-radius: 4px;
-    }
-    .custom-table-container::-webkit-scrollbar-track {
-        background: #f1f5f9; 
     }
 
     /* ================= TÙY CHỈNH KHỐI KPI ================= */
@@ -319,12 +280,12 @@ with kpi_container:
     with r2_c4: st.markdown(render_kpi("Vướng mắc", p_paused, "⚠️"), unsafe_allow_html=True)
 
 
-# ================= 8. HIỂN THỊ BẢNG HTML TÙY CHỈNH KẺ VIỀN ĐẬM =================
+# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU =================
 with table_container:
     # 1. In Tiêu đề Bảng
     st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 35px; margin-bottom: 25px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
     
-    # 2. Xử lý xuất Excel dạng Base64 để ép link HTML ra sát lề phải
+    # 2. Xử lý xuất Excel
     def generate_excel_with_colors(df_data):
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -366,6 +327,7 @@ with table_container:
         wb.save(final_output)
         return final_output.getvalue()
 
+    # Tạo link HTML thẻ <a> (Căn lề phải tuyệt đối)
     try:
         excel_bytes = generate_excel_with_colors(df_export)
         b64 = base64.b64encode(excel_bytes).decode()
@@ -377,11 +339,10 @@ with table_container:
         mime_type = "text/csv"
         filename = "Bao_cao_tien_do_Thien_Son.csv"
 
-    # Gắn thẻ link Tải Excel vào giao diện
     download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}">Tải Excel</a>'
     st.markdown(download_html, unsafe_allow_html=True)
 
-    # 3. Chuyển đổi Dataframe sang HTML tĩnh để bắt viền đậm
+    # 3. Hiển thị bảng Streamlit gốc (Mượt mà, có đầy đủ công cụ như cũ)
     priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
 
     if 'Trạng Thái' in df_display.columns and 'Tiến Độ (%)' in df_display.columns:
@@ -398,13 +359,9 @@ with table_container:
         if status == 'Chưa bắt đầu': return ['background-color: #f5f5f5; color: #000;'] * len(row)
         return ['background-color: #ffffff; color: #000;'] * len(row)
 
-    # Tạo HTML Table từ Pandas
-    try:
-        styled_df = df_display.style.apply(color_rows, axis=1).hide(axis="index")
-    except Exception:
-        styled_df = df_display.style.apply(color_rows, axis=1).hide_index()
-        
-    html_table = styled_df.to_html(classes="custom-table", escape=False)
+    styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
+        'selector': 'th',
+        'props': [('background-color', '#e2e8f0'), ('color', '#0f172a'), ('font-weight', 'bold')]
+    }])
     
-    # Render bảng HTML kèm thanh cuộn (Scroll)
-    st.markdown(f'<div class="custom-table-container">{html_table}</div>', unsafe_allow_html=True)
+    st.dataframe(styled_df, use_container_width=True, hide_index=True, height=550)
