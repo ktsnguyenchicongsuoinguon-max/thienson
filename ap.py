@@ -26,17 +26,20 @@ st.markdown("""
         font-weight: 800 !important; font-size: 14px !important;
     }
     
-    /* ĐẨY NÚT TẢI EXCEL RA SÁT MÉP PHẢI VÀ ĐỔI MÀU GIỐNG TIÊU ĐỀ BẢNG */
-    div[data-testid="stDownloadButton"] {
-        display: flex;
+    /* ĐẨY NÚT TẢI EXCEL SÁT MÉP PHẢI VÀ NGANG HÀNG VỚI TIÊU ĐỀ */
+    div.stDownloadButton {
+        display: flex !important;
         justify-content: flex-end !important;
-        width: 100%;
+        margin-top: -55px !important; /* Kéo nút lên ngang hàng với tiêu đề */
+        margin-bottom: 15px !important;
+        position: relative !important;
+        z-index: 999 !important;
     }
-    div[data-testid="stDownloadButton"] > button {
+    div.stDownloadButton > button {
         background-color: transparent !important;
         border: none !important;
         box-shadow: none !important;
-        color: #0f172a !important; /* Màu giống tiêu đề cột của bảng */
+        color: #0f172a !important; /* Màu giống tiêu đề cột bảng */
         font-size: 14px !important;
         font-weight: 700 !important;
         padding: 0 !important;
@@ -44,7 +47,7 @@ st.markdown("""
         height: auto !important;
         min-height: unset !important;
     }
-    div[data-testid="stDownloadButton"] > button:hover {
+    div.stDownloadButton > button:hover {
         color: #198754 !important;
         text-decoration: underline !important;
         background-color: transparent !important;
@@ -285,73 +288,69 @@ with kpi_container:
 
 # ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & NÚT TẢI SÁT MÉP PHẢI =================
 with table_container:
-    # CHIA CỘT ĐỂ ÉP RA SÁT PHẢI MÀ VẪN GIỮ TIÊU ĐỀ Ở GIỮA
-    col_left_space, col_title, col_download = st.columns([1.5, 8, 1.5])
+    # 1. In Tiêu đề Bảng (Chiếm 100% không gian container, tự động căn giữa)
+    st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 35px; margin-bottom: 25px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
     
-    with col_title:
-        st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 25px; margin-bottom: 10px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
+    # 2. Xử lý xuất Excel (Nút này sẽ được CSS tự động kéo lên ngang hàng với tiêu đề và căn phải tuyệt đối)
+    def generate_excel_with_colors(df_data):
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df_data.to_excel(writer, index=False, sheet_name='TienDo')
+        output.seek(0)
         
-    with col_download:
-        st.markdown("<div style='margin-top: 30px;'></div>", unsafe_allow_html=True) # Căn dọc vừa vặn với tiêu đề
+        import openpyxl
+        from openpyxl.styles import PatternFill
         
-        def generate_excel_with_colors(df_data):
-            output = io.BytesIO()
-            with pd.ExcelWriter(output, engine='openpyxl') as writer:
-                df_data.to_excel(writer, index=False, sheet_name='TienDo')
-            output.seek(0)
-            
-            import openpyxl
-            from openpyxl.styles import PatternFill
-            
-            wb = openpyxl.load_workbook(output)
-            ws = wb.active
+        wb = openpyxl.load_workbook(output)
+        ws = wb.active
 
-            green_fill = PatternFill(start_color="A5D6A7", end_color="A5D6A7", fill_type="solid")
-            red_fill = PatternFill(start_color="EF9A9A", end_color="EF9A9A", fill_type="solid")
-            gray_fill = PatternFill(start_color="F5F5F5", end_color="F5F5F5", fill_type="solid")
+        green_fill = PatternFill(start_color="A5D6A7", end_color="A5D6A7", fill_type="solid")
+        red_fill = PatternFill(start_color="EF9A9A", end_color="EF9A9A", fill_type="solid")
+        gray_fill = PatternFill(start_color="F5F5F5", end_color="F5F5F5", fill_type="solid")
 
-            status_col_idx = None
-            for col_idx, col_name in enumerate(df_data.columns, 1):
-                if col_name == 'Trạng Thái':
-                    status_col_idx = col_idx
-                    break
+        status_col_idx = None
+        for col_idx, col_name in enumerate(df_data.columns, 1):
+            if col_name == 'Trạng Thái':
+                status_col_idx = col_idx
+                break
 
-            if status_col_idx:
-                for row_idx in range(2, ws.max_row + 1):
-                    status_val = str(ws.cell(row=row_idx, column=status_col_idx).value).strip()
-                    fill_to_use = None
-                    if status_val == 'Đã hoàn thành':
-                        fill_to_use = green_fill
-                    elif status_val == 'Tạm dừng':
-                        fill_to_use = red_fill
-                    elif status_val == 'Chưa bắt đầu':
-                        fill_to_use = gray_fill
-                    
-                    if fill_to_use:
-                        for col in range(1, ws.max_column + 1):
-                            ws.cell(row=row_idx, column=col).fill = fill_to_use
+        if status_col_idx:
+            for row_idx in range(2, ws.max_row + 1):
+                status_val = str(ws.cell(row=row_idx, column=status_col_idx).value).strip()
+                fill_to_use = None
+                if status_val == 'Đã hoàn thành':
+                    fill_to_use = green_fill
+                elif status_val == 'Tạm dừng':
+                    fill_to_use = red_fill
+                elif status_val == 'Chưa bắt đầu':
+                    fill_to_use = gray_fill
+                
+                if fill_to_use:
+                    for col in range(1, ws.max_column + 1):
+                        ws.cell(row=row_idx, column=col).fill = fill_to_use
 
-            final_output = io.BytesIO()
-            wb.save(final_output)
-            return final_output.getvalue()
+        final_output = io.BytesIO()
+        wb.save(final_output)
+        return final_output.getvalue()
 
-        try:
-            excel_bytes = generate_excel_with_colors(df_export)
-            st.download_button(
-                label="Tải Excel",
-                data=excel_bytes,
-                file_name="Bao_cao_tien_do_Thien_Son.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            )
-        except Exception:
-            csv_bytes = df_export.to_csv(index=False).encode('utf-8-sig')
-            st.download_button(
-                label="Tải Excel",
-                data=csv_bytes,
-                file_name="Bao_cao_tien_do_Thien_Son.csv",
-                mime="text/csv"
-            )
+    try:
+        excel_bytes = generate_excel_with_colors(df_export)
+        st.download_button(
+            label="Tải Excel",
+            data=excel_bytes,
+            file_name="Bao_cao_tien_do_Thien_Son.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+    except Exception:
+        csv_bytes = df_export.to_csv(index=False).encode('utf-8-sig')
+        st.download_button(
+            label="Tải Excel",
+            data=csv_bytes,
+            file_name="Bao_cao_tien_do_Thien_Son.csv",
+            mime="text/csv"
+        )
 
+    # 3. Hiển thị bảng
     priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
 
     if 'Trạng Thái' in df_display.columns and 'Tiến Độ (%)' in df_display.columns:
