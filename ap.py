@@ -4,138 +4,146 @@ import io
 import base64
 from datetime import datetime, timedelta
 
-# ================= 1. THIẾT LẬP GIAO DIỆN & CSS HIỆN ĐẠI (iOS/macOS STYLE) =================
+# ================= 1. THIẾT LẬP GIAO DIỆN & CSS HIỆN ĐẠI (macOS/iOS STYLE) =================
 st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", page_icon="logothienson.png", layout="wide", initial_sidebar_state="expanded")
 
+# Nhúng bộ Icon nét tròn hiện đại của Google
 st.markdown("""
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
 <style>
-    /* Reset & Font chữ tổng thể */
+    /* 1. FONT CHỮ VÀ HEADER */
     html, body, [class*="css"] {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
-
-    /* Ẩn Header Streamlit mặc định */
     header[data-testid="stHeader"] { background: transparent !important; }
     .stAppDeployButton { display: none !important; }
-    .block-container { padding-top: 3rem !important; padding-bottom: 2rem !important; }
+    .block-container { padding-top: 2rem !important; padding-bottom: 2rem !important; background-color: #FAFAFC; }
 
-    /* ================= TÙY CHỈNH NÚT TẢI EXCEL ================= */
+    /* 2. ĐỒNG BỘ ICON CHO SIDEBAR */
+    .sidebar-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 4px;
+        margin-top: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .sidebar-title .material-symbols-rounded {
+        font-size: 18px;
+        color: #8B9BB4;
+    }
+
+    /* 3. NÚT TẢI EXCEL (GÓC PHẢI - TINH TẾ) */
     .custom-download-link {
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 4px;
         float: right;
-        text-align: right;
-        color: #64748b !important; /* Xám thanh lịch */
-        font-size: 14px !important;
+        color: #64748B !important;
+        font-size: 13px !important;
         font-weight: 600 !important;
         text-decoration: none !important;
-        margin-top: -42px !important; 
+        margin-top: -38px !important; 
         margin-bottom: 15px !important;
         position: relative;
         z-index: 9999;
         transition: color 0.2s ease;
     }
     .custom-download-link:hover {
-        color: #2563eb !important; /* Xanh Apple xám khi hover */
+        color: #007AFF !important; /* Xanh chuẩn Apple */
+    }
+    .custom-download-link .material-symbols-rounded {
+        font-size: 16px;
     }
 
-    /* ================= THIẾT KẾ KHỐI KPI HIỆN ĐẠI (APPLE WIDGET STYLE) ================= */
+    /* 4. KHỐI KPI (NEUMORPHISM / MAC OS CARD) */
     .kpi-card {
-        background-color: #ffffff;
+        background-color: #FFFFFF;
         border-radius: 16px;
-        padding: 20px;
-        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04); /* Đổ bóng cực mờ, sang trọng */
-        border: 1px solid #f1f5f9;
+        padding: 16px 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03); /* Đổ bóng cực nhạt */
+        border: 1px solid #F1F5F9;
         display: flex;
         align-items: center;
         gap: 16px;
-        margin-bottom: 15px;
-        min-height: 110px;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .kpi-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        margin-bottom: 16px;
+        min-height: 100px;
     }
     .kpi-icon-wrapper {
-        width: 54px;
-        height: 54px;
-        border-radius: 14px; /* Squircle mềm mại */
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
     }
     .kpi-icon-wrapper .material-symbols-rounded {
-        font-size: 28px;
+        font-size: 24px;
     }
-    .kpi-details { 
-        flex-grow: 1; 
-        overflow: hidden; 
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
+    .kpi-details { flex-grow: 1; overflow: hidden; }
     .kpi-title {
-        font-size: 0.85rem; 
+        font-size: 12.5px; 
         font-weight: 600; 
-        color: #64748b; /* Xám tối - Slate 500 */
+        color: #8E8E93; /* Xám chuẩn iOS */
         text-transform: uppercase; 
-        letter-spacing: 0.5px;
-        margin-bottom: 4px; 
+        margin-bottom: 2px; 
         white-space: nowrap;
         overflow: hidden; 
         text-overflow: ellipsis;
     }
     .kpi-value { 
-        font-size: 1.8rem; 
-        font-weight: 800; 
-        color: #0f172a; /* Đen tuyền hiện đại - Slate 900 */
+        font-size: 24px; 
+        font-weight: 700; 
+        color: #1C1C1E; 
         line-height: 1.2;
     }
 
-    /* ================= BỘ LỌC RADIO BUTTON SẠCH SẼ ================= */
+    /* 5. SEGMENTED CONTROL (Thay thế Radio Button - Chuẩn iOS) */
     div[data-testid="stRadio"] > div[role="radiogroup"] {
-        display: flex; 
+        display: inline-flex; 
         flex-direction: row; 
-        justify-content: center; 
-        gap: 25px; 
-        margin-top: 5px; 
-        margin-bottom: 25px;
-        flex-wrap: wrap; 
-        background: transparent;
+        background-color: #EFEFF4; /* Nền xám nhạt */
+        padding: 4px;
+        border-radius: 10px;
+        gap: 0px;
+        margin: 10px auto 25px auto;
+        width: fit-content;
     }
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label {
-        padding: 8px 16px !important;
-        border-radius: 20px !important;
-        background: #f8fafc !important;
-        border: 1px solid #e2e8f0 !important;
-        transition: all 0.2s ease;
+    div[data-testid="stRadio"] label {
+        padding: 6px 16px !important;
+        border-radius: 8px !important;
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        cursor: pointer;
+        transition: background-color 0.2s;
     }
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label:hover {
-        background: #f1f5f9 !important;
-        border-color: #cbd5e1 !important;
+    div[data-testid="stRadio"] label[data-checked="true"] {
+        background-color: #FFFFFF !important;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1) !important; /* Đổ bóng khi được chọn */
     }
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label[data-checked="true"] {
-        background: #2563eb !important; /* Màu xanh active */
-        border-color: #2563eb !important;
-    }
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label[data-checked="true"] p {
-        color: #ffffff !important;
-    }
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label p {
+    div[data-testid="stRadio"] label p {
         font-weight: 600 !important; 
-        color: #475569 !important; 
-        font-size: 0.95rem !important; 
+        color: #8E8E93 !important; 
+        font-size: 13.5px !important; 
+        margin: 0;
+    }
+    div[data-testid="stRadio"] label[data-checked="true"] p {
+        color: #1C1C1E !important; /* Chữ đậm khi chọn */
     }
 
-    /* Tùy chỉnh nhẹ bảng mặc định để viền bớt thô */
+    /* 6. HEADER BẢNG DỮ LIỆU CŨ */
     div[data-testid="stDataFrame"] th {
-        background-color: #f8fafc !important; 
-        color: #334155 !important;
-        font-weight: 700 !important; 
-        font-size: 13.5px !important;
-        border-bottom: 2px solid #e2e8f0 !important;
+        background-color: #E2E8F0 !important; 
+        color: #0F172A !important;
+        font-weight: bold !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -171,40 +179,46 @@ def load_data():
 df = load_data()
 
 
-# ================= 3. SIDEBAR BỘ LỌC =================
+# ================= 3. SIDEBAR BỘ LỌC ĐỒNG BỘ ICON =================
 with st.sidebar:
     col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
     with col_logo2:
         st.image("logothienson.png", use_container_width=True) 
         
-    st.markdown("<h3 style='text-align: left; margin-top: 10px; margin-bottom: 10px;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center; font-size: 16px; margin-top: 10px; margin-bottom: 15px; color: #1C1C1E;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
     
     unique_projects = [p for p in df.get('Dự Án', pd.Series()).unique() if p != '']
-    selected_projects = st.multiselect("🏢 DỰ ÁN", options=unique_projects, placeholder="Chọn Tất cả")
+    st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">domain</span> Dự Án</div>', unsafe_allow_html=True)
+    selected_projects = st.multiselect("Dự Án", options=unique_projects, placeholder="Chọn Tất cả", label_visibility="collapsed")
 
     df_temp = df.copy()
     if selected_projects: df_temp = df_temp[df_temp['Dự Án'].isin(selected_projects)]
 
     hd_opts = [x for x in df_temp.get('Hợp Đồng - PLHĐ', pd.Series()).unique() if x != '']
-    selected_hd = st.multiselect("📑 SỐ HỢP ĐỒNG", options=hd_opts, placeholder="Chọn Tất cả")
+    st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">description</span> Số Hợp Đồng</div>', unsafe_allow_html=True)
+    selected_hd = st.multiselect("Số Hợp Đồng", options=hd_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
     if selected_hd: df_temp = df_temp[df_temp['Hợp Đồng - PLHĐ'].isin(selected_hd)]
 
     hm_opts = [x for x in df_temp.get('Hạng Mục', pd.Series()).unique() if x != '']
-    selected_hm = st.multiselect("📁 HẠNG MỤC", options=hm_opts, placeholder="Chọn Tất cả")
+    st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">folder</span> Hạng Mục</div>', unsafe_allow_html=True)
+    selected_hm = st.multiselect("Hạng Mục", options=hm_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
     if selected_hm: df_temp = df_temp[df_temp['Hạng Mục'].isin(selected_hm)]
 
     ql_opts = [x for x in df_temp.get('Cán Bộ Quản Lý', pd.Series()).unique() if x != ''] if 'Cán Bộ Quản Lý' in df_temp.columns else []
-    selected_ql = st.multiselect("👔 CÁN BỘ QUẢN LÝ", options=ql_opts, placeholder="Chọn Tất cả")
+    st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">manage_accounts</span> Cán Bộ Quản Lý</div>', unsafe_allow_html=True)
+    selected_ql = st.multiselect("Cán Bộ Quản Lý", options=ql_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
 
     cb_col = 'Cán Bộ Triển Khai - SĐT' if 'Cán Bộ Triển Khai - SĐT' in df_temp.columns else ('Người Triển Khai' if 'Người Triển Khai' in df_temp.columns else None)
     cb_opts = [x for x in df_temp[cb_col].unique() if x != ''] if cb_col else []
-    selected_cb = st.multiselect("👷 CÁN BỘ TRIỂN KHAI", options=cb_opts, placeholder="Chọn Tất cả")
+    st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">person</span> Cán Bộ Triển Khai</div>', unsafe_allow_html=True)
+    selected_cb = st.multiselect("Cán Bộ Triển Khai", options=cb_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
 
-    # ================= BỘ LỌC THỜI GIAN =================
+    # BỘ LỌC THỜI GIAN
     st.markdown("<br>", unsafe_allow_html=True)
-    
-    time_filter = st.selectbox("📅 KHOẢNG THỜI GIAN", 
-                               ["Tất cả", "Hôm nay", "Tuần này", "Tháng này", "Năm nay", "Tùy chọn khoảng ngày"])
+    st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">calendar_month</span> Khoảng Thời Gian</div>', unsafe_allow_html=True)
+    time_filter = st.selectbox("Khoảng Thời Gian", 
+                               ["Tất cả", "Hôm nay", "Tuần này", "Tháng này", "Năm nay", "Tùy chọn khoảng ngày"], 
+                               label_visibility="collapsed")
     
     today = datetime.today().date()
     start_date, end_date = None, None
@@ -233,17 +247,18 @@ with st.sidebar:
 
 # ================= 4. KHỞI TẠO CÁC CONTAINER =================
 header_container = st.container()
-kpi_container = st.container()
 status_container = st.container()
+kpi_container = st.container()
 table_container = st.container()
 
 
-# ================= 5. XỬ LÝ LỌC TRẠNG THÁI (BỎ EMOJI) =================
+# ================= 5. XỬ LÝ LỌC TRẠNG THÁI (SEGMENTED CONTROL APPLE STYLE) =================
 with status_container:
-    # Chuyển đổi tên để giao diện sạch sẽ (không còn emoji)
+    # Ẩn hoàn toàn Emoji
     status_options = ["Tất cả", "Chưa bắt đầu", "Đang triển khai", "Đã hoàn thành", "Tạm dừng"]
-    
-    selected_ui_status = st.radio("Bộ lọc Trạng Thái", options=status_options, horizontal=True, label_visibility="collapsed")
+    col_center = st.columns([1, 4, 1])[1]
+    with col_center:
+        selected_ui_status = st.radio("Bộ lọc Trạng Thái", options=status_options, horizontal=True, label_visibility="collapsed")
     actual_status = selected_ui_status
 
 
@@ -276,9 +291,9 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
             df_export = df_export.drop(columns=[col])
 
 
-# ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI (DÙNG MATERIAL ICONS) =================
+# ================= 7. HIỂN THỊ TIÊU ĐỀ & KHỐI KPI ĐỒNG BỘ =================
 with header_container:
-    st.markdown("<h2 style='text-align: center; color: #0f172a; font-weight: 800; letter-spacing: -0.5px; margin-top: 10px; margin-bottom: 25px;'>BÁO CÁO TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center; color: #1C1C1E; font-weight: 800; margin-top: 10px; margin-bottom: 5px; font-size: 26px;'>BÁO CÁO TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</h2>", unsafe_allow_html=True)
 
 with kpi_container:
     p_projects = df_display.get('Dự Án', pd.Series()).nunique()
@@ -291,7 +306,7 @@ with kpi_container:
     p_notstarted = len(df_display[df_display.get('Trạng Thái', '') == 'Chưa bắt đầu'])
     p_paused = len(df_display[df_display.get('Trạng Thái', '') == 'Tạm dừng'])
 
-    # Hàm render KPI với HTML nhúng icon Google Material Symbols
+    # Hàm tạo thẻ KPI với Material Icon và Giao diện nhã nhặn
     def render_modern_kpi(title, value, icon_name, bg_color, icon_color):
         return f"""
         <div class="kpi-card">
@@ -306,26 +321,26 @@ with kpi_container:
         """
 
     r1_c1, r1_c2, r1_c3, r1_c4 = st.columns(4)
-    # Tầng 1: Màu sắc xanh dương dịu (Primary theme)
-    with r1_c1: st.markdown(render_modern_kpi("Tổng Dự án", p_projects, "domain", "#eff6ff", "#3b82f6"), unsafe_allow_html=True)
-    with r1_c2: st.markdown(render_modern_kpi("Hạng mục", p_categories, "folder_open", "#eff6ff", "#3b82f6"), unsafe_allow_html=True)
-    with r1_c3: st.markdown(render_modern_kpi("Công việc", p_total, "assignment", "#eff6ff", "#3b82f6"), unsafe_allow_html=True)
-    with r1_c4: st.markdown(render_modern_kpi("Tiến độ TB", f"{p_prog:.1f}%", "speed", "#f5f3ff", "#6366f1"), unsafe_allow_html=True)
+    # Các ô KPI cấu hình tổng quan: Màu xanh tinh tế
+    with r1_c1: st.markdown(render_modern_kpi("Tổng Dự án", p_projects, "domain", "#EBF3FF", "#0066FF"), unsafe_allow_html=True)
+    with r1_c2: st.markdown(render_modern_kpi("Hạng mục", p_categories, "folder", "#EBF3FF", "#0066FF"), unsafe_allow_html=True)
+    with r1_c3: st.markdown(render_modern_kpi("Công việc", p_total, "assignment", "#EBF3FF", "#0066FF"), unsafe_allow_html=True)
+    with r1_c4: st.markdown(render_modern_kpi("Tiến độ TB", f"{p_prog:.1f}%", "donut_large", "#F2F2F7", "#5E5CE6"), unsafe_allow_html=True)
     
     r2_c1, r2_c2, r2_c3, r2_c4 = st.columns(4)
-    # Tầng 2: Màu sắc theo ngữ nghĩa trạng thái (Semantic theme)
-    with r2_c1: st.markdown(render_modern_kpi("Đã hoàn thành", p_done, "check_circle", "#ecfdf5", "#10b981"), unsafe_allow_html=True)
-    with r2_c2: st.markdown(render_modern_kpi("Đang triển khai", p_inprogress, "sync", "#f0fdf4", "#0ea5e9"), unsafe_allow_html=True)
-    with r2_c3: st.markdown(render_kpi_not_started := render_modern_kpi("Chưa bắt đầu", p_notstarted, "hourglass_empty", "#f8fafc", "#64748b"), unsafe_allow_html=True)
-    with r2_c4: st.markdown(render_modern_kpi("Tạm dừng", p_paused, "error", "#fef2f2", "#ef4444"), unsafe_allow_html=True)
+    # Các ô KPI cấu hình trạng thái: Màu semantic chuẩn Apple
+    with r2_c1: st.markdown(render_modern_kpi("Đã hoàn thành", p_done, "check_circle", "#EAF9EE", "#34C759"), unsafe_allow_html=True)
+    with r2_c2: st.markdown(render_modern_kpi("Đang triển khai", p_inprogress, "sync", "#E5F2FF", "#007AFF"), unsafe_allow_html=True)
+    with r2_c3: st.markdown(render_modern_kpi("Chưa bắt đầu", p_notstarted, "schedule", "#F2F2F7", "#8E8E93"), unsafe_allow_html=True)
+    with r2_c4: st.markdown(render_modern_kpi("Tạm dừng", p_paused, "warning", "#FFEBEA", "#FF3B30"), unsafe_allow_html=True)
 
 
-# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & LINK TẢI =================
+# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU BẢN CŨ & NÚT TẢI =================
 with table_container:
-    # 1. Tiêu đề Bảng
-    st.markdown("<h4 style='text-align: center; color: #0f172a; margin-top: 25px; margin-bottom: 25px; font-weight: 700; letter-spacing: -0.5px;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
+    # 1. In Tiêu đề Bảng
+    st.markdown("<h4 style='text-align: center; color: #1C1C1E; margin-top: 35px; margin-bottom: 25px; font-weight: 700; font-size: 20px;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
     
-    # 2. Xử lý tải Excel (Link sát phải)
+    # 2. Xử lý xuất Excel
     def generate_excel_with_colors(df_data):
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -338,10 +353,10 @@ with table_container:
         wb = openpyxl.load_workbook(output)
         ws = wb.active
 
-        # Cập nhật màu Excel cho tương đồng màu web mới
-        green_fill = PatternFill(start_color="ecfdf5", end_color="ecfdf5", fill_type="solid")
-        red_fill = PatternFill(start_color="fef2f2", end_color="fef2f2", fill_type="solid")
-        gray_fill = PatternFill(start_color="f8fafc", end_color="f8fafc", fill_type="solid")
+        # Giữ nguyên màu Excel xuất ra
+        green_fill = PatternFill(start_color="A5D6A7", end_color="A5D6A7", fill_type="solid")
+        red_fill = PatternFill(start_color="EF9A9A", end_color="EF9A9A", fill_type="solid")
+        gray_fill = PatternFill(start_color="F5F5F5", end_color="F5F5F5", fill_type="solid")
 
         status_col_idx = None
         for col_idx, col_name in enumerate(df_data.columns, 1):
@@ -353,9 +368,12 @@ with table_container:
             for row_idx in range(2, ws.max_row + 1):
                 status_val = str(ws.cell(row=row_idx, column=status_col_idx).value).strip()
                 fill_to_use = None
-                if status_val == 'Đã hoàn thành': fill_to_use = green_fill
-                elif status_val == 'Tạm dừng': fill_to_use = red_fill
-                elif status_val == 'Chưa bắt đầu': fill_to_use = gray_fill
+                if status_val == 'Đã hoàn thành':
+                    fill_to_use = green_fill
+                elif status_val == 'Tạm dừng':
+                    fill_to_use = red_fill
+                elif status_val == 'Chưa bắt đầu':
+                    fill_to_use = gray_fill
                 
                 if fill_to_use:
                     for col in range(1, ws.max_column + 1):
@@ -376,11 +394,11 @@ with table_container:
         mime_type = "text/csv"
         filename = "Bao_cao_tien_do_Thien_Son.csv"
 
-    # Link Tải Excel Text Sạch Sẽ
-    download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}"><span class="material-symbols-rounded" style="vertical-align: middle; font-size: 18px; margin-right: 4px;">download</span>Tải Excel</a>'
+    # Link tải Excel có icon nhỏ
+    download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}"><span class="material-symbols-rounded">download</span> Tải Excel</a>'
     st.markdown(download_html, unsafe_allow_html=True)
 
-    # 3. Định dạng lại màu Bảng cho thanh lịch (Pastel)
+    # 3. Hiển thị bảng màu chuẩn xác phiên bản trước (Xanh lá / Đỏ / Xám)
     priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
 
     if 'Trạng Thái' in df_display.columns and 'Tiến Độ (%)' in df_display.columns:
@@ -390,14 +408,17 @@ with table_container:
         df_display = df_display.sort_values(by=sort_cols, ascending=[True] * len(sort_cols))
         df_display = df_display.drop(columns=['Mức Ưu Tiên'])
 
-    def modern_color_rows(row):
+    # GIỮ ĐÚNG MÀU SẮC BẢNG NHƯ PHIÊN BẢN TRƯỚC BẠN YÊU CẦU
+    def color_rows(row):
         status = row.get('Trạng Thái', '')
-        # Sử dụng dải màu pastel mềm mại, chữ đen xám nhẹ để không gắt mắt
-        if status == 'Đã hoàn thành': return ['background-color: #ecfdf5; color: #064e3b;'] * len(row)
-        if status == 'Tạm dừng': return ['background-color: #fef2f2; color: #7f1d1d;'] * len(row)
-        if status == 'Chưa bắt đầu': return ['background-color: #f8fafc; color: #475569;'] * len(row)
-        return ['background-color: #ffffff; color: #0f172a;'] * len(row)
+        if status == 'Đã hoàn thành': return ['background-color: #a5d6a7; color: #000;'] * len(row)
+        if status == 'Tạm dừng': return ['background-color: #ef9a9a; color: #000;'] * len(row)
+        if status == 'Chưa bắt đầu': return ['background-color: #f5f5f5; color: #000;'] * len(row)
+        return ['background-color: #ffffff; color: #000;'] * len(row)
 
-    styled_df = df_display.style.apply(modern_color_rows, axis=1)
+    styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
+        'selector': 'th',
+        'props': [('background-color', '#E2E8F0'), ('color', '#0F172A'), ('font-weight', 'bold')]
+    }])
     
     st.dataframe(styled_df, use_container_width=True, hide_index=True, height=550)
