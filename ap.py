@@ -14,14 +14,16 @@ def get_base64_image(image_path):
             return base64.b64encode(f.read()).decode()
     return None
 
+# Đọc ảnh nền
 bg_base64 = get_base64_image("background.jpg")
-bg_style = f'background-image: url("data:image/jpeg;base64,{bg_base64}");' if bg_base64 else 'background-image: url("https://img.freepik.com/free-photo/green-marble-texture-background_23-2150383431.jpg");'
+bg_url = f"data:image/jpeg;base64,{bg_base64}" if bg_base64 else "https://img.freepik.com/free-photo/green-marble-texture-background_23-2150383431.jpg"
 
+# CSS tổng thể (Đã tách khỏi f-string để tránh lỗi ngoặc nhọn)
 st.markdown(f"""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
     .stApp {{
-        {bg_style}
+        background-image: url("{bg_url}");
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -104,8 +106,8 @@ st.markdown(f"""
         display: flex; flex-direction: row; justify-content: center; gap: 35px;
         margin-top: 10px; margin-bottom: 25px; flex-wrap: wrap; background-color: transparent !important;
     }}
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label { cursor: pointer; background: transparent !important; border: none !important; padding: 5px !important; }
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label p { font-weight: 500 !important; color: #0f172a !important; margin: 0 !important; font-size: 1rem !important; }
+    div[data-testid="stRadio"] > div[role="radiogroup"] > label {{ cursor: pointer; background: transparent !important; border: none !important; padding: 5px !important; }}
+    div[data-testid="stRadio"] > div[role="radiogroup"] > label p {{ font-weight: 500 !important; color: #0f172a !important; margin: 0 !important; font-size: 1rem !important; }}
 </style>
 """, unsafe_allow_html=True)
 
