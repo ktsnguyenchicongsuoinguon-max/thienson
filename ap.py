@@ -26,29 +26,30 @@ st.markdown("""
         font-weight: 800 !important; font-size: 14px !important;
     }
     
-    /* ĐẨY NÚT TẢI EXCEL SÁT MÉP PHẢI VÀ NGANG HÀNG VỚI TIÊU ĐỀ */
-    div.stDownloadButton {
+    /* ĐẨY NÚT TẢI EXCEL RA SÁT MÉP PHẢI TUYỆT ĐỐI VÀ LÀM NHẠT MÀU CHỮ */
+    div[data-testid="stDownloadButton"] {
         display: flex !important;
-        justify-content: flex-end !important;
-        margin-top: -55px !important; /* Kéo nút lên ngang hàng với tiêu đề */
-        margin-bottom: 15px !important;
-        position: relative !important;
+        justify-content: flex-end !important; /* Ép nội dung sang phải */
+        width: 100% !important; /* Phủ kín chiều ngang để đẩy được sát lề */
+        margin-top: -40px !important; /* Kéo lên ngang hàng với tiêu đề bảng */
+        margin-bottom: 10px !important;
         z-index: 999 !important;
+        position: relative !important;
     }
-    div.stDownloadButton > button {
+    div[data-testid="stDownloadButton"] > button {
         background-color: transparent !important;
         border: none !important;
         box-shadow: none !important;
-        color: #0f172a !important; /* Màu giống tiêu đề cột bảng */
-        font-size: 14px !important;
-        font-weight: 700 !important;
+        color: #6c757d !important; /* Màu chữ xám nhạt tinh tế hơn */
+        font-size: 13.5px !important;
+        font-weight: 600 !important;
         padding: 0 !important;
         margin: 0 !important;
         height: auto !important;
         min-height: unset !important;
     }
-    div.stDownloadButton > button:hover {
-        color: #198754 !important;
+    div[data-testid="stDownloadButton"] > button:hover {
+        color: #198754 !important; /* Sáng lên màu xanh khi rê chuột */
         text-decoration: underline !important;
         background-color: transparent !important;
     }
@@ -286,12 +287,12 @@ with kpi_container:
     with r2_c4: st.markdown(render_kpi("Vướng mắc", p_paused, "⚠️"), unsafe_allow_html=True)
 
 
-# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & NÚT TẢI SÁT MÉP PHẢI =================
+# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU =================
 with table_container:
-    # 1. In Tiêu đề Bảng (Chiếm 100% không gian container, tự động căn giữa)
-    st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 35px; margin-bottom: 25px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
+    # 1. In Tiêu đề Bảng (Tự động căn giữa)
+    st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 35px; margin-bottom: 20px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
     
-    # 2. Xử lý xuất Excel (Nút này sẽ được CSS tự động kéo lên ngang hàng với tiêu đề và căn phải tuyệt đối)
+    # 2. Xử lý xuất Excel
     def generate_excel_with_colors(df_data):
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
