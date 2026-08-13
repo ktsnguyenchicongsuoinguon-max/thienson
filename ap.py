@@ -2,24 +2,44 @@ import streamlit as st
 import pandas as pd
 import io
 import base64
+import os
 from datetime import datetime, timedelta
 
-# ================= 1. THIẾT LẬP GIAO DIỆN & CSS TÙY CHỈNH =================
+# ================= 1. THIẾT LẬP GIAO DIỆN =================
 st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", page_icon="logothienson.png", layout="wide", initial_sidebar_state="expanded")
 
-# Nhúng font icon hiện đại của Google
+# ================= HÀM ĐỌC ẢNH LOCAL LÀM BACKGROUND =================
+def get_base64_image(image_path):
+    if os.path.exists(image_path):
+        with open(image_path, "rb") as img_file:
+            return base64.b64encode(img_file.read()).decode()
+    return None
+
+# BẠN THAY TÊN FILE ẢNH Ở ĐÂY NẾU CẦN (Phải để cùng thư mục với app.py)
+background_image_path = "background.jpg" 
+bg_base64 = get_base64_image(background_image_path)
+
+if bg_base64:
+    # Nếu tìm thấy file ảnh trong thư mục, nhúng vào CSS
+    bg_css = f"""
+    <style>
+        .stApp {{
+            background-image: url("data:image/jpeg;base64,{bg_base64}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }}
+    </style>
+    """
+    st.markdown(bg_css, unsafe_allow_html=True)
+else:
+    # Nếu không thấy file ảnh, dùng màu nền xám nhạt dự phòng
+    st.markdown("<style>.stApp { background-color: #FAFAFC; }</style>", unsafe_allow_html=True)
+
+# ================= CSS TÙY CHỈNH (GLASSMORPHISM & MATERIAL ICONS) =================
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* ================= NỀN TỔNG THỂ MAP ĐÁ MARBLE XANH NGỌC ================= */
-    .stApp { 
-        /* Bạn có thể thay link ảnh trong ngoặc kép bằng link ảnh map đá của riêng bạn */
-        background-image: url("https://img.freepik.com/free-photo/green-marble-texture-background_23-2150383431.jpg"); 
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-    }
-
     /* Hiệu ứng kính mờ (Glassmorphism) cho khung chứa nội dung để chữ không bị chìm vào vân đá */
     .block-container { 
         padding-top: 2rem !important; 
@@ -39,9 +59,7 @@ st.markdown("""
     }
 
     /* THANH HEADER TÀNG HÌNH */
-    header[data-testid="stHeader"] { 
-        background: transparent !important; 
-    }
+    header[data-testid="stHeader"] { background: transparent !important; }
     .stAppDeployButton { display: none !important; }
 
     /* LÀM ĐẬM HEADER BẢNG */
@@ -251,12 +269,12 @@ with st.sidebar:
 
 # ================= 4. KHỞI TẠO CÁC CONTAINER =================
 header_container = st.container()
-kpi_container = st.container()
 status_container = st.container()
+kpi_container = st.container()
 table_container = st.container()
 
 
-# ================= 5. XỬ LÝ LỌC TRẠNG THÁI (BỎ ICON EMOJI) =================
+# ================= 5. XỬ LÝ LỌC TRẠNG THÁI =================
 with status_container:
     status_options = ["Tất cả", "Chưa bắt đầu", "Đang triển khai", "Đã hoàn thành", "Tạm dừng"]
     
@@ -340,7 +358,7 @@ with table_container:
     # Tiêu đề bảng căn giữa tuyệt đối
     st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 35px; margin-bottom: 25px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
     
-    # Xử lý xuất Excel
+    # Xử lý xuất Excel qua Base64
     def generate_excel_with_colors(df_data):
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -397,7 +415,7 @@ with table_container:
     download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}">Tải Excel</a>'
     st.markdown(download_html, unsafe_allow_html=True)
 
-    # Hiển thị bảng màu chuẩn xác
+    # Hiển thị bảng màu chuẩn xác phiên bản trước
     priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
 
     if 'Trạng Thái' in df_display.columns and 'Tiến Độ (%)' in df_display.columns:
