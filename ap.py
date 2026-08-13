@@ -49,23 +49,23 @@ else:
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* Nền màu trắng có độ trong suốt (Glassmorphism tổng thể) */
+    /* Nền tổng thể trong suốt hơn nhiều (Giảm từ 75% xuống 45%) */
     .block-container { 
         padding-top: 2rem !important; 
         padding-bottom: 2rem !important; 
-        background-color: rgba(255, 255, 255, 0.75) !important; /* Trắng trong suốt 75% */
-        backdrop-filter: blur(12px); /* Hiệu ứng kính mờ */
+        background-color: rgba(255, 255, 255, 0.45) !important; /* Trắng trong suốt 45% */
+        backdrop-filter: blur(16px); /* Tăng nhẹ kính mờ để làm nổi bật chữ */
         border-radius: 20px;
         margin-top: 30px;
         margin-bottom: 30px;
         box-shadow: 0 8px 32px rgba(0,0,0,0.15);
     }
 
-    /* Hiệu ứng kính mờ cho thanh Sidebar */
+    /* Hiệu ứng kính mờ cho thanh Sidebar cũng trong suốt hơn (Giảm từ 85% xuống 55%) */
     section[data-testid="stSidebar"] {
-        background-color: rgba(255, 255, 255, 0.85) !important;
-        backdrop-filter: blur(10px);
-        border-right: 1px solid rgba(255, 255, 255, 0.3);
+        background-color: rgba(255, 255, 255, 0.55) !important;
+        backdrop-filter: blur(16px);
+        border-right: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     /* THANH HEADER TÀNG HÌNH */
