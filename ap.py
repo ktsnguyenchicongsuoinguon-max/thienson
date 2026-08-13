@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import io
 from datetime import datetime, timedelta
 
 # ================= 1. THIẾT LẬP GIAO DIỆN & CSS TÙY CHỈNH =================
@@ -211,9 +212,12 @@ if selected_cb: df_display = df_display[df_display[cb_col].isin(selected_cb)]
 if actual_status != "Tất cả": 
     df_display = df_display[df_display.get('Trạng Thái', '') == actual_status]
 
+df_export = df_display.copy()
 for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
     if col in df_display.columns:
         df_display = df_display.drop(columns=[col])
+        if col in df_export.columns:
+            df_export = df_export.drop(columns=[col])
 
 
 # ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI 2 HÀNG =================
@@ -255,9 +259,27 @@ with kpi_container:
     with r2_c4: st.markdown(render_kpi("Vướng mắc", p_paused, "⚠️"), unsafe_allow_html=True)
 
 
-# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU =================
+# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & NÚT TẢI EXCEL GÓC PHẢI =================
 with table_container:
-    st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 35px; margin-bottom: 20px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
+    col_title, col_btn = st.columns([3, 1])
+    
+    with col_title:
+        st.markdown("<h4 style='color: #198754; margin-top: 25px; margin-bottom: 10px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
+        
+    with col_btn:
+        st.markdown("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True)
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df_export.to_excel(writer, index=False, sheet_name='TienDo')
+        excel_data = output.getvalue()
+        
+        st.download_button(
+            label="📥 Tải xuống Excel",
+            data=excel_data,
+            file_name="Bao_cao_tien_do_Thien_Son.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            use_container_width=True
+        )
 
     priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
 
@@ -268,11 +290,10 @@ with table_container:
         df_display = df_display.sort_values(by=sort_cols, ascending=[True] * len(sort_cols))
         df_display = df_display.drop(columns=['Mức Ưu Tiên'])
 
-    # Điều chỉnh màu nền đậm lên (Đã gỡ bỏ in đậm chữ, sử dụng mã màu Hex đậm hơn)
     def color_rows(row):
         status = row.get('Trạng Thái', '')
-        if status == 'Đã hoàn thành': return ['background-color: #a5d6a7; color: #000;'] * len(row) # Xanh lá đậm hơn
-        if status == 'Tạm dừng': return ['background-color: #ef9a9a; color: #000;'] * len(row)      # Đỏ đậm hơn
+        if status == 'Đã hoàn thành': return ['background-color: #a5d6a7; color: #000;'] * len(row)
+        if status == 'Tạm dừng': return ['background-color: #ef9a9a; color: #000;'] * len(row)
         if status == 'Chưa bắt đầu': return ['background-color: #f5f5f5; color: #000;'] * len(row)
         return ['background-color: #ffffff; color: #000;'] * len(row)
 
