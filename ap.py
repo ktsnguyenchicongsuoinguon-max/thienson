@@ -26,26 +26,11 @@ st.markdown("""
         font-weight: 800 !important; font-size: 14px !important;
     }
     
-    /* TÙY CHỈNH NÚT TẢI EXCEL: BỎ VIỀN, NHỎ GỌN, CĂN PHẢI */
-    div[data-testid="stDownloadButton"] {
+    /* CĂN PHẢI CHO CỘT NÚT TẢI EXCEL */
+    div[data-testid="column"]:last-child {
         display: flex;
         justify-content: flex-end;
-    }
-    div[data-testid="stDownloadButton"] > button {
-        background-color: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        color: #198754 !important;
-        font-size: 0.95rem !important;
-        font-weight: 700 !important;
-        padding: 0 !important;
-        height: auto !important;
-        min-height: unset !important;
-    }
-    div[data-testid="stDownloadButton"] > button:hover {
-        background-color: transparent !important;
-        color: #14532d !important;
-        text-decoration: underline;
+        align-items: center;
     }
 
     /* ================= TÙY CHỈNH KHỐI KPI ================= */
@@ -281,15 +266,15 @@ with kpi_container:
     with r2_c4: st.markdown(render_kpi("Vướng mắc", p_paused, "⚠️"), unsafe_allow_html=True)
 
 
-# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & NÚT "Tải Excel" GÓC PHẢI =================
+# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & TIÊU ĐỀ GIỮA, NÚT GÓC PHẢI =================
 with table_container:
-    col_title, col_btn = st.columns([4, 1.2])
+    col_empty_l, col_title, col_btn = st.columns([1, 4, 1])
     
     with col_title:
         st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 25px; margin-bottom: 10px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
         
     with col_btn:
-        st.markdown("<div style='margin-top: 22px;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True)
         
         def generate_excel_with_colors(df_data):
             output = io.BytesIO()
