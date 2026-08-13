@@ -42,27 +42,33 @@ st.markdown("""
     }
     .kpi-value { font-size: 1.8rem; font-weight: 900; color: #1e293b; }
     
-    /* ÉP THANH TRẠNG THÁI DÀN ĐỀU */
+    /* ÉP THANH TRẠNG THÁI DÀN ĐỀU (ĐÃ FIX LỖI MẤT CHỮ) */
     div[data-testid="stRadio"] { width: 100% !important; }
-    div.row-widget.stRadio > div[role="radiogroup"] {
+    div[data-testid="stRadio"] > div[role="radiogroup"] {
         display: flex; flex-direction: row; width: 100% !important;
         justify-content: space-between; gap: 15px; background-color: transparent; 
         padding: 0px; margin-top: 15px; margin-bottom: 10px;
     }
-    div.row-widget.stRadio > div[role="radiogroup"] > label {
+    div[data-testid="stRadio"] > div[role="radiogroup"] > label {
         flex: 1 1 0px !important; background-color: #ffffff;
         padding: 15px 5px !important; border-radius: 12px !important; 
         border: 1px solid #ced4da; box-shadow: 0 4px 6px rgba(0,0,0,0.04);
         cursor: pointer; transition: all 0.2s ease-in-out;
         display: flex; justify-content: center; align-items: center;
     }
-    div.row-widget.stRadio > div[role="radiogroup"] > label:hover {
+    div[data-testid="stRadio"] > div[role="radiogroup"] > label:hover {
         background-color: #FFEBEE; border-color: #C62828;
         box-shadow: 0 8px 15px rgba(198, 40, 40, 0.15); transform: translateY(-3px);
     }
-    div.row-widget.stRadio > div[role="radiogroup"] > label > div:first-child { display: none; }
-    div.row-widget.stRadio > div[role="radiogroup"] > label div[data-testid="stMarkdownContainer"] p {
-        font-weight: 700 !important; color: #495057; margin: 0; font-size: 1.1rem; text-align: center;
+    
+    /* Nhắm chính xác vào cục tròn Radio để ẩn đi mà không làm mất chữ */
+    div[data-testid="stRadio"] > div[role="radiogroup"] > label div[role="radio"] { 
+        display: none !important; 
+    }
+    /* Ép hiển thị rõ chữ */
+    div[data-testid="stRadio"] > div[role="radiogroup"] > label p {
+        font-weight: 700 !important; color: #495057 !important; margin: 0; 
+        font-size: 1.1rem; text-align: center;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -125,7 +131,7 @@ with st.sidebar:
     cb_opts = [x for x in df_temp[cb_col].unique() if x != ''] if cb_col else []
     selected_cb = st.multiselect("👷 CÁN BỘ TRIỂN KHAI", options=cb_opts, placeholder="Chọn Tất cả")
 
-    # ================= BỘ LỌC THỜI GIAN THÔNG MINH (ĐÃ GỘP) =================
+    # ================= BỘ LỌC THỜI GIAN THÔNG MINH (ĐÃ FIX) =================
     st.markdown("<br>", unsafe_allow_html=True)
     
     time_filter = st.selectbox("📅 KHOẢNG THỜI GIAN", 
@@ -178,26 +184,19 @@ with status_container:
 # ================= 6. TỔNG HỢP & ÁP DỤNG MỌI BỘ LỌC =================
 df_display = df.copy()
 
-# A. LỌC THỜI GIAN GỘP CHUNG (Lọc các việc CÓ DIỄN RA trong khoảng thời gian)
+# A. LỌC THỜI GIAN THEO "ĐIỂM RƠI" (Bắt đầu HOẶC Kết thúc trong khoảng chọn)
 if start_date and end_date and 'Ngày_Bat_Dau_Obj' in df_display.columns and 'Ngày_Hoan_Thanh_Obj' in df_display.columns:
     start_ts = pd.to_datetime(start_date)
     end_ts = pd.to_datetime(end_date)
     
-    has_start = df_display['Ngày_Bat_Dau_Obj'].notna()
-    has_end = df_display['Ngày_Hoan_Thanh_Obj'].notna()
+    # Kiểm tra xem Ngày Bắt Đầu CÓ rơi vào khoảng thời gian không
+    cond_start = df_display['Ngày_Bat_Dau_Obj'].between(start_ts, end_ts)
     
-    # 1. Việc có đủ 2 ngày: Xét giao thoa (Bắt đầu <= Ngày cuối lọc VÀ Kết thúc >= Ngày đầu lọc)
-    mask_both = has_start & has_end & (df_display['Ngày_Bat_Dau_Obj'] <= end_ts) & (df_display['Ngày_Hoan_Thanh_Obj'] >= start_ts)
+    # Kiểm tra xem Ngày Hoàn Thành CÓ rơi vào khoảng thời gian không
+    cond_end = df_display['Ngày_Hoan_Thanh_Obj'].between(start_ts, end_ts)
     
-    # 2. Chỉ có ngày bắt đầu: Chỉ xét mốc bắt đầu có lọt thỏm vào khoảng chọn không
-    mask_start_only = has_start & ~has_end & (df_display['Ngày_Bat_Dau_Obj'] >= start_ts) & (df_display['Ngày_Bat_Dau_Obj'] <= end_ts)
-    
-    # 3. Chỉ có ngày kết thúc: Chỉ xét mốc kết thúc có lọt thỏm vào khoảng chọn không
-    mask_end_only = ~has_start & has_end & (df_display['Ngày_Hoan_Thanh_Obj'] >= start_ts) & (df_display['Ngày_Hoan_Thanh_Obj'] <= end_ts)
-    
-    # Gộp 3 trường hợp lại
-    mask_total = mask_both | mask_start_only | mask_end_only
-    df_display = df_display[mask_total]
+    # Gộp 2 điều kiện: Chỉ cần 1 trong 2 mốc thời gian thỏa mãn là lấy
+    df_display = df_display[cond_start | cond_end]
 
 # B. Lọc Sidebar
 if selected_projects: df_display = df_display[df_display['Dự Án'].isin(selected_projects)]
