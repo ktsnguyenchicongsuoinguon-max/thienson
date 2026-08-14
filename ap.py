@@ -46,16 +46,16 @@ else:
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* ================= CĂN CHỈNH KHOẢNG HỞ NỀN ĐÁ TRÊN / DƯỚI ================= */
+    /* ================= CĂN CHỈNH KHOẢNG HỞ NỀN ĐÁ TRÊN / DƯỚI & PADDING ================= */
     .block-container { 
-        padding-top: 1rem !important; 
-        padding-bottom: 1rem !important; 
+        padding-top: 30px !important; /* Ép khoảng cách từ viền trên kính mờ xuống tiêu đề đúng 30px */
+        padding-bottom: 30px !important; 
         background-color: rgba(255, 255, 255, 0.35) !important; 
         backdrop-filter: blur(20px) !important; 
         -webkit-backdrop-filter: blur(20px) !important;
         border-radius: 24px;
         margin-top: 60px; /* Khớp đúng với chiều cao Header để nút Share lọt thỏm chính giữa */
-        margin-bottom: 20px; /* Giảm mạnh lề dưới để cân bằng vì trình duyệt có sẵn lề ngầm */
+        margin-bottom: 20px; 
         box-shadow: 0 10px 40px rgba(0,0,0,0.15);
         border: 1px solid rgba(255, 255, 255, 0.4); 
     }
@@ -68,7 +68,7 @@ st.markdown("""
     /* THANH HEADER/FOOTER TÀNG HÌNH & CHÍNH GIỮA */
     header[data-testid="stHeader"] { 
         background: transparent !important; 
-        height: 60px !important; /* Cố định chiều cao Header */
+        height: 60px !important; 
     }
     footer[data-testid="stFooter"] { display: none !important; }
     .stAppDeployButton { display: none !important; }
@@ -312,8 +312,9 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
 
 # ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI =================
 with header_container:
+    # Ô bao tiêu đề trên cùng: margin-top = 0, margin-bottom = 30px (cộng padding-top block 30px => Ở chính giữa hoàn hảo)
     st.markdown("""
-    <div class="title-card" style="padding: 8px 24px; margin-top: 5px; margin-bottom: 25px;">
+    <div class="title-card" style="padding: 10px 24px; margin-top: 0px; margin-bottom: 30px;">
         <div style="font-size: 32px; font-weight: 900; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
     </div>
     """, unsafe_allow_html=True)
