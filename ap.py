@@ -56,11 +56,19 @@ st.markdown("""
     }
     
     ::-webkit-scrollbar { display: none !important; width: 0px !important; height: 0px !important; }
-    * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
+    * { 
+        scrollbar-width: none !important; 
+        -ms-overflow-style: none !important; 
+        box-sizing: border-box !important; 
+    }
 
-    header[data-testid="stHeader"] { display: none !important; }
+    /* GIỮ LẠI HEADER (TRONG SUỐT) ĐỂ KHÔNG BỊ MẤT NÚT MŨI TÊN THU/ẨN BỘ LỌC */
+    header[data-testid="stHeader"] { background: transparent !important; box-shadow: none !important; }
+    [data-testid="stHeaderActionElements"], .stAppDeployButton { display: none !important; }
     footer[data-testid="stFooter"], footer { display: none !important; }
-    .stAppDeployButton { display: none !important; }
+    
+    /* Đảm bảo nút thu phóng bấm được mượt mà */
+    [data-testid="collapsedControl"] { z-index: 999999 !important; }
 
     /* Ép khung chứa chính hiển thị dạng Flex để quản lý khoảng cách 2 khối */
     [data-testid="stAppViewContainer"] {
@@ -144,11 +152,19 @@ st.markdown("""
         
         height: calc(100vh - 120px) !important; 
         max-height: calc(100vh - 120px) !important;
-        width: calc(100vw - 300px - 50px) !important; /* Tự động co giãn theo màn hình */
+        
+        /* ĐỂ CHẾ ĐỘ AUTO GIÚP KHỐI TỰ MỞ RỘNG KHI ẨN BỘ LỌC */
+        width: auto !important; 
+        flex: 1 !important;
         max-width: none !important; 
         
         overflow-y: auto !important; 
         overflow-x: hidden !important; 
+    }
+
+    /* Cân bằng lại lề trái 20px khi Sidebar bị đóng */
+    [data-testid="stAppViewContainer"]:has(section[data-testid="stSidebar"][aria-expanded="false"]) .block-container {
+        margin-left: 20px !important;
     }
 
     /* Thanh cuộn mượt mà riêng cho khối chính */
@@ -310,10 +326,10 @@ with st.sidebar:
 
 # ================= 4. KHỐI CHÍNH (BÊN PHẢI) =================
 
-# ----------------- ĐÃ ĐỔI ĐỘ ĐẬM (FONT-WEIGHT) TỪ 900 XUỐNG 700 -----------------
+# Điều chỉnh font-weight 600 mảnh
 st.markdown("""
 <div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 25px;">
-    <div style="font-size: 32px; font-weight: 700; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
+    <div style="font-size: 32px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -377,10 +393,10 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
     if col in df_display.columns: df_display = df_display.drop(columns=[col])
     if col in df_export.columns: df_export = df_export.drop(columns=[col])
 
-# ----------------- ĐÃ ĐỔI ĐỘ ĐẬM (FONT-WEIGHT) TỪ 900 XUỐNG 700 -----------------
+# Điều chỉnh font-weight 600 mảnh
 st.markdown("""
 <div class="title-card" style="padding: 8px 24px; margin-top: 25px; margin-bottom: 25px;">
-    <div style="font-size: 22px; font-weight: 700; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2;">BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</div>
+    <div style="font-size: 22px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2;">BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -448,7 +464,7 @@ def color_rows(row):
 
 styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
     'selector': 'th',
-    'props': [('background-color', 'rgba(226, 232, 240, 0.9)'), ('color', '#0f172a'), ('font-weight', 'bold')]
+    'props': [('background-color', 'rgba(226, 232, 240, 0.9)'), ('color', '#0F172A'), ('font-weight', 'bold')]
 }])
 
 st.dataframe(styled_df, use_container_width=True, hide_index=True, height=550)
