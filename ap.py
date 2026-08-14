@@ -6,7 +6,7 @@ import os
 from datetime import datetime, timedelta
 
 # ================= 1. THIẾT LẬP GIAO DIỆN =================
-st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", page_icon="logothienson.png", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", page_icon="logothienson.png", layout="wide", initial_sidebar_state="expanded")
 
 # ================= HÀM ĐỌC ẢNH LOCAL LÀM BACKGROUND =================
 def get_base64_image(image_path):
@@ -49,7 +49,7 @@ else:
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* ================= 1. KHÓA CUỘN VÀ ẨN MỌI THANH CUỘN TRANG ================= */
+    /* ================= 1. KHÓA CUỘN TRÌNH DUYỆT VÀ ẨN MỌI THANH CUỘN ================= */
     html, body {
         overflow: hidden !important; 
         margin: 0 !important; padding: 0 !important;
@@ -62,54 +62,34 @@ st.markdown("""
     footer[data-testid="stFooter"], footer { display: none !important; }
     .stAppDeployButton { display: none !important; }
 
-    [data-testid="stMain"] { padding: 0 !important; }
-    
-    /* Bao ngoài tổng thể: Căn lề trái 20px, phải 20px, trên/dưới 60px */
-    .block-container, [data-testid="stAppViewBlockContainer"] { 
-        padding: 0 !important;
-        margin-top: 60px !important;     
-        margin-bottom: 60px !important;  
-        margin-left: 20px !important;
-        margin-right: 20px !important;
-        max-width: calc(100vw - 40px) !important;
-        width: calc(100vw - 40px) !important;
-        background: transparent !important;
-    }
+    [data-testid="stMain"] > div:first-child { padding: 0 !important; }
 
-    /* ================= 2. ĐỊNH DẠNG 2 KHỐI KÍNH SONG SONG (CỘT 1 & CỘT 2) ================= */
-    /* Biến các cột của Streamlit thành 2 tấm kính mờ bo góc 24px */
-    [data-testid="column"] {
+    /* ================= 2. KHỐI KÍNH BỘ LỌC (SIDEBAR) ================= */
+    section[data-testid="stSidebar"] {
         background-color: rgba(255, 255, 255, 0.35) !important;
         backdrop-filter: blur(20px) !important;
         -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important;
-        border-radius: 24px !important; 
+        border-radius: 24px !important;
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         
+        /* SIDEBAR: Trái 20px, Phải cách khối chính 10px, Trên/Dưới 60px */
+        margin-top: 60px !important;
+        margin-bottom: 60px !important;
+        margin-left: 20px !important;
+        margin-right: 0px !important; 
+        
         height: calc(100vh - 120px) !important; 
-        max-height: calc(100vh - 120px) !important;
-        overflow: hidden !important;
     }
 
-    /* Cột 1 (Bộ lọc bên trái): Cố định, không cuộn ngoài */
-    [data-testid="column"]:nth-of-type(1) {
-        padding: 20px 15px !important;
+    [data-testid="stSidebarResizer"] { display: none !important; }
+    
+    [data-testid="stSidebarUserContent"] {
+        padding: 10px 20px 20px 20px !important;
         overflow-y: auto !important;
+        overflow-x: hidden !important;
     }
 
-    /* Cột 2 (Khối chính bên phải): Cho phép cuộn bảng mượt mà bên trong */
-    [data-testid="column"]:nth-of-type(2) {
-        padding: 25px 30px !important;
-        overflow-y: auto !important; 
-    }
-
-    /* Thanh cuộn mượt mà riêng cho khối chính */
-    [data-testid="column"]:nth-of-type(2)::-webkit-scrollbar { width: 8px !important; display: block !important; }
-    [data-testid="column"]:nth-of-type(2)::-webkit-scrollbar-track { background: transparent !important; margin: 20px 0 !important; }
-    [data-testid="column"]:nth-of-type(2)::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.3) !important; border-radius: 10px !important; }
-    [data-testid="column"]:nth-of-type(2)::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.5) !important; }
-
-    /* ================= 3. TRANG TRÍ BỘ LỌC ================= */
     .sidebar-title {
         display: flex; align-items: center; gap: 8px;
         font-size: 14px; font-weight: 700; color: #0f172a;
@@ -121,13 +101,43 @@ st.markdown("""
         font-size: 20px; color: #198754;
     }
     
-    [data-testid="column"]:nth-of-type(1) div[data-baseweb="select"] > div,
-    [data-testid="column"]:nth-of-type(1) div[data-baseweb="input"] > div {
+    section[data-testid="stSidebar"] div[data-baseweb="select"] > div,
+    section[data-testid="stSidebar"] div[data-baseweb="input"] > div {
         background-color: rgba(255, 255, 255, 0.4) !important;
         backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.6) !important;
         border-radius: 12px !important;
     }
+
+    /* ================= 3. KHỐI KÍNH CHÍNH (BẢNG & KPI) ================= */
+    .stMainBlockContainer, .block-container, [data-testid="stAppViewBlockContainer"] { 
+        background-color: rgba(255, 255, 255, 0.35) !important; 
+        backdrop-filter: blur(20px) !important; 
+        -webkit-backdrop-filter: blur(20px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.4) !important; 
+        border-radius: 24px !important; 
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
+        
+        /* KHỐI CHÍNH: Cách Sidebar (bên trái) đúng 10px, Cách mép phải 20px, Trên/Dưới 60px */
+        margin-top: 60px !important;     
+        margin-bottom: 60px !important;  
+        margin-left: 10px !important;  /* KHOẢNG HỞ CHUẨN 10PX GIỮA 2 KHỐI */
+        margin-right: 20px !important; 
+        
+        padding: 25px 30px !important; 
+        
+        height: calc(100vh - 120px) !important; 
+        max-width: none !important; 
+        
+        overflow-y: auto !important; 
+        overflow-x: hidden !important; 
+    }
+
+    /* Thanh cuộn mượt mà riêng cho khối chính */
+    .block-container::-webkit-scrollbar { width: 8px !important; display: block !important; }
+    .block-container::-webkit-scrollbar-track { background: transparent !important; margin: 20px 0 !important; }
+    .block-container::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.3) !important; border-radius: 10px !important; }
+    .block-container::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.5) !important; }
 
     /* ================= 4. CÁC THÀNH PHẦN BÊN TRONG ================= */
     div[data-testid="stDataFrame"] th {
@@ -222,15 +232,11 @@ def load_data():
 df = load_data()
 
 
-# ================= 3. CHIA LAYOUT 2 CỘT TÁCH BIỆT (GÓC CÁCH ĐÚNG 10PX) =================
-# gap="small" tạo khe hở chuẩn xác 10px giữa 2 khối kính
-col_filter, col_main = st.columns([1.5, 8.5], gap="small")
-
-
-# ================= TẤM KÍNH 1: BỘ LỌC (BÊN TRÁI) =================
-with col_filter:
-    col_l1, col_l2, col_l3 = st.columns([1, 2, 1])
-    with col_l2: st.image("logothienson.png", use_container_width=True) 
+# ================= 3. SIDEBAR BỘ LỌC =================
+with st.sidebar:
+    col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
+    with col_logo2:
+        st.image("logothienson.png", use_container_width=True) 
         
     st.markdown("<h3 style='text-align: left; margin-top: 5px; margin-bottom: 10px; color: #0f172a; font-size: 15px;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
     
@@ -284,145 +290,146 @@ with col_filter:
         elif len(date_range) == 1: start_date = end_date = date_range[0]
 
 
-# ================= TẤM KÍNH 2: KHỐI CHÍNH (BÊN PHẢI) =================
-with col_main:
-    st.markdown("""
-    <div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 25px;">
-        <div style="font-size: 32px; font-weight: 900; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
-    </div>
-    """, unsafe_allow_html=True)
+# ================= 4. KHỐI CHÍNH (BÊN PHẢI) =================
 
-    df_display = df.copy()
-    if start_date and end_date and 'Ngày_Bat_Dau_Obj' in df_display.columns and 'Ngày_Hoan_Thanh_Obj' in df_display.columns:
-        start_ts = pd.to_datetime(start_date)
-        end_ts = pd.to_datetime(end_date)
-        cond_start = df_display['Ngày_Bat_Dau_Obj'].between(start_ts, end_ts)
-        cond_end = df_display['Ngày_Hoan_Thanh_Obj'].between(start_ts, end_ts)
-        df_display = df_display[cond_start | cond_end]
+st.markdown("""
+<div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 25px;">
+    <div style="font-size: 32px; font-weight: 900; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
+</div>
+""", unsafe_allow_html=True)
 
-    if selected_projects: df_display = df_display[df_display['Dự Án'].isin(selected_projects)]
-    if selected_hd: df_display = df_display[df_display['Hợp Đồng - PLHĐ'].isin(selected_hd)]
-    if selected_hm: df_display = df_display[df_display['Hạng Mục'].isin(selected_hm)]
-    if selected_ql: df_display = df_display[df_display['Cán Bộ Quản Lý'].isin(selected_ql)]
-    if selected_cb: df_display = df_display[df_display[cb_col].isin(selected_cb)]
+df_display = df.copy()
+if start_date and end_date and 'Ngày_Bat_Dau_Obj' in df_display.columns and 'Ngày_Hoan_Thanh_Obj' in df_display.columns:
+    start_ts = pd.to_datetime(start_date)
+    end_ts = pd.to_datetime(end_date)
+    cond_start = df_display['Ngày_Bat_Dau_Obj'].between(start_ts, end_ts)
+    cond_end = df_display['Ngày_Hoan_Thanh_Obj'].between(start_ts, end_ts)
+    df_display = df_display[cond_start | cond_end]
 
-    p_projects = df_display.get('Dự Án', pd.Series()).nunique()
-    p_categories = df_display.get('Hạng Mục', pd.Series()).nunique()
-    p_total = len(df_display)
-    p_prog = df_display['Tiến Độ (%)'].mean() if ('Tiến Độ (%)' in df_display.columns and p_total > 0) else 0
+if selected_projects: df_display = df_display[df_display['Dự Án'].isin(selected_projects)]
+if selected_hd: df_display = df_display[df_display['Hợp Đồng - PLHĐ'].isin(selected_hd)]
+if selected_hm: df_display = df_display[df_display['Hạng Mục'].isin(selected_hm)]
+if selected_ql: df_display = df_display[df_display['Cán Bộ Quản Lý'].isin(selected_ql)]
+if selected_cb: df_display = df_display[df_display[cb_col].isin(selected_cb)]
 
-    p_done = len(df_display[df_display.get('Trạng Thái', '') == 'Đã hoàn thành'])
-    p_inprogress = len(df_display[df_display.get('Trạng Thái', '') == 'Đang triển khai'])
-    p_notstarted = len(df_display[df_display.get('Trạng Thái', '') == 'Chưa bắt đầu'])
-    p_paused = len(df_display[df_display.get('Trạng Thái', '') == 'Tạm dừng'])
+p_projects = df_display.get('Dự Án', pd.Series()).nunique()
+p_categories = df_display.get('Hạng Mục', pd.Series()).nunique()
+p_total = len(df_display)
+p_prog = df_display['Tiến Độ (%)'].mean() if ('Tiến Độ (%)' in df_display.columns and p_total > 0) else 0
 
-    def render_transparent_shadow_kpi(title, value, icon_name, bg_color, icon_color):
-        return f"""
-        <div class="kpi-card">
-            <div class="kpi-icon-wrapper" style="background-color: {bg_color}; color: {icon_color};">
-                <span class="material-symbols-rounded">{icon_name}</span>
-            </div>
-            <div class="kpi-details">
-                <div class="kpi-title">{title}</div>
-                <div class="kpi-value">{value}</div>
-            </div>
+p_done = len(df_display[df_display.get('Trạng Thái', '') == 'Đã hoàn thành'])
+p_inprogress = len(df_display[df_display.get('Trạng Thái', '') == 'Đang triển khai'])
+p_notstarted = len(df_display[df_display.get('Trạng Thái', '') == 'Chưa bắt đầu'])
+p_paused = len(df_display[df_display.get('Trạng Thái', '') == 'Tạm dừng'])
+
+def render_transparent_shadow_kpi(title, value, icon_name, bg_color, icon_color):
+    return f"""
+    <div class="kpi-card">
+        <div class="kpi-icon-wrapper" style="background-color: {bg_color}; color: {icon_color};">
+            <span class="material-symbols-rounded">{icon_name}</span>
         </div>
-        """
-
-    r1_c1, r1_c2, r1_c3, r1_c4 = st.columns(4)
-    with r1_c1: st.markdown(render_transparent_shadow_kpi("Tổng Dự án", p_projects, "domain", "#cfe2ff", "#0d6efd"), unsafe_allow_html=True)
-    with r1_c2: st.markdown(render_transparent_shadow_kpi("Hạng mục", p_categories, "folder_open", "#cfe2ff", "#0d6efd"), unsafe_allow_html=True)
-    with r1_c3: st.markdown(render_transparent_shadow_kpi("Công việc", p_total, "assignment", "#cfe2ff", "#0d6efd"), unsafe_allow_html=True)
-    with r1_c4: st.markdown(render_transparent_shadow_kpi("Tiến độ TB", f"{p_prog:.1f}%", "speed", "#e0cffc", "#6f42c1"), unsafe_allow_html=True)
-
-    r2_c1, r2_c2, r2_c3, r2_c4 = st.columns(4)
-    with r2_c1: st.markdown(render_transparent_shadow_kpi("Đã hoàn thành", p_done, "check_circle", "#d1e7dd", "#198754"), unsafe_allow_html=True)
-    with r2_c2: st.markdown(render_transparent_shadow_kpi("Đang triển khai", p_inprogress, "sync", "#cff4fc", "#0dcaf0"), unsafe_allow_html=True)
-    with r2_c3: st.markdown(render_transparent_shadow_kpi("Chưa bắt đầu", p_notstarted, "hourglass_empty", "#e2e3e5", "#6c757d"), unsafe_allow_html=True)
-    with r2_c4: st.markdown(render_transparent_shadow_kpi("Vướng mắc", p_paused, "error", "#f8d7da", "#dc3545"), unsafe_allow_html=True)
-
-    status_options = ["Tất cả", "Chưa bắt đầu", "Đang triển khai", "Đã hoàn thành", "Tạm dừng"]
-    actual_status = st.radio("Bộ lọc Trạng Thái", options=status_options, horizontal=True, label_visibility="collapsed")
-
-    if actual_status != "Tất cả": 
-        df_display = df_display[df_display.get('Trạng Thái', '') == actual_status]
-
-    df_export = df_display.copy()
-    for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
-        if col in df_display.columns: df_display = df_display.drop(columns=[col])
-        if col in df_export.columns: df_export = df_export.drop(columns=[col])
-
-    st.markdown("""
-    <div class="title-card" style="padding: 8px 24px; margin-top: 25px; margin-bottom: 25px;">
-        <div style="font-size: 22px; font-weight: 900; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2;">BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</div>
+        <div class="kpi-details">
+            <div class="kpi-title">{title}</div>
+            <div class="kpi-value">{value}</div>
+        </div>
     </div>
-    """, unsafe_allow_html=True)
+    """
 
-    def generate_excel_with_colors(df_data):
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            df_data.to_excel(writer, index=False, sheet_name='TienDo')
-        output.seek(0)
-        import openpyxl
-        from openpyxl.styles import PatternFill
-        wb = openpyxl.load_workbook(output)
-        ws = wb.active
-        green_fill = PatternFill(start_color="A5D6A7", end_color="A5D6A7", fill_type="solid")
-        red_fill = PatternFill(start_color="EF9A9A", end_color="EF9A9A", fill_type="solid")
-        gray_fill = PatternFill(start_color="F5F5F5", end_color="F5F5F5", fill_type="solid")
+r1_c1, r1_c2, r1_c3, r1_c4 = st.columns(4)
+with r1_c1: st.markdown(render_transparent_shadow_kpi("Tổng Dự án", p_projects, "domain", "#cfe2ff", "#0d6efd"), unsafe_allow_html=True)
+with r1_c2: st.markdown(render_transparent_shadow_kpi("Hạng mục", p_categories, "folder_open", "#cfe2ff", "#0d6efd"), unsafe_allow_html=True)
+with r1_c3: st.markdown(render_transparent_shadow_kpi("Công việc", p_total, "assignment", "#cfe2ff", "#0d6efd"), unsafe_allow_html=True)
+with r1_c4: st.markdown(render_transparent_shadow_kpi("Tiến độ TB", f"{p_prog:.1f}%", "speed", "#e0cffc", "#6f42c1"), unsafe_allow_html=True)
 
-        status_col_idx = None
-        for col_idx, col_name in enumerate(df_data.columns, 1):
-            if col_name == 'Trạng Thái':
-                status_col_idx = col_idx
-                break
-        if status_col_idx:
-            for row_idx in range(2, ws.max_row + 1):
-                status_val = str(ws.cell(row=row_idx, column=status_col_idx).value).strip()
-                fill_to_use = None
-                if status_val == 'Đã hoàn thành': fill_to_use = green_fill
-                elif status_val == 'Tạm dừng': fill_to_use = red_fill
-                elif status_val == 'Chưa bắt đầu': fill_to_use = gray_fill
-                if fill_to_use:
-                    for col in range(1, ws.max_column + 1):
-                        ws.cell(row=row_idx, column=col).fill = fill_to_use
-        final_output = io.BytesIO()
-        wb.save(final_output)
-        return final_output.getvalue()
+r2_c1, r2_c2, r2_c3, r2_c4 = st.columns(4)
+with r2_c1: st.markdown(render_transparent_shadow_kpi("Đã hoàn thành", p_done, "check_circle", "#d1e7dd", "#198754"), unsafe_allow_html=True)
+with r2_c2: st.markdown(render_transparent_shadow_kpi("Đang triển khai", p_inprogress, "sync", "#cff4fc", "#0dcaf0"), unsafe_allow_html=True)
+with r2_c3: st.markdown(render_transparent_shadow_kpi("Chưa bắt đầu", p_notstarted, "hourglass_empty", "#e2e3e5", "#6c757d"), unsafe_allow_html=True)
+with r2_c4: st.markdown(render_transparent_shadow_kpi("Vướng mắc", p_paused, "error", "#f8d7da", "#dc3545"), unsafe_allow_html=True)
 
-    try:
-        excel_bytes = generate_excel_with_colors(df_export)
-        b64 = base64.b64encode(excel_bytes).decode()
-        mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        filename = "Bao_cao_tien_do_Thien_Son.xlsx"
-    except Exception:
-        csv_bytes = df_export.to_csv(index=False).encode('utf-8-sig')
-        b64 = base64.b64encode(csv_bytes).decode()
-        mime_type = "text/csv"
-        filename = "Bao_cao_tien_do_Thien_Son.csv"
+status_options = ["Tất cả", "Chưa bắt đầu", "Đang triển khai", "Đã hoàn thành", "Tạm dừng"]
+actual_status = st.radio("Bộ lọc Trạng Thái", options=status_options, horizontal=True, label_visibility="collapsed")
 
-    download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}">Tải Excel</a>'
-    st.markdown(download_html, unsafe_allow_html=True)
+if actual_status != "Tất cả": 
+    df_display = df_display[df_display.get('Trạng Thái', '') == actual_status]
 
-    priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
+df_export = df_display.copy()
+for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
+    if col in df_display.columns: df_display = df_display.drop(columns=[col])
+    if col in df_export.columns: df_export = df_export.drop(columns=[col])
 
-    if 'Trạng Thái' in df_display.columns and 'Tiến Độ (%)' in df_display.columns:
-        df_display['Mức Ưu Tiên'] = df_display['Trạng Thái'].map(priority_map).fillna(99)
-        sort_cols = ['Mức Ưu Tiên', 'Tiến Độ (%)']
-        if 'Hạng Mục' in df_display.columns: sort_cols = ['Hạng Mục'] + sort_cols
-        df_display = df_display.sort_values(by=sort_cols, ascending=[True] * len(sort_cols))
-        df_display = df_display.drop(columns=['Mức Ưu Tiên'])
 
-    def color_rows(row):
-        status = row.get('Trạng Thái', '')
-        if status == 'Đã hoàn thành': return ['background-color: #a5d6a7; color: #000;'] * len(row)
-        if status == 'Tạm dừng': return ['background-color: #ef9a9a; color: #000;'] * len(row)
-        if status == 'Chưa bắt đầu': return ['background-color: #f5f5f5; color: #000;'] * len(row)
-        return ['background-color: #ffffff; color: #000;'] * len(row)
+st.markdown("""
+<div class="title-card" style="padding: 8px 24px; margin-top: 25px; margin-bottom: 25px;">
+    <div style="font-size: 22px; font-weight: 900; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2;">BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</div>
+</div>
+""", unsafe_allow_html=True)
 
-    styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
-        'selector': 'th',
-        'props': [('background-color', 'rgba(226, 232, 240, 0.9)'), ('color', '#0f172a'), ('font-weight', 'bold')]
-    }])
-    
-    st.dataframe(styled_df, use_container_width=True, hide_index=True, height=550)
+def generate_excel_with_colors(df_data):
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df_data.to_excel(writer, index=False, sheet_name='TienDo')
+    output.seek(0)
+    import openpyxl
+    from openpyxl.styles import PatternFill
+    wb = openpyxl.load_workbook(output)
+    ws = wb.active
+    green_fill = PatternFill(start_color="A5D6A7", end_color="A5D6A7", fill_type="solid")
+    red_fill = PatternFill(start_color="EF9A9A", end_color="EF9A9A", fill_type="solid")
+    gray_fill = PatternFill(start_color="F5F5F5", end_color="F5F5F5", fill_type="solid")
+
+    status_col_idx = None
+    for col_idx, col_name in enumerate(df_data.columns, 1):
+        if col_name == 'Trạng Thái':
+            status_col_idx = col_idx
+            break
+    if status_col_idx:
+        for row_idx in range(2, ws.max_row + 1):
+            status_val = str(ws.cell(row=row_idx, column=status_col_idx).value).strip()
+            fill_to_use = None
+            if status_val == 'Đã hoàn thành': fill_to_use = green_fill
+            elif status_val == 'Tạm dừng': fill_to_use = red_fill
+            elif status_val == 'Chưa bắt đầu': fill_to_use = gray_fill
+            if fill_to_use:
+                for col in range(1, ws.max_column + 1):
+                    ws.cell(row=row_idx, column=col).fill = fill_to_use
+    final_output = io.BytesIO()
+    wb.save(final_output)
+    return final_output.getvalue()
+
+try:
+    excel_bytes = generate_excel_with_colors(df_export)
+    b64 = base64.b64encode(excel_bytes).decode()
+    mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    filename = "Bao_cao_tien_do_Thien_Son.xlsx"
+except Exception:
+    csv_bytes = df_export.to_csv(index=False).encode('utf-8-sig')
+    b64 = base64.b64encode(csv_bytes).decode()
+    mime_type = "text/csv"
+    filename = "Bao_cao_tien_do_Thien_Son.csv"
+
+download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}">Tải Excel</a>'
+st.markdown(download_html, unsafe_allow_html=True)
+
+priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
+
+if 'Trạng Thái' in df_display.columns and 'Tiến Độ (%)' in df_display.columns:
+    df_display['Mức Ưu Tiên'] = df_display['Trạng Thái'].map(priority_map).fillna(99)
+    sort_cols = ['Mức Ưu Tiên', 'Tiến Độ (%)']
+    if 'Hạng Mục' in df_display.columns: sort_cols = ['Hạng Mục'] + sort_cols
+    df_display = df_display.sort_values(by=sort_cols, ascending=[True] * len(sort_cols))
+    df_display = df_display.drop(columns=['Mức Ưu Tiên'])
+
+def color_rows(row):
+    status = row.get('Trạng Thái', '')
+    if status == 'Đã hoàn thành': return ['background-color: #a5d6a7; color: #000;'] * len(row)
+    if status == 'Tạm dừng': return ['background-color: #ef9a9a; color: #000;'] * len(row)
+    if status == 'Chưa bắt đầu': return ['background-color: #f5f5f5; color: #000;'] * len(row)
+    return ['background-color: #ffffff; color: #000;'] * len(row)
+
+styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
+    'selector': 'th',
+    'props': [('background-color', 'rgba(226, 232, 240, 0.9)'), ('color', '#0f172a'), ('font-weight', 'bold')]
+}])
+
+st.dataframe(styled_df, use_container_width=True, hide_index=True, height=550)
