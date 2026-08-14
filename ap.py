@@ -58,9 +58,13 @@ st.markdown("""
     ::-webkit-scrollbar { display: none !important; width: 0px !important; height: 0px !important; }
     * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
 
-    header[data-testid="stHeader"] { display: none !important; }
-    footer[data-testid="stFooter"], footer { display: none !important; }
+    /* KHÔNG ẨN HEADER ĐỂ GIỮ LẠI NÚT MŨI TÊN, CHỈ LÀM TRONG SUỐT VÀ ẨN NÚT DEPLOY */
+    header[data-testid="stHeader"] { background: transparent !important; }
     .stAppDeployButton { display: none !important; }
+    footer[data-testid="stFooter"], footer { display: none !important; }
+    
+    /* Đảm bảo nút mũi tên thu/ẩn luôn nằm trên cùng và bấm được dễ dàng */
+    [data-testid="collapsedControl"] { z-index: 999999 !important; }
 
     /* Ép khung chứa chính hiển thị dạng Flex để quản lý khoảng cách 2 khối */
     [data-testid="stAppViewContainer"] {
@@ -73,8 +77,6 @@ st.markdown("""
         flex-grow: 1 !important;
         overflow: hidden !important;
         padding: 0 !important;
-        display: flex !important;
-        flex-direction: column !important;
     }
 
     /* ================= 2. KHỐI KÍNH BỘ LỌC (SIDEBAR) ================= */
@@ -86,6 +88,10 @@ st.markdown("""
         border-radius: 24px !important;
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         
+        position: relative !important;
+        width: 300px !important;
+        min-width: 300px !important;
+        
         /* CĂN LỀ: Trái 20px, Trên/Dưới 60px */
         margin-top: 60px !important;
         margin-bottom: 60px !important;
@@ -93,8 +99,6 @@ st.markdown("""
         margin-right: 0px !important;
         
         height: calc(100vh - 120px) !important; 
-        
-        /* GỠ BỎ LỆNH ÉP CỨNG WIDTH ĐỂ KHỐI CÓ THỂ TỰ ĐỘNG ẨN/MỞ MƯỢT MÀ */
     }
 
     [data-testid="stSidebarResizer"] { display: none !important; }
@@ -144,10 +148,7 @@ st.markdown("""
         
         height: calc(100vh - 120px) !important; 
         max-height: calc(100vh - 120px) !important;
-        
-        /* TRẢ QUYỀN TỰ CO GIÃN ĐỂ KHỐI TRÀN KÍN MÀN HÌNH KHI ẨN BỘ LỌC */
-        width: auto !important; 
-        flex: 1 !important;
+        width: calc(100vw - 300px - 50px) !important; /* Tự động co giãn theo màn hình */
         max-width: none !important; 
         
         overflow-y: auto !important; 
@@ -313,7 +314,6 @@ with st.sidebar:
 
 # ================= 4. KHỐI CHÍNH (BÊN PHẢI) =================
 
-# ----------------- ĐÃ ĐỔI ĐỘ ĐẬM (FONT-WEIGHT) XUỐNG 600 Ở ĐÂY -----------------
 st.markdown("""
 <div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 25px;">
     <div style="font-size: 32px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
@@ -380,7 +380,6 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
     if col in df_display.columns: df_display = df_display.drop(columns=[col])
     if col in df_export.columns: df_export = df_export.drop(columns=[col])
 
-# ----------------- ĐÃ ĐỔI ĐỘ ĐẬM (FONT-WEIGHT) XUỐNG 600 Ở ĐÂY -----------------
 st.markdown("""
 <div class="title-card" style="padding: 8px 24px; margin-top: 25px; margin-bottom: 25px;">
     <div style="font-size: 22px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2;">BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</div>
