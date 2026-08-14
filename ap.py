@@ -49,14 +49,21 @@ else:
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* ================= 1. KHÓA CUỘN TOÀN TRANG (ĐỂ KHỐI MỜ ĐỨNG YÊN) ================= */
-    [data-testid="stAppViewContainer"], [data-testid="stMain"] {
+    /* ================= 1. KHÓA CUỘN TOÀN TRANG (ÉP BUỘC) ================= */
+    /* Triệt tiêu scrollbar ở mọi lớp HTML bọc ngoài của Streamlit */
+    html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"], [data-testid="stMain"] > div {
         overflow: hidden !important; 
+        height: 100vh !important;
+        width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
+
     /* Xóa mọi bù trừ khoảng trống ngầm của Streamlit */
     .stApp > header + div {
         padding-top: 0 !important;
         padding-bottom: 0 !important;
+        margin: 0 !important;
     }
 
     /* ================= 2. BIẾN KHỐI NỀN MỜ THÀNH CỬA SỔ APP CỐ ĐỊNH ================= */
@@ -72,8 +79,8 @@ st.markdown("""
         margin-top: 60px !important;     
         margin-bottom: 80px !important;  
         
-        /* Khóa cứng chiều cao & kích hoạt thanh cuộn bên trong khối */
-        height: calc(100vh - 140px) !important; 
+        /* Khóa cứng chiều cao & kích hoạt thanh cuộn CỦA RIÊNG KHỐI KÍNH */
+        height: calc(100vh - 140px) !important; /* 100vh trừ đi 60px top và 80px bottom */
         overflow-y: auto !important;
         overflow-x: hidden !important;
         
@@ -346,6 +353,7 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
 
 # ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI =================
 with header_container:
+    # Cân bằng hoàn hảo: padding trên khối mờ là 30px, margin đẩy xuống KPI là 30px
     st.markdown("""
     <div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 30px;">
         <div style="font-size: 32px; font-weight: 900; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
