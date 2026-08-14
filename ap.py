@@ -49,15 +49,15 @@ else:
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* Nền tổng thể trong suốt 35% */
+    /* Nền tổng thể: Đẩy lề trên (margin-top) xuống thấp hơn và thu gọn padding-top để lộ nền đá */
     .block-container { 
-        padding-top: 2rem !important; 
+        padding-top: 1.2rem !important; /* Gọt bớt khoảng trống thừa phía trên cùng */
         padding-bottom: 2rem !important; 
         background-color: rgba(255, 255, 255, 0.35) !important; 
         backdrop-filter: blur(20px) !important; 
         -webkit-backdrop-filter: blur(20px) !important;
         border-radius: 24px;
-        margin-top: 30px;
+        margin-top: 75px; /* Đẩy khối nền xuống 75px để phần đá phía trên lộ ra nhiều hơn */
         margin-bottom: 30px;
         box-shadow: 0 10px 40px rgba(0,0,0,0.15);
         border: 1px solid rgba(255, 255, 255, 0.4); 
@@ -134,7 +134,7 @@ st.markdown("""
         font-size: 13.5px !important;
         font-weight: 700 !important;
         text-decoration: none !important;
-        margin-top: -42px !important; /* Chỉnh lại để cân đối với tiêu đề đã thu gọn chiều cao */
+        margin-top: -42px !important; 
         margin-right: 5px !important;
         margin-bottom: 15px !important;
         position: relative;
@@ -152,13 +152,12 @@ st.markdown("""
         padding: 20px 18px; 
         border-radius: 24px; 
         border: none !important; 
-        /* Đổ bóng đa lớp giúp khối KPI nổi bật rõ rệt trên nền trong suốt */
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.05); 
         display: flex; 
         align-items: center; 
         margin-bottom: 15px; 
         min-height: 120px; 
-        background-color: rgba(255, 255, 255, 0.25) !important; /* Độ trong suốt cao, để lộ vân đá rõ nét */
+        background-color: rgba(255, 255, 255, 0.25) !important; 
         backdrop-filter: blur(15px); 
         -webkit-backdrop-filter: blur(15px);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -361,9 +360,9 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
 
 # ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI SHADOW =================
 with header_container:
-    # Thay thế thẻ <h2> mặc định của Streamlit bằng <div> để xóa bỏ hoàn toàn margin/padding dư thừa gây lệch viền
+    # Ô bao tiêu đề trên cùng, đã giảm padding để ôm gọn chữ
     st.markdown("""
-    <div class="title-card" style="padding: 10px 30px; margin-top: 10px; margin-bottom: 25px;">
+    <div class="title-card" style="padding: 8px 24px; margin-top: 5px; margin-bottom: 25px;">
         <div style="font-size: 32px; font-weight: 900; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
     </div>
     """, unsafe_allow_html=True)
@@ -408,9 +407,9 @@ with kpi_container:
 
 # ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & LINK TẢI SÁT MÉP =================
 with table_container:
-    # Thay thế thẻ <h4> bằng <div> để căn lề đều khít
+    # Ô tiêu đề bảng phía dưới ôm sát chữ
     st.markdown("""
-    <div class="title-card" style="padding: 8px 24px; margin-top: 35px; margin-bottom: 25px;">
+    <div class="title-card" style="padding: 6px 20px; margin-top: 35px; margin-bottom: 25px;">
         <div style="font-size: 22px; font-weight: 900; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2;">BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</div>
     </div>
     """, unsafe_allow_html=True)
