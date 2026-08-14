@@ -54,32 +54,27 @@ st.markdown("""
         overflow: hidden !important; 
         margin: 0 !important; padding: 0 !important;
     }
+    ::-webkit-scrollbar { display: none !important; width: 0px !important; height: 0px !important; }
+    
+    /* ÉP MỌI THÀNH PHẦN KHÔNG ĐƯỢC PHÌNH RA NGOÀI VIỀN */
     * { 
         scrollbar-width: none !important; 
         -ms-overflow-style: none !important; 
-        box-sizing: border-box !important; /* Khóa mọi thành phần không được phình to quá viền */
+        box-sizing: border-box !important; 
     }
-    ::-webkit-scrollbar { display: none !important; width: 0px !important; height: 0px !important; }
 
-    /* Bảo vệ thanh Header chứa mũi tên thu phóng (Làm trong suốt) */
-    header[data-testid="stHeader"] { background: transparent !important; box-shadow: none !important; }
-    [data-testid="stHeaderActionElements"], .stAppDeployButton { display: none !important; }
-    footer[data-testid="stFooter"], footer { display: none !important; }
-
-    /* Xóa lề ảo của Streamlit */
-    [data-testid="stMain"] > div:first-child { padding: 0 !important; }
-    [data-testid="stMain"] { padding: 0 !important; overflow: hidden !important; }
-
-    /* ================= 2. KHỐI KÍNH BỘ LỌC (SIDEBAR) ================= */
-    /* Tẩy trắng lớp vỏ ngoài của Sidebar để không che khuất màn hình */
-    section[data-testid="stSidebar"] {
-        background: transparent !important;
-        border: none !important;
+    /* ================= 2. BẢO TỒN NÚT THU/ẨN MŨI TÊN ================= */
+    /* Làm trong suốt Header thay vì ẩn đi, giúp nút Mũi tên góc trên bên trái vẫn bấm được */
+    header[data-testid="stHeader"] { 
+        background: transparent !important; 
+        box-shadow: none !important;
     }
-    [data-testid="stSidebarResizer"] { display: none !important; }
+    /* Chỉ ẩn nút Deploy thừa thãi */
+    .stAppDeployButton { display: none !important; }
+    footer { display: none !important; }
 
-    /* Phủ kính mờ trực tiếp lên LÕI của Sidebar để tạo thành 1 khối lơ lửng */
-    [data-testid="stSidebarContent"] {
+    /* ================= 3. KHỐI KÍNH BỘ LỌC (SIDEBAR) ================= */
+    [data-testid="stSidebar"] {
         background-color: rgba(255, 255, 255, 0.35) !important;
         backdrop-filter: blur(20px) !important;
         -webkit-backdrop-filter: blur(20px) !important;
@@ -87,42 +82,42 @@ st.markdown("""
         border-radius: 24px !important;
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         
-        /* Căn lề: Cách lề trái 20px, trên/dưới 60px */
+        /* Căn lề: Cách lề trái 20px, Trên/Dưới 60px */
         margin-top: 60px !important;
         margin-bottom: 60px !important;
-        margin-left: 20px !important;
-        margin-right: 0px !important;
-        
+        margin-left: 20px !important; 
         height: calc(100vh - 120px) !important;
+    }
+
+    [data-testid="stSidebarResizer"] { display: none !important; } /* Ẩn vạch kéo giãn */
+
+    /* ÉP BỘ LỌC CỐ ĐỊNH, ĐỨNG IM, KHÔNG CUỘN LÊN XUỐNG ĐƯỢC */
+    [data-testid="stSidebarUserContent"] {
+        padding: 5px 20px 20px 20px !important;
         overflow: hidden !important; 
     }
 
-    /* Ép bộ lọc cố định, không cuộn */
-    [data-testid="stSidebarUserContent"] {
-        padding: 5px 20px 20px 20px !important;
-        overflow: hidden !important;
-    }
-
-    /* Thu gọn khoảng cách các dòng chữ để vừa khít mà không tràn */
+    /* Thu gọn khoảng cách các chữ trong Sidebar để tất cả nằm gọn trên 1 màn hình */
     .sidebar-title {
         display: flex; align-items: center; gap: 8px;
         font-size: 13px; font-weight: 700; color: #0f172a;
-        margin-top: 12px; 
-        margin-bottom: 4px; 
-        text-transform: uppercase;
+        margin-top: 12px; margin-bottom: 4px; text-transform: uppercase;
     }
     .sidebar-title .material-symbols-rounded { font-size: 18px; color: #198754; }
     
-    section[data-testid="stSidebar"] div[data-baseweb="select"] > div,
-    section[data-testid="stSidebar"] div[data-baseweb="input"] > div {
+    [data-testid="stSidebar"] div[data-baseweb="select"] > div,
+    [data-testid="stSidebar"] div[data-baseweb="input"] > div {
         background-color: rgba(255, 255, 255, 0.4) !important;
         backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.6) !important;
         border-radius: 12px !important;
-        min-height: 36px !important;
+        min-height: 36px !important; /* Thu mỏng chiều cao ô lọc */
+    }
+    div.row-widget.stSelectbox, div.row-widget.stMultiSelect {
+        margin-bottom: 0px !important; /* Xóa lề thừa dưới các ô */
     }
 
-    /* ================= 3. KHỐI KÍNH CHÍNH (BẢNG & KPI) ================= */
+    /* ================= 4. KHỐI KÍNH CHÍNH (BẢNG & KPI) ================= */
     .block-container { 
         background-color: rgba(255, 255, 255, 0.35) !important; 
         backdrop-filter: blur(20px) !important; 
@@ -134,36 +129,32 @@ st.markdown("""
         margin-top: 60px !important;     
         margin-bottom: 60px !important;  
         
-        /* Mặc định (khi sidebar ĐÓNG): Cách lề trái 20px, Lề phải 20px */
-        margin-left: 20px !important;  
-        margin-right: 20px !important; 
+        /* BÍ QUYẾT TÁCH KHỐI 10PX: Sidebar đã lùi phải 20px. 
+           Ta cho Khối chính lùi phải 30px. Kết quả 30 - 20 = 10px khe hở chính xác! */
+        margin-left: 30px !important;  
+        margin-right: 20px !important; /* Cách lề phải màn hình 20px */
         
         padding: 25px 30px !important; 
         
         height: calc(100vh - 120px) !important; 
-        max-width: none !important; 
-        width: auto !important; 
+        max-width: 100% !important; /* Khóa cứng không cho phình to */
         
-        overflow-y: auto !important; /* Bảng trong khối chính được phép cuộn */
+        /* Cho phép nội dung bên trong được cuộn */
+        overflow-y: auto !important; 
         overflow-x: hidden !important; 
     }
 
-    /* ĐIỀU KIỆN THÔNG MINH: Nếu Sidebar đang MỞ -> Khối chính cách bên trái (Sidebar) đúng 10px */
-    [data-testid="stAppViewContainer"]:has(section[data-testid="stSidebar"][aria-expanded="true"]) .block-container {
-        margin-left: 10px !important;
-    }
+    /* Đảm bảo Bảng dữ liệu không bao giờ đâm thủng viền khối chính */
+    [data-testid="stDataFrame"] { width: 100% !important; max-width: 100% !important; }
+    .element-container { max-width: 100% !important; }
 
-    /* Tránh tràn viền bên trong Khối chính */
-    [data-testid="stVerticalBlock"] {
-        max-width: 100% !important;
-    }
-
+    /* Thanh cuộn mượt mà dành riêng cho nội dung bên trong khối chính */
     .block-container::-webkit-scrollbar { width: 8px !important; display: block !important; }
     .block-container::-webkit-scrollbar-track { background: transparent !important; margin: 20px 0 !important; }
     .block-container::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.3) !important; border-radius: 10px !important; }
     .block-container::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.5) !important; }
 
-    /* ================= 4. CÁC THÀNH PHẦN BÊN TRONG ================= */
+    /* ================= 5. TRANG TRÍ CÁC THÀNH PHẦN ================= */
     div[data-testid="stDataFrame"] th {
         background-color: rgba(226, 232, 240, 0.9) !important; 
         color: #0F172A !important;
@@ -177,9 +168,9 @@ st.markdown("""
         backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
         border: none !important;
         width: fit-content; 
-        max-width: 100% !important;
         margin-left: auto; margin-right: auto; 
         display: flex; align-items: center; justify-content: center;
+        max-width: 100% !important;
     }
 
     .custom-download-link {
@@ -257,7 +248,7 @@ def load_data():
 df = load_data()
 
 
-# ================= 3. TRỞ LẠI SỬ DỤNG SIDEBAR GỐC =================
+# ================= 3. KHỐI SIDEBAR BỘ LỌC =================
 with st.sidebar:
     col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
     with col_logo2:
@@ -317,7 +308,7 @@ with st.sidebar:
 
 # ================= 4. KHỐI CHÍNH =================
 
-# ----------------- ĐỘ ĐẬM (FONT-WEIGHT) Ở MỨC 600 MẢNH MAI -----------------
+# ----------------- CHỮ MẢNH VỪA PHẢI MỨC ĐỘ 600 -----------------
 st.markdown("""
 <div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 25px;">
     <div style="font-size: 32px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
@@ -384,7 +375,7 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
     if col in df_display.columns: df_display = df_display.drop(columns=[col])
     if col in df_export.columns: df_export = df_export.drop(columns=[col])
 
-# ----------------- ĐỘ ĐẬM (FONT-WEIGHT) Ở MỨC 600 MẢNH MAI -----------------
+# ----------------- CHỮ MẢNH VỪA PHẢI MỨC ĐỘ 600 -----------------
 st.markdown("""
 <div class="title-card" style="padding: 8px 24px; margin-top: 25px; margin-bottom: 25px;">
     <div style="font-size: 22px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2;">BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</div>
