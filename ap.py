@@ -111,15 +111,15 @@ st.markdown("""
 
     /* ================= KHỐI BAO TIÊU ĐỀ (BO VỪA KHÍT CHỮ & CĂN GIỮA) ================= */
     .title-card {
-        border-radius: 20px; 
+        border-radius: 16px; /* Bo góc nhỏ hơn một chút cho hợp với ô chữ ôm sát */
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.05); 
         background-color: rgba(255, 255, 255, 0.25) !important; 
         backdrop-filter: blur(15px); 
         -webkit-backdrop-filter: blur(15px);
         border: none !important;
-        width: fit-content; /* Thu nhỏ ô vừa đúng giới hạn chữ */
-        margin-left: auto;  /* Đẩy tự động lề trái để căn giữa */
-        margin-right: auto; /* Đẩy tự động lề phải để căn giữa */
+        width: fit-content; 
+        margin-left: auto;  
+        margin-right: auto; 
     }
 
     /* LINK TẢI EXCEL TÙY CHỈNH */
@@ -131,7 +131,7 @@ st.markdown("""
         font-size: 13.5px !important;
         font-weight: 700 !important;
         text-decoration: none !important;
-        margin-top: -35px !important; /* Đặt lại vị trí tương đối so với bảng */
+        margin-top: -38px !important; /* Căn lại theo độ cao mới của ô tiêu đề */
         margin-right: 5px !important;
         margin-bottom: 15px !important;
         position: relative;
@@ -358,9 +358,9 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
 
 # ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI SHADOW =================
 with header_container:
-    # Ô tiêu đề trên cùng bo gọn khít với văn bản
+    # Ô tiêu đề trên cùng bo gọn khít với văn bản nhờ padding nhỏ lại (10px 24px)
     st.markdown("""
-    <div class="title-card" style="padding: 15px 40px; margin-top: 10px; margin-bottom: 25px;">
+    <div class="title-card" style="padding: 10px 24px; margin-top: 10px; margin-bottom: 25px;">
         <h2 style='text-align: center; color: #0A3622; font-weight: 900; margin: 0; text-shadow: 0 2px 8px rgba(0,0,0,0.2);'>BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</h2>
     </div>
     """, unsafe_allow_html=True)
@@ -405,9 +405,9 @@ with kpi_container:
 
 # ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & LINK TẢI SÁT MÉP =================
 with table_container:
-    # Ô tiêu đề bảng phía dưới bo gọn khít với văn bản
+    # Ô tiêu đề bảng phía dưới ôm sát chữ hơn với padding (8px 20px)
     st.markdown("""
-    <div class="title-card" style="padding: 12px 35px; margin-top: 35px; margin-bottom: 25px;">
+    <div class="title-card" style="padding: 8px 20px; margin-top: 35px; margin-bottom: 25px;">
         <h4 style='text-align: center; color: #0A3622; font-weight: 900; margin: 0; text-shadow: 0 2px 6px rgba(0,0,0,0.15);'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>
     </div>
     """, unsafe_allow_html=True)
