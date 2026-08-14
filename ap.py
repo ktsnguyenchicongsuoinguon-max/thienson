@@ -46,30 +46,31 @@ else:
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* ================= CĂN CHỈNH KHOẢNG HỞ NỀN ĐÁ TRÊN & PADDING ================= */
+    /* ================= CĂN CHỈNH KHOẢNG HỞ NỀN ĐÁ TRÊN / DƯỚI & PADDING ================= */
     .block-container { 
-        padding-top: 30px !important;    /* Khoảng cách từ mép nền mờ xuống tiêu đề */
+        padding-top: 30px !important;    /* Khoảng cách dội từ viền mờ xuống tiêu đề */
         padding-bottom: 30px !important; 
         background-color: rgba(255, 255, 255, 0.35) !important; 
         backdrop-filter: blur(20px) !important; 
         -webkit-backdrop-filter: blur(20px) !important;
         border-radius: 24px;
-        margin-top: 60px !important;     /* Khoảng hở nền đá đúng 60px */
-        margin-bottom: 30px !important; 
+        margin-top: 65px !important;     /* Căn 65px để hàng nút Share nằm ngay chính giữa nền đá */
+        margin-bottom: 65px !important;  /* Cân bằng với bên trên */
         box-shadow: 0 10px 40px rgba(0,0,0,0.15);
         border: 1px solid rgba(255, 255, 255, 0.4); 
     }
 
-    /* Xóa các khoảng đệm ngầm của Streamlit làm lệch tỷ lệ */
+    /* Xóa khoảng đệm ngầm của Streamlit */
     .stApp > header + div {
         padding-bottom: 0 !important;
     }
 
-    /* THANH HEADER TÀNG HÌNH & VỪA KHÍT NỀN ĐÁ */
+    /* THANH HEADER TÀNG HÌNH */
     header[data-testid="stHeader"] { 
         background: transparent !important; 
-        height: 60px !important; /* Chiều cao Header khớp đúng với khoảng hở 60px ở trên */
+        height: 60px !important; 
     }
+    footer[data-testid="stFooter"] { display: none !important; }
     .stAppDeployButton { display: none !important; }
 
     /* ================= SIDEBAR ================= */
@@ -311,9 +312,9 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
 
 # ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI =================
 with header_container:
-    # margin-bottom: 30px khớp chính xác với phần padding-top: 30px bên trên, đưa ô tiêu đề này vào trung tâm hoàn hảo
+    # margin-bottom: 30px để đồng bộ với padding-top: 30px của class .block-container
     st.markdown("""
-    <div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 30px;">
+    <div class="title-card" style="padding: 10px 24px; margin-top: 0px; margin-bottom: 30px;">
         <div style="font-size: 32px; font-weight: 900; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
     </div>
     """, unsafe_allow_html=True)
