@@ -54,21 +54,22 @@ st.markdown("""
         overflow: hidden !important; 
         margin: 0 !important; padding: 0 !important;
     }
-    
     ::-webkit-scrollbar { display: none !important; width: 0px !important; height: 0px !important; }
     * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
 
-    header[data-testid="stHeader"] { background: transparent !important; }
+    /* ================= 2. BẢO TỒN NÚT THU/ẨN (HEADER TRONG SUỐT) ================= */
+    header[data-testid="stHeader"] { 
+        background: transparent !important; 
+        box-shadow: none !important;
+    }
+    /* Ẩn các menu phụ trợ phía trên cùng bên phải để gọn gàng */
+    [data-testid="stHeaderActionElements"], .stAppDeployButton { display: none !important; }
     footer[data-testid="stFooter"], footer { display: none !important; }
-    .stAppDeployButton { display: none !important; }
 
-    /* Đảm bảo nút mũi tên thu/ẩn ở góc trên cùng không bị che */
-    [data-testid="collapsedControl"] { z-index: 999999 !important; }
-
-    /* Triệt tiêu khoảng trống thừa của Streamlit */
+    /* Xóa khoảng trống đệm ngầm định của Streamlit */
     [data-testid="stMain"] > div:first-child { padding: 0 !important; }
 
-    /* ================= 2. KHỐI KÍNH BỘ LỌC (SIDEBAR GỐC) ================= */
+    /* ================= 3. KHỐI KÍNH BỘ LỌC (SIDEBAR) ================= */
     section[data-testid="stSidebar"] {
         background-color: rgba(255, 255, 255, 0.35) !important;
         backdrop-filter: blur(20px) !important;
@@ -77,28 +78,26 @@ st.markdown("""
         border-radius: 24px !important;
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         
-        /* CĂN LỀ: Trái 20px, Trên/Dưới 60px (Thành khối kính nổi) */
-        margin-top: 60px !important;
-        margin-bottom: 60px !important;
-        margin-left: 20px !important;
-        
+        /* Ép lề 20px so với mép trái màn hình và 60px trên/dưới */
+        left: 20px !important;
+        top: 60px !important;
         height: calc(100vh - 120px) !important; 
     }
 
-    [data-testid="stSidebarResizer"] { display: none !important; } /* Ẩn vạch kéo giãn */
+    [data-testid="stSidebarResizer"] { display: none !important; }
     
-    /* ÉP BỘ LỌC CỐ ĐỊNH, KHÔNG CUỘN LÊN XUỐNG */
+    /* ÉP BỘ LỌC CỐ ĐỊNH, KHÔNG CUỘN (OVERFLOW: HIDDEN) */
     [data-testid="stSidebarUserContent"] {
         padding: 5px 20px 20px 20px !important;
-        overflow-y: hidden !important; /* CHẶN CUỘN TRONG BỘ LỌC */
+        overflow-y: hidden !important; /* Chặn cuộn */
         overflow-x: hidden !important;
     }
 
-    /* ĐỊNH DẠNG CÁC Ô LỌC TRONG SIDEBAR - Thu gọn khoảng cách để vừa màn hình */
+    /* Thu gọn khoảng cách các thành phần trong bộ lọc để vừa vặn màn hình */
     .sidebar-title {
         display: flex; align-items: center; gap: 8px;
         font-size: 13px; font-weight: 700; color: #0f172a;
-        margin-top: 15px; /* Giảm khoảng cách để không bị tràn */
+        margin-top: 14px; 
         margin-bottom: 4px; 
         text-transform: uppercase;
     }
@@ -110,11 +109,14 @@ st.markdown("""
         backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.6) !important;
         border-radius: 12px !important;
-        min-height: 36px !important; 
+        min-height: 38px !important; /* Làm ô nhập liệu thanh mảnh hơn chút */
+    }
+    div.row-widget.stSelectbox, div.row-widget.stMultiSelect {
+        margin-bottom: 0px !important;
     }
 
-    /* ================= 3. KHỐI KÍNH CHÍNH (BẢNG & KPI) ================= */
-    .stMainBlockContainer, .block-container, [data-testid="stAppViewBlockContainer"] { 
+    /* ================= 4. KHỐI KÍNH CHÍNH (BẢNG & KPI) ================= */
+    .block-container { 
         background-color: rgba(255, 255, 255, 0.35) !important; 
         backdrop-filter: blur(20px) !important; 
         -webkit-backdrop-filter: blur(20px) !important;
@@ -122,10 +124,11 @@ st.markdown("""
         border-radius: 24px !important; 
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         
-        /* CĂN LỀ CHUẨN: Cách Sidebar 10px, Cách mép phải 20px, Trên/Dưới 60px */
         margin-top: 60px !important;     
         margin-bottom: 60px !important;  
-        margin-left: 10px !important;  /* KHE HỞ 10PX GIỮA 2 KHỐI */
+        
+        /* CĂN LỀ: Sidebar dịch 20px -> Khối chính dịch 30px -> Tạo khe hở Tách biệt đúng 10px */
+        margin-left: 30px !important;  
         margin-right: 20px !important; 
         
         padding: 25px 30px !important; 
@@ -133,8 +136,7 @@ st.markdown("""
         height: calc(100vh - 120px) !important; 
         max-width: none !important; 
         
-        /* Chỉ cho phép cuộn nội dung bảng bên trong khối này */
-        overflow-y: auto !important; 
+        overflow-y: auto !important; /* Khối chính vẫn được cuộn bảng bình thường */
         overflow-x: hidden !important; 
     }
 
@@ -144,7 +146,7 @@ st.markdown("""
     .block-container::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.3) !important; border-radius: 10px !important; }
     .block-container::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.5) !important; }
 
-    /* ================= 4. CÁC THÀNH PHẦN BÊN TRONG ================= */
+    /* ================= 5. CÁC THÀNH PHẦN BÊN TRONG ================= */
     div[data-testid="stDataFrame"] th {
         background-color: rgba(226, 232, 240, 0.9) !important; 
         color: #0F172A !important;
@@ -237,7 +239,7 @@ def load_data():
 df = load_data()
 
 
-# ================= 3. TRỞ LẠI SỬ DỤNG SIDEBAR GỐC CỦA STREAMLIT =================
+# ================= 3. TRỞ LẠI SỬ DỤNG SIDEBAR GỐC =================
 with st.sidebar:
     col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
     with col_logo2:
@@ -295,7 +297,7 @@ with st.sidebar:
         elif len(date_range) == 1: start_date = end_date = date_range[0]
 
 
-# ================= 4. KHỐI CHÍNH (ĐƯỢC ĐẶT Ở NGOÀI ĐỂ TỰ ĐỘNG MỞ RỘNG KHI ẨN SIDEBAR) =================
+# ================= 4. KHỐI CHÍNH =================
 
 # ----------------- ĐỘ ĐẬM (FONT-WEIGHT) Ở MỨC 600 MẢNH MAI -----------------
 st.markdown("""
