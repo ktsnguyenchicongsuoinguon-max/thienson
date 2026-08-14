@@ -6,7 +6,8 @@ import os
 from datetime import datetime, timedelta
 
 # ================= 1. THIẾT LẬP GIAO DIỆN =================
-st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", page_icon="logothienson.png", layout="wide", initial_sidebar_state="expanded")
+# Tắt sidebar mặc định của Streamlit (chuyển sang dùng cột layout)
+st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", page_icon="logothienson.png", layout="wide", initial_sidebar_state="collapsed")
 
 # ================= HÀM ĐỌC ẢNH LOCAL LÀM BACKGROUND =================
 def get_base64_image(image_path):
@@ -18,7 +19,7 @@ def get_base64_image(image_path):
 background_image_path = "background.jpg" 
 bg_base64 = get_base64_image(background_image_path)
 
-# 1. GHIM CHẾT ẢNH NỀN VÀO LỚP SÂU NHẤT, TUYỆT ĐỐI KHÔNG DI CHUYỂN
+# LỚP NỀN ĐÁ CỐ ĐỊNH, KHÔNG BỊ TRƯỢT KHI CUỘN
 if bg_base64:
     bg_css = f"""
     <style>
@@ -56,22 +57,35 @@ st.markdown("""
         padding: 0 !important;
     }
 
-    /* Ẩn hoàn toàn thanh cuộn toàn trang (Global Scrollbar) */
+    /* Ẩn thanh cuộn toàn trang (Global Scrollbar) */
     ::-webkit-scrollbar {
         width: 0px !important;
         background: transparent !important;
         display: none !important;
     }
 
-    /* Triệt tiêu Streamlit tự động bù khoảng trống thừa */
+    /* Ẩn sidebar mặc định của Streamlit (chúng ta dùng cột thay thế) */
+    [data-testid="stSidebar"] { display: none !important; }
+
+    /* Triệt tiêu bù lề ngầm */
     [data-testid="stMain"] > div:first-child {
-        padding-top: 0px !important;
-        padding-bottom: 0px !important;
+        padding: 0 !important;
+    }
+    
+    /* Thiết lập khoảng hở nền đá xung quanh toàn bộ giao diện: Trái 20, Phải 20, Trên 60, Dưới 60 */
+    .stMainBlockContainer, .block-container, [data-testid="stAppViewBlockContainer"] { 
+        padding: 0 !important;
+        margin-top: 60px !important;     
+        margin-bottom: 60px !important;  
+        margin-left: 20px !important;
+        margin-right: 20px !important;
+        max-width: 100% !important;
+        width: auto !important;
     }
 
-    /* ================= 2. KHỐI KÍNH BỘ LỌC (SIDEBAR) ================= */
-    section[data-testid="stSidebar"] {
-        /* ĐỒNG BỘ MÀU, KÍNH MỜ, ĐỘ BO GÓC NHƯ KHỐI CHÍNH */
+    /* ================= 2. HAI TẤM KÍNH SONG SONG (CỘT TRÁI & PHẢI) ================= */
+    /* Định dạng chung cho 2 cột để biến chúng thành tấm kính mờ */
+    [data-testid="column"] {
         background-color: rgba(255, 255, 255, 0.35) !important;
         backdrop-filter: blur(20px) !important;
         -webkit-backdrop-filter: blur(20px) !important;
@@ -79,37 +93,33 @@ st.markdown("""
         border-radius: 24px !important; 
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         
-        /* CĂN LỀ: Trái 20px, Trên 60px, Dưới 60px */
-        margin-top: 60px !important;
-        margin-bottom: 60px !important;
-        margin-left: 20px !important;
-        margin-right: 0px !important;
-        
-        height: calc(100vh - 120px) !important;
-        overflow: hidden !important; /* Ép nội dung tôn trọng góc bo viền */
-    }
-
-    /* XÓA THANH KÉO GIÃN ĐỂ BẢO TOÀN GÓC BO VIỀN PHẢI SIDEBAR */
-    [data-testid="stSidebarResizer"] {
-        display: none !important;
-    }
-
-    /* Kích hoạt thanh cuộn bên trong khối Sidebar */
-    [data-testid="stSidebarUserContent"], [data-testid="stSidebarContent"], .stSidebarContent {
-        height: 100% !important;
-        overflow-y: auto !important;
-        overflow-x: hidden !important;
-        padding: 25px 20px !important;
+        height: calc(100vh - 120px) !important; /* Khóa chiều cao vừa với màn hình */
+        overflow: hidden !important; 
     }
     
-    [data-testid="stSidebarUserContent"]::-webkit-scrollbar { width: 6px !important; display: block !important;}
-    [data-testid="stSidebarUserContent"]::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.2) !important; border-radius: 10px; }
+    /* Cột BỘ LỌC (Trái) - XÓA THANH CUỘN HOÀN TOÀN */
+    [data-testid="column"]:nth-of-type(1) {
+        padding: 20px 15px !important;
+        overflow-y: hidden !important; /* KHÔNG CUỘN BỘ LỌC */
+    }
 
-    /* ĐỊNH DẠNG CÁC Ô LỌC CÁCH ĐỀU NHAU */
+    /* Cột CHÍNH (Phải) - CHO PHÉP CUỘN MƯỢT MÀ */
+    [data-testid="column"]:nth-of-type(2) {
+        padding: 30px !important;
+        overflow-y: auto !important; 
+    }
+    /* Thanh cuộn riêng cho tấm kính chính */
+    [data-testid="column"]:nth-of-type(2)::-webkit-scrollbar { width: 8px !important; display: block !important; }
+    [data-testid="column"]:nth-of-type(2)::-webkit-scrollbar-track { background: transparent !important; margin: 20px 0 !important; }
+    [data-testid="column"]:nth-of-type(2)::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.3) !important; border-radius: 10px !important; }
+    [data-testid="column"]:nth-of-type(2)::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.5) !important; }
+
+
+    /* ================= 3. TRANG TRÍ BỘ LỌC ================= */
     .sidebar-title {
         display: flex; align-items: center; gap: 8px;
         font-size: 14px; font-weight: 700; color: #0f172a;
-        margin-top: 24px; /* Tách đều các mục */
+        margin-top: 24px; 
         margin-bottom: 8px; 
         text-transform: uppercase;
     }
@@ -117,51 +127,16 @@ st.markdown("""
         font-size: 20px; color: #198754;
     }
     
-    section[data-testid="stSidebar"] div[data-baseweb="select"] > div,
-    section[data-testid="stSidebar"] div[data-baseweb="input"] > div {
+    /* Ô nhập liệu trong suốt */
+    [data-testid="column"]:nth-of-type(1) div[data-baseweb="select"] > div,
+    [data-testid="column"]:nth-of-type(1) div[data-baseweb="input"] > div {
         background-color: rgba(255, 255, 255, 0.4) !important;
         backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.6) !important;
         border-radius: 12px !important;
     }
 
-    /* ================= 3. KHỐI KÍNH CHÍNH (BẢNG & KPI) ================= */
-    .stMainBlockContainer, .block-container, [data-testid="stAppViewBlockContainer"] { 
-        /* ĐỒNG BỘ MÀU, KÍNH MỜ, ĐỘ BO GÓC NHƯ SIDEBAR */
-        background-color: rgba(255, 255, 255, 0.35) !important; 
-        backdrop-filter: blur(20px) !important; 
-        -webkit-backdrop-filter: blur(20px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.4) !important; 
-        border-radius: 24px !important; 
-        box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
-        
-        /* CĂN LỀ: Tách Sidebar 10px, Cách lề phải 20px, Trên/Dưới 60px */
-        margin-top: 60px !important;     
-        margin-bottom: 60px !important;  
-        margin-left: 10px !important;  
-        margin-right: 20px !important; 
-        
-        padding: 30px !important; 
-        
-        height: calc(100vh - 120px) !important; 
-        max-height: calc(100vh - 120px) !important;
-        
-        /* Chìa khóa để margin-right 20px hoạt động: Dùng width auto thay vì ép 100% */
-        width: auto !important; 
-        max-width: 100% !important;
-        
-        /* Kích hoạt thanh cuộn bên trong khối kính */
-        overflow-y: auto !important; 
-        overflow-x: hidden !important; 
-    }
-
-    /* Thanh cuộn cho riêng khối kính mờ chính */
-    .block-container::-webkit-scrollbar { width: 8px !important; display: block !important; }
-    .block-container::-webkit-scrollbar-track { background: transparent !important; margin: 20px 0 !important; }
-    .block-container::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.3) !important; border-radius: 10px !important; }
-    .block-container::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.5) !important; }
-
-    /* ================= 4. THANH HEADER (SHARE) & LOGO DƯỚI ĐÁY ================= */
+    /* ================= 4. KHỐI BAO TIÊU ĐỀ & BẢNG ================= */
     header[data-testid="stHeader"] { 
         background: transparent !important; 
         height: 60px !important; 
@@ -169,14 +144,12 @@ st.markdown("""
     .stAppDeployButton { display: none !important; }
     footer[data-testid="stFooter"], footer { display: none !important; }
 
-    /* LÀM ĐẬM HEADER BẢNG */
     div[data-testid="stDataFrame"] th {
         background-color: rgba(226, 232, 240, 0.9) !important; 
         color: #0F172A !important;
         font-weight: 800 !important; font-size: 14px !important;
     }
 
-    /* ================= 5. KHỐI BAO TIÊU ĐỀ ================= */
     .title-card {
         border-radius: 16px; 
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.05); 
@@ -188,7 +161,6 @@ st.markdown("""
         display: flex; align-items: center; justify-content: center;
     }
 
-    /* LINK TẢI EXCEL TÙY CHỈNH */
     .custom-download-link {
         display: block; float: right; text-align: right;
         color: #0A3622 !important; font-size: 13.5px !important; font-weight: 700 !important;
@@ -200,7 +172,7 @@ st.markdown("""
         color: #198754 !important; text-decoration: underline !important;
     }
 
-    /* ================= 6. KHỐI KPI ================= */
+    /* ================= 5. KHỐI KPI ================= */
     .kpi-card {
         width: 100%; padding: 20px 18px; border-radius: 24px; border: none !important; 
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.05); 
@@ -225,7 +197,6 @@ st.markdown("""
     }
     .kpi-value { font-size: 1.8rem; font-weight: 900; color: #0f172a; }
     
-    /* ================= 7. THANH TRẠNG THÁI ================= */
     div[data-testid="stRadio"] { width: 100% !important; }
     div[data-testid="stRadio"] > div[role="radiogroup"] {
         display: flex; flex-direction: row; justify-content: center; gap: 35px; 
@@ -271,13 +242,18 @@ def load_data():
 df = load_data()
 
 
-# ================= 3. SIDEBAR BỘ LỌC =================
-with st.sidebar:
-    col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
-    with col_logo2:
-        st.image("logothienson.png", use_container_width=True) 
+# ================= 3. CHIA LAYOUT 2 TẤM KÍNH (10px khoảng cách) =================
+# gap="small" trong Streamlit tương đương với việc tách 2 khối ra đúng 10-15px
+col_filter, col_main = st.columns([1.5, 8.5], gap="small")
+
+
+# ================= TẤM KÍNH TRÁI: BỘ LỌC =================
+with col_filter:
+    # Logo
+    col_l1, col_l2, col_l3 = st.columns([1, 2, 1])
+    with col_l2: st.image("logothienson.png", use_container_width=True) 
         
-    st.markdown("<h3 style='text-align: left; margin-top: 5px; margin-bottom: 10px; color: #0f172a;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: left; margin-top: 5px; margin-bottom: 10px; color: #0f172a; font-size: 16px;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
     
     unique_projects = [p for p in df.get('Dự Án', pd.Series()).unique() if p != '']
     st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">domain</span> DỰ ÁN</div>', unsafe_allow_html=True)
@@ -305,7 +281,6 @@ with st.sidebar:
     st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">engineering</span> CÁN BỘ TRIỂN KHAI</div>', unsafe_allow_html=True)
     selected_cb = st.multiselect("CÁN BỘ TRIỂN KHAI", options=cb_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
 
-    # BỘ LỌC THỜI GIAN
     st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">calendar_month</span> KHOẢNG THỜI GIAN</div>', unsafe_allow_html=True)
     time_filter = st.selectbox("KHOẢNG THỜI GIAN", 
                                ["Tất cả", "Hôm nay", "Tuần này", "Tháng này", "Năm nay", "Tùy chọn khoảng ngày"],
@@ -313,7 +288,6 @@ with st.sidebar:
     
     today = datetime.today().date()
     start_date, end_date = None, None
-    
     if time_filter == "Hôm nay":
         start_date = end_date = today
     elif time_filter == "Tuần này":
@@ -321,79 +295,54 @@ with st.sidebar:
         end_date = start_date + timedelta(days=6)
     elif time_filter == "Tháng này":
         start_date = today.replace(day=1)
-        if today.month == 12:
-            end_date = today.replace(year=today.year+1, month=1, day=1) - timedelta(days=1)
-        else:
-            end_date = today.replace(month=today.month+1, day=1) - timedelta(days=1)
+        if today.month == 12: end_date = today.replace(year=today.year+1, month=1, day=1) - timedelta(days=1)
+        else: end_date = today.replace(month=today.month+1, day=1) - timedelta(days=1)
     elif time_filter == "Năm nay":
-        start_date = today.replace(month=1, day=1)
-        end_date = today.replace(month=12, day=31)
+        start_date = today.replace(month=1, day=1); end_date = today.replace(month=12, day=31)
     elif time_filter == "Tùy chọn khoảng ngày":
         date_range = st.date_input("Chọn khoảng thời gian:", [today, today])
-        if len(date_range) == 2:
-            start_date, end_date = date_range
-        elif len(date_range) == 1:
-            start_date = end_date = date_range[0]
+        if len(date_range) == 2: start_date, end_date = date_range
+        elif len(date_range) == 1: start_date = end_date = date_range[0]
 
 
-# ================= 4. ĐỊNH TỈ LỆ CONTAINER =================
-header_container = st.container()
-kpi_container = st.container()       
-status_container = st.container()    
-table_container = st.container()
-
-
-# ================= 5. XỬ LÝ LỌC TRẠNG THÁI =================
-with status_container:
+# ================= 5. TẤM KÍNH PHẢI: BẢNG CHÍNH =================
+with col_main:
+    
+    # 5.1. BỘ LỌC TRẠNG THÁI TRÊN CÙNG BẢNG
     status_options = ["Tất cả", "Chưa bắt đầu", "Đang triển khai", "Đã hoàn thành", "Tạm dừng"]
-    
-    selected_ui_status = st.radio("Bộ lọc Trạng Thái", options=status_options, horizontal=True, label_visibility="collapsed")
-    actual_status = selected_ui_status
+    actual_status = st.radio("Bộ lọc Trạng Thái", options=status_options, horizontal=True, label_visibility="collapsed")
 
+    # XỬ LÝ LỌC DATA
+    df_display = df.copy()
+    if start_date and end_date and 'Ngày_Bat_Dau_Obj' in df_display.columns and 'Ngày_Hoan_Thanh_Obj' in df_display.columns:
+        start_ts = pd.to_datetime(start_date)
+        end_ts = pd.to_datetime(end_date)
+        cond_start = df_display['Ngày_Bat_Dau_Obj'].between(start_ts, end_ts)
+        cond_end = df_display['Ngày_Hoan_Thanh_Obj'].between(start_ts, end_ts)
+        df_display = df_display[cond_start | cond_end]
+    if selected_projects: df_display = df_display[df_display['Dự Án'].isin(selected_projects)]
+    if selected_hd: df_display = df_display[df_display['Hợp Đồng - PLHĐ'].isin(selected_hd)]
+    if selected_hm: df_display = df_display[df_display['Hạng Mục'].isin(selected_hm)]
+    if selected_ql: df_display = df_display[df_display['Cán Bộ Quản Lý'].isin(selected_ql)]
+    if selected_cb: df_display = df_display[df_display[cb_col].isin(selected_cb)]
+    if actual_status != "Tất cả": df_display = df_display[df_display.get('Trạng Thái', '') == actual_status]
 
-# ================= 6. TỔNG HỢP & ÁP DỤNG MỌI BỘ LỌC =================
-df_display = df.copy()
+    df_export = df_display.copy()
+    for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
+        if col in df_display.columns: df_display = df_display.drop(columns=[col])
+        if col in df_export.columns: df_export = df_export.drop(columns=[col])
 
-if start_date and end_date and 'Ngày_Bat_Dau_Obj' in df_display.columns and 'Ngày_Hoan_Thanh_Obj' in df_display.columns:
-    start_ts = pd.to_datetime(start_date)
-    end_ts = pd.to_datetime(end_date)
-    
-    cond_start = df_display['Ngày_Bat_Dau_Obj'].between(start_ts, end_ts)
-    cond_end = df_display['Ngày_Hoan_Thanh_Obj'].between(start_ts, end_ts)
-    
-    df_display = df_display[cond_start | cond_end]
-
-if selected_projects: df_display = df_display[df_display['Dự Án'].isin(selected_projects)]
-if selected_hd: df_display = df_display[df_display['Hợp Đồng - PLHĐ'].isin(selected_hd)]
-if selected_hm: df_display = df_display[df_display['Hạng Mục'].isin(selected_hm)]
-if selected_ql: df_display = df_display[df_display['Cán Bộ Quản Lý'].isin(selected_ql)]
-if selected_cb: df_display = df_display[df_display[cb_col].isin(selected_cb)]
-
-if actual_status != "Tất cả": 
-    df_display = df_display[df_display.get('Trạng Thái', '') == actual_status]
-
-df_export = df_display.copy()
-for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
-    if col in df_display.columns:
-        df_display = df_display.drop(columns=[col])
-        if col in df_export.columns:
-            df_export = df_export.drop(columns=[col])
-
-
-# ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI =================
-with header_container:
+    # 5.2. TIÊU ĐỀ & KPI
     st.markdown("""
     <div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 30px;">
         <div style="font-size: 32px; font-weight: 900; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
     </div>
     """, unsafe_allow_html=True)
 
-with kpi_container:
     p_projects = df_display.get('Dự Án', pd.Series()).nunique()
     p_categories = df_display.get('Hạng Mục', pd.Series()).nunique()
     p_total = len(df_display)
     p_prog = df_display['Tiến Độ (%)'].mean() if ('Tiến Độ (%)' in df_display.columns and p_total > 0) else 0
-    
     p_done = len(df_display[df_display.get('Trạng Thái', '') == 'Đã hoàn thành'])
     p_inprogress = len(df_display[df_display.get('Trạng Thái', '') == 'Đang triển khai'])
     p_notstarted = len(df_display[df_display.get('Trạng Thái', '') == 'Chưa bắt đầu'])
@@ -424,9 +373,7 @@ with kpi_container:
     with r2_c3: st.markdown(render_transparent_shadow_kpi("Chưa bắt đầu", p_notstarted, "hourglass_empty", "#e2e3e5", "#6c757d"), unsafe_allow_html=True)
     with r2_c4: st.markdown(render_transparent_shadow_kpi("Vướng mắc", p_paused, "error", "#f8d7da", "#dc3545"), unsafe_allow_html=True)
 
-
-# ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & LINK TẢI SÁT MÉP =================
-with table_container:
+    # 5.3. BẢNG DỮ LIỆU
     st.markdown("""
     <div class="title-card" style="padding: 8px 24px; margin-top: 35px; margin-bottom: 25px;">
         <div style="font-size: 22px; font-weight: 900; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2;">BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</div>
@@ -438,13 +385,10 @@ with table_container:
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
             df_data.to_excel(writer, index=False, sheet_name='TienDo')
         output.seek(0)
-        
         import openpyxl
         from openpyxl.styles import PatternFill
-        
         wb = openpyxl.load_workbook(output)
         ws = wb.active
-
         green_fill = PatternFill(start_color="A5D6A7", end_color="A5D6A7", fill_type="solid")
         red_fill = PatternFill(start_color="EF9A9A", end_color="EF9A9A", fill_type="solid")
         gray_fill = PatternFill(start_color="F5F5F5", end_color="F5F5F5", fill_type="solid")
@@ -454,22 +398,16 @@ with table_container:
             if col_name == 'Trạng Thái':
                 status_col_idx = col_idx
                 break
-
         if status_col_idx:
             for row_idx in range(2, ws.max_row + 1):
                 status_val = str(ws.cell(row=row_idx, column=status_col_idx).value).strip()
                 fill_to_use = None
-                if status_val == 'Đã hoàn thành':
-                    fill_to_use = green_fill
-                elif status_val == 'Tạm dừng':
-                    fill_to_use = red_fill
-                elif status_val == 'Chưa bắt đầu':
-                    fill_to_use = gray_fill
-                
+                if status_val == 'Đã hoàn thành': fill_to_use = green_fill
+                elif status_val == 'Tạm dừng': fill_to_use = red_fill
+                elif status_val == 'Chưa bắt đầu': fill_to_use = gray_fill
                 if fill_to_use:
                     for col in range(1, ws.max_column + 1):
                         ws.cell(row=row_idx, column=col).fill = fill_to_use
-
         final_output = io.BytesIO()
         wb.save(final_output)
         return final_output.getvalue()
