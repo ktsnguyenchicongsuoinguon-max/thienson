@@ -18,12 +18,12 @@ def get_base64_image(image_path):
 background_image_path = "background.jpg" 
 bg_base64 = get_base64_image(background_image_path)
 
-# LỚP NỀN ĐÁ CỐ ĐỊNH
+# LỚP NỀN ĐÁ CỐ ĐỊNH, KHÔNG BỊ TRƯỢT KHI CUỘN
 if bg_base64:
     bg_css = f"""
     <style>
         .stApp::before {{
-            content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background-image: url("data:image/jpeg;base64,{bg_base64}");
             background-size: cover; background-position: center; background-repeat: no-repeat;
             z-index: -99999;
@@ -36,7 +36,7 @@ else:
     st.markdown("""
     <style>
         .stApp::before { 
-            content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background-image: url("https://img.freepik.com/free-photo/green-marble-texture-background_23-2150383431.jpg"); 
             background-size: cover; background-position: center; background-repeat: no-repeat;
             z-index: -99999;
@@ -49,61 +49,72 @@ else:
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* ================= 1. KHÓA CHẾT TOÀN BỘ TRANG (KHÔNG CHO CUỘN) ================= */
-    html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"], [data-testid="stMain"] > div {
+    /* ================= 1. KHÓA CUỘN TRÌNH DUYỆT (NỀN VÀ TRANG ĐỨNG IM) ================= */
+    html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
         overflow: hidden !important; 
-        height: 100vh !important;
-        max-height: 100vh !important;
-        width: 100vw !important;
         margin: 0 !important;
         padding: 0 !important;
     }
 
-    /* Ẩn hoàn toàn tất cả thanh cuộn bên ngoài */
+    /* Ẩn thanh cuộn toàn trang (Global Scrollbar) */
     ::-webkit-scrollbar {
-        display: none !important;
         width: 0px !important;
-        height: 0px !important;
-    }
-    * {
-        scrollbar-width: none !important;
-        -ms-overflow-style: none !important;
+        background: transparent !important;
+        display: none !important;
     }
 
-    /* Triệt tiêu tự động bù trừ khoảng trống của Streamlit */
-    .stApp > header + div {
-        padding-top: 0 !important;
-        padding-bottom: 0 !important;
+    /* Triệt tiêu Streamlit tự động bù khoảng trống thừa */
+    [data-testid="stMain"] > div:first-child {
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
     }
 
-    /* ================= 2. KHỐI KÍNH MỜ CỐ ĐỊNH BẤT ĐỘNG (KHÔNG CUỘN) ================= */
+    /* ================= 2. KHỐI KÍNH MỜ = CỬA SỔ APP CỐ ĐỊNH ================= */
     .stMainBlockContainer, .block-container, [data-testid="stAppViewBlockContainer"] { 
         padding-top: 30px !important;    
         padding-bottom: 30px !important; 
+        
+        /* Đối xứng khoảng hở nền đá: 60px trên, 60px dưới */
+        margin-top: 60px !important;     
+        margin-bottom: 60px !important;  
+        
+        /* Khóa cứng chiều cao: 100% màn hình trừ đi 120px (60 trên + 60 dưới) */
+        height: calc(100vh - 120px) !important; 
+        max-height: calc(100vh - 120px) !important;
+        
+        /* CHO PHÉP CUỘN BÊN TRONG KHỐI KÍNH */
+        overflow-y: auto !important; 
+        overflow-x: hidden !important; 
+        
         background-color: rgba(255, 255, 255, 0.35) !important; 
         backdrop-filter: blur(20px) !important; 
         -webkit-backdrop-filter: blur(20px) !important;
         border-radius: 24px !important;
-        
-        /* Cố định khoảng hở nền đá: 60px trên, 60px dưới */
-        margin-top: 60px !important;     
-        margin-bottom: 60px !important;  
-        
-        /* Khóa cứng chiều cao tuyệt đối, chặn mọi hành vi cuộn bên trong khối kính */
-        height: calc(100vh - 120px) !important; 
-        max-height: calc(100vh - 120px) !important;
-        overflow: hidden !important; 
-        
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; 
     }
 
-    /* ================= 3. THANH HEADER (SHARE) & ẨN LOGO DƯỚI ĐÁY ================= */
+    /* Tùy chỉnh thanh cuộn cho riêng khối kính mờ */
+    .block-container::-webkit-scrollbar {
+        width: 8px !important;
+        display: block !important;
+    }
+    .block-container::-webkit-scrollbar-track {
+        background: transparent !important;
+        margin: 20px 0 !important;
+    }
+    .block-container::-webkit-scrollbar-thumb {
+        background: rgba(15, 23, 42, 0.3) !important;
+        border-radius: 10px !important;
+    }
+    .block-container::-webkit-scrollbar-thumb:hover {
+        background: rgba(15, 23, 42, 0.5) !important;
+    }
+
+    /* ================= 3. THANH HEADER (SHARE) & LOGO DƯỚI ĐÁY ================= */
     header[data-testid="stHeader"] { 
         background: transparent !important; 
-        height: 60px !important; 
-        position: fixed !important;
-        top: 0 !important;
+        height: 60px !important; /* Khớp đúng 60px hở nền trên để nằm giữa */
     }
     .stAppDeployButton { display: none !important; }
     footer[data-testid="stFooter"], footer { display: none !important; }
