@@ -18,7 +18,7 @@ def get_base64_image(image_path):
 background_image_path = "background.jpg" 
 bg_base64 = get_base64_image(background_image_path)
 
-# 1. GHIM CHẾT ẢNH NỀN VÀO LỚP SÂU NHẤT, TUYỆT ĐỐI KHÔNG DI CHUYỂN
+# LỚP NỀN ĐÁ CỐ ĐỊNH, KHÔNG BỊ TRƯỢT KHI CUỘN
 if bg_base64:
     bg_css = f"""
     <style>
@@ -49,17 +49,28 @@ else:
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* ================= 2. ĐIỀU CHỈNH KHỐI KÍNH MỜ (TỰ ĐỘNG CO GIÃN, KHÔNG CÓ CUỘN TRONG) ================= */
-    /* Triệt tiêu tự động bù trừ khoảng cách header */
-    [data-testid="stMain"] {
-        padding-top: 0px !important;
-        margin-top: 0px !important;
+    /* ================= 1. XÓA BỎ HOÀN TOÀN THANH CUỘN PHÍA NGOÀI ================= */
+    /* Ẩn thanh cuộn của trình duyệt và Streamlit trên Chrome, Safari, Edge */
+    html::-webkit-scrollbar, body::-webkit-scrollbar, 
+    [data-testid="stAppViewContainer"]::-webkit-scrollbar, 
+    [data-testid="stMain"]::-webkit-scrollbar {
+        display: none !important;
+        width: 0px !important;
+        height: 0px !important;
     }
+    /* Ẩn thanh cuộn trên Firefox và các trình duyệt khác */
+    html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+    }
+
+    /* Triệt tiêu tự động bù trừ khoảng trống của Streamlit */
     .stApp > header + div {
         padding-top: 0 !important;
         padding-bottom: 0 !important;
     }
 
+    /* ================= 2. KHỐI KÍNH MỜ (ÔM VỪA KHÍT NỘI DUNG, KHÔNG CÓ THANH CUỘN TRONG) ================= */
     .stMainBlockContainer, .block-container, [data-testid="stAppViewBlockContainer"] { 
         padding-top: 30px !important;    
         padding-bottom: 30px !important; 
@@ -68,11 +79,11 @@ st.markdown("""
         -webkit-backdrop-filter: blur(20px) !important;
         border-radius: 24px !important;
         
-        /* CỐ ĐỊNH KHOẢNG HỞ NỀN ĐÁ: 60px trên, 60px dưới */
+        /* Cố định khoảng hở nền đá: 60px trên, 60px dưới */
         margin-top: 60px !important;     
         margin-bottom: 60px !important;  
         
-        /* Chiều cao tự động ôm sát nội dung (KHÔNG BỊ CUỘN BÊN TRONG) */
+        /* Để chiều cao tự động co giãn theo bảng, không dùng height cố định nữa */
         height: auto !important; 
         overflow: visible !important;
         
@@ -80,14 +91,14 @@ st.markdown("""
         border: 1px solid rgba(255, 255, 255, 0.4) !important; 
     }
 
-    /* ================= 3. THANH HEADER (SHARE) & LOGO ================= */
+    /* ================= 3. THANH HEADER (SHARE) & ẨN LOGO DƯỚI ĐÁY ================= */
     header[data-testid="stHeader"] { 
         background: transparent !important; 
-        height: 60px !important; /* Chiều cao đúng bằng khoảng hở nền đá 60px để nằm giữa */
+        height: 60px !important; 
+        position: fixed !important;
+        top: 0 !important;
     }
     .stAppDeployButton { display: none !important; }
-    
-    /* ẨN VĨNH VIỄN LOGO "Made with Streamlit" ĐỂ ĐÁY SẠCH SẼ NHƯ TRONG ẢNH */
     footer[data-testid="stFooter"], footer { display: none !important; }
 
     /* ================= 4. SIDEBAR ================= */
@@ -120,7 +131,7 @@ st.markdown("""
         font-weight: 800 !important; font-size: 14px !important;
     }
 
-    /* ================= 5. KHỐI BAO TIÊU ĐỀ ================= */
+    /* ================= 5. KHỐI BAO TIÊU ĐỀ CĂN GIỮA ================= */
     .title-card {
         border-radius: 16px; 
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.05); 
@@ -327,7 +338,6 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
 
 # ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI =================
 with header_container:
-    # margin-bottom 30px sẽ cân bằng với padding-top 30px bên trên, giúp tiêu đề lọt thỏm vào giữa hoàn hảo
     st.markdown("""
     <div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 30px;">
         <div style="font-size: 32px; font-weight: 900; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
