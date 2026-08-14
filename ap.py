@@ -48,14 +48,14 @@ st.markdown("""
 <style>
     /* ================= CĂN CHỈNH KHOẢNG HỞ NỀN ĐÁ TRÊN / DƯỚI & PADDING ================= */
     .block-container { 
-        padding-top: 35px !important;    /* Khoảng cách dội từ viền mờ xuống tiêu đề */
-        padding-bottom: 35px !important; 
+        padding-top: 30px !important;    /* Khoảng cách dội từ viền mờ xuống tiêu đề */
+        padding-bottom: 30px !important; 
         background-color: rgba(255, 255, 255, 0.35) !important; 
         backdrop-filter: blur(20px) !important; 
         -webkit-backdrop-filter: blur(20px) !important;
         border-radius: 24px;
-        margin-top: 80px !important;     /* Đẩy nền mờ xuống 80px để hàng nút Share nằm ngay chính giữa nền đá */
-        margin-bottom: 80px !important;  /* Cân bằng với bên trên */
+        margin-top: 65px !important;     /* Căn 65px để hàng nút Share nằm ngay chính giữa nền đá */
+        margin-bottom: 65px !important;  /* Cân bằng với bên trên */
         box-shadow: 0 10px 40px rgba(0,0,0,0.15);
         border: 1px solid rgba(255, 255, 255, 0.4); 
     }
@@ -312,9 +312,9 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
 
 # ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI =================
 with header_container:
-    # Ở đây: margin-top: 0px (chạm viền trên padding 35px), margin-bottom: 35px (đẩy ô KPI xuống 35px). Chính giữa hoàn hảo.
+    # margin-bottom: 30px để đồng bộ với padding-top: 30px của class .block-container
     st.markdown("""
-    <div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 35px;">
+    <div class="title-card" style="padding: 10px 24px; margin-top: 0px; margin-bottom: 30px;">
         <div style="font-size: 32px; font-weight: 900; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
     </div>
     """, unsafe_allow_html=True)
