@@ -136,10 +136,9 @@ st.markdown("""
         
         margin: 0 !important; 
         
-        /* BỨC TƯỜNG ĐỆM 30PX: Bắt buộc mọi đối tượng bên trong cách đều viền đúng 30px */
+        /* PADDING 30PX CHUẨN XÁC: Ép mọi đối tượng bên trong cách đều viền 30px */
         padding: 30px !important; 
         
-        /* TRẢ LẠI KÍCH THƯỚC CHUẨN: Bung rộng lấp kín stMain */
         width: 100% !important; 
         max-width: 100% !important; 
         height: 100% !important; 
@@ -149,7 +148,7 @@ st.markdown("""
         overflow: hidden !important; 
     }
 
-    /* ================= 5. HIỆU ỨNG FLEX - KÉO DÃN BẢNG SÁT ĐÁY ĐỆM ================= */
+    /* ================= 5. CHỐNG TRÀN VIỀN CHO MỌI THÀNH PHẦN BÊN TRONG ================= */
     .block-container > div[data-testid="stVerticalBlock"] {
         flex-grow: 1 !important;
         display: flex !important;
@@ -159,26 +158,36 @@ st.markdown("""
         max-width: 100% !important;
     }
     
+    /* Ép tất cả các hàng bên trong (KPI, Tiêu đề, Radio, Download) không bao giờ vượt quá độ rộng cho phép (-60px cho 2 bên đệm) */
     .block-container > div[data-testid="stVerticalBlock"] > div {
         flex-shrink: 0 !important;
+        width: 100% !important;
+        max-width: calc(100% - 0px) !important;
     }
     
+    /* KHÓA CỨNG BẢNG DỮ LIỆU: Bắt buộc nằm gọn trong vùng đệm 30px */
     div.element-container:has([data-testid="stDataFrame"]) {
         flex-grow: 1 !important;
         flex-shrink: 1 !important;
         display: flex !important;
         flex-direction: column !important;
         min-height: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
     
     [data-testid="stDataFrame"] { 
         flex-grow: 1 !important;
         width: 100% !important; 
+        max-width: 100% !important;
         min-height: 0 !important;
     }
+    
+    /* Khung chứa bảng có thanh cuộn nội bộ khi cần thiết */
     [data-testid="stDataFrame"] > div { 
         height: 100% !important; 
         width: 100% !important; 
+        max-width: 100% !important;
         overflow: auto !important; 
     }
 
@@ -210,7 +219,7 @@ st.markdown("""
         display: block; float: right; text-align: right;
         color: #0A3622 !important; font-size: 13.5px !important; font-weight: 700 !important;
         text-decoration: none !important;
-        margin-top: -35px !important; margin-right: 5px !important; margin-bottom: 10px !important;
+        margin-top: -35px !important; margin-right: 0px !important; margin-bottom: 10px !important;
         position: relative; z-index: 9999; cursor: pointer;
     }
     .custom-download-link:hover { color: #198754 !important; text-decoration: underline !important; }
