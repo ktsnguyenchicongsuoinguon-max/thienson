@@ -15,12 +15,10 @@ def get_base64_image(image_path):
             return base64.b64encode(img_file.read()).decode()
     return None
 
-# BẠN THAY TÊN FILE ẢNH Ở ĐÂY NẾU CẦN (Phải để cùng thư mục với app.py)
 background_image_path = "background.jpg" 
 bg_base64 = get_base64_image(background_image_path)
 
 if bg_base64:
-    # Nếu tìm thấy file ảnh trong thư mục, nhúng vào CSS
     bg_css = f"""
     <style>
         .stApp {{
@@ -33,7 +31,6 @@ if bg_base64:
     """
     st.markdown(bg_css, unsafe_allow_html=True)
 else:
-    # Nếu không thấy file ảnh, dùng ảnh marble mặc định từ web
     st.markdown("""
     <style>
         .stApp { 
@@ -45,35 +42,61 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-# ================= CSS TÙY CHỈNH (GLASSMORPHISM & ĐỘ TRONG SUỐT ĐỒNG BỘ) =================
+# ================= CSS TÙY CHỈNH =================
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* TRẢ LẠI NỀN NHƯ CŨ (Trong suốt 35%, khoảng cách lề như bản gốc bạn ưng ý) */
+    /* ================= CĂN CHỈNH KHOẢNG HỞ NỀN ĐÁ TRÊN / DƯỚI & PADDING ================= */
     .block-container { 
-        padding-top: 2rem !important; 
-        padding-bottom: 2rem !important; 
+        padding-top: 35px !important;    /* Khoảng cách dội từ viền mờ xuống tiêu đề */
+        padding-bottom: 35px !important; 
         background-color: rgba(255, 255, 255, 0.35) !important; 
         backdrop-filter: blur(20px) !important; 
         -webkit-backdrop-filter: blur(20px) !important;
         border-radius: 24px;
-        margin-top: 30px;
-        margin-bottom: 30px;
+        margin-top: 80px !important;     /* Đẩy nền mờ xuống 80px để hàng nút Share nằm ngay chính giữa nền đá */
+        margin-bottom: 80px !important;  /* Cân bằng với bên trên */
         box-shadow: 0 10px 40px rgba(0,0,0,0.15);
         border: 1px solid rgba(255, 255, 255, 0.4); 
     }
 
-    /* Sidebar trong suốt 45% */
+    /* Xóa khoảng đệm ngầm của Streamlit */
+    .stApp > header + div {
+        padding-bottom: 0 !important;
+    }
+
+    /* THANH HEADER TÀNG HÌNH */
+    header[data-testid="stHeader"] { 
+        background: transparent !important; 
+        height: 60px !important; 
+    }
+    footer[data-testid="stFooter"] { display: none !important; }
+    .stAppDeployButton { display: none !important; }
+
+    /* ================= SIDEBAR ================= */
     section[data-testid="stSidebar"] {
         background-color: rgba(255, 255, 255, 0.45) !important;
         backdrop-filter: blur(20px) !important;
         -webkit-backdrop-filter: blur(20px) !important;
         border-right: 1px solid rgba(255, 255, 255, 0.3);
     }
+    .sidebar-title {
+        display: flex; align-items: center; gap: 8px;
+        font-size: 14px; font-weight: 700; color: #0f172a;
+        margin-bottom: 5px; margin-top: 12px; text-transform: uppercase;
+    }
+    .sidebar-title .material-symbols-rounded {
+        font-size: 20px; color: #198754;
+    }
 
-    /* THANH HEADER TÀNG HÌNH */
-    header[data-testid="stHeader"] { background: transparent !important; }
-    .stAppDeployButton { display: none !important; }
+    /* ĐỒNG BỘ: Ô CHỌN TRONG SIDEBAR */
+    section[data-testid="stSidebar"] div[data-baseweb="select"] > div,
+    section[data-testid="stSidebar"] div[data-baseweb="input"] > div {
+        background-color: rgba(255, 255, 255, 0.25) !important;
+        backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.4) !important;
+        border-radius: 12px !important;
+    }
 
     /* LÀM ĐẬM HEADER BẢNG */
     div[data-testid="stDataFrame"] th {
@@ -81,85 +104,38 @@ st.markdown("""
         color: #0F172A !important;
         font-weight: 800 !important; font-size: 14px !important;
     }
-    
-    /* CSS CHO ICON Ở SIDEBAR BỘ LỌC */
-    .sidebar-title {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 14px;
-        font-weight: 700;
-        color: #0f172a;
-        margin-bottom: 5px;
-        margin-top: 12px;
-        text-transform: uppercase;
-    }
-    .sidebar-title .material-symbols-rounded {
-        font-size: 20px;
-        color: #198754;
-    }
-
-    /* ĐỒNG BỘ: CÁC Ô NHẬP LIỆU / CHỌN TRONG SIDEBAR CÓ ĐỘ TRONG SUỐT GIỐNG Ô KPI */
-    section[data-testid="stSidebar"] div[data-baseweb="select"] > div,
-    section[data-testid="stSidebar"] div[data-baseweb="input"] > div {
-        background-color: rgba(255, 255, 255, 0.25) !important;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.4) !important;
-        border-radius: 12px !important;
-    }
 
     /* ================= KHỐI BAO TIÊU ĐỀ ================= */
     .title-card {
         border-radius: 16px; 
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.05); 
         background-color: rgba(255, 255, 255, 0.25) !important; 
-        backdrop-filter: blur(15px); 
-        -webkit-backdrop-filter: blur(15px);
+        backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
         border: none !important;
         width: fit-content; 
-        margin-left: auto;  
-        margin-right: auto; 
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        margin-left: auto; margin-right: auto; 
+        display: flex; align-items: center; justify-content: center;
     }
 
     /* LINK TẢI EXCEL TÙY CHỈNH */
     .custom-download-link {
-        display: block;
-        float: right;
-        text-align: right;
-        color: #0A3622 !important;
-        font-size: 13.5px !important;
-        font-weight: 700 !important;
+        display: block; float: right; text-align: right;
+        color: #0A3622 !important; font-size: 13.5px !important; font-weight: 700 !important;
         text-decoration: none !important;
-        margin-top: -42px !important; 
-        margin-right: 5px !important;
-        margin-bottom: 15px !important;
-        position: relative;
-        z-index: 9999;
-        cursor: pointer;
+        margin-top: -42px !important; margin-right: 5px !important; margin-bottom: 15px !important;
+        position: relative; z-index: 9999; cursor: pointer;
     }
     .custom-download-link:hover {
-        color: #198754 !important;
-        text-decoration: underline !important;
+        color: #198754 !important; text-decoration: underline !important;
     }
 
-    /* ================= KHỐI KPI: NỀN TRẮNG TRONG SUỐT CAO (25%) & SHADOW ĐẬM NÉT ================= */
+    /* ================= KHỐI KPI ================= */
     .kpi-card {
-        width: 100%; 
-        padding: 20px 18px; 
-        border-radius: 24px; 
-        border: none !important; 
+        width: 100%; padding: 20px 18px; border-radius: 24px; border: none !important; 
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.05); 
-        display: flex; 
-        align-items: center; 
-        margin-bottom: 15px; 
-        min-height: 120px; 
+        display: flex; align-items: center; margin-bottom: 15px; min-height: 120px; 
         background-color: rgba(255, 255, 255, 0.25) !important; 
-        backdrop-filter: blur(15px); 
-        -webkit-backdrop-filter: blur(15px);
+        backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     .kpi-card:hover {
@@ -167,52 +143,28 @@ st.markdown("""
         box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25), 0 10px 20px rgba(0, 0, 0, 0.12); 
     }
     .kpi-icon-wrapper {
-        width: 65px; 
-        height: 65px;
-        border-radius: 20px; 
-        display: flex; align-items: center; justify-content: center;
-        flex-shrink: 0;
-        margin-right: 18px;
+        width: 65px; height: 65px; border-radius: 20px; 
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 18px;
     }
-    .kpi-icon-wrapper .material-symbols-rounded {
-        font-size: 36px; 
-    }
+    .kpi-icon-wrapper .material-symbols-rounded { font-size: 36px; }
     .kpi-details { flex-grow: 1; overflow: hidden; }
     .kpi-title {
-        font-size: 0.85rem; font-weight: 800; opacity: 0.85;
-        text-transform: uppercase; margin-bottom: 5px; white-space: nowrap;
-        overflow: hidden; text-overflow: ellipsis;
-        color: #0f172a;
+        font-size: 0.85rem; font-weight: 800; opacity: 0.85; text-transform: uppercase; margin-bottom: 5px; 
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #0f172a;
     }
-    .kpi-value { 
-        font-size: 1.8rem; font-weight: 900; 
-        color: #0f172a;
-    }
+    .kpi-value { font-size: 1.8rem; font-weight: 900; color: #0f172a; }
     
-    /* ================= THANH TRẠNG THÁI NGUYÊN BẢN ================= */
+    /* ================= THANH TRẠNG THÁI ================= */
     div[data-testid="stRadio"] { width: 100% !important; }
     div[data-testid="stRadio"] > div[role="radiogroup"] {
-        display: flex; 
-        flex-direction: row; 
-        justify-content: center; 
-        gap: 35px; 
-        margin-top: 10px; 
-        margin-bottom: 25px;
-        flex-wrap: wrap; 
-        background-color: transparent !important; 
+        display: flex; flex-direction: row; justify-content: center; gap: 35px; 
+        margin-top: 10px; margin-bottom: 25px; flex-wrap: wrap; background-color: transparent !important; 
     }
     div[data-testid="stRadio"] > div[role="radiogroup"] > label {
-        cursor: pointer;
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        padding: 5px !important;
+        cursor: pointer; background: transparent !important; border: none !important; box-shadow: none !important; padding: 5px !important;
     }
     div[data-testid="stRadio"] > div[role="radiogroup"] > label p {
-        font-weight: 600 !important; 
-        color: #0f172a !important; 
-        margin: 0 !important; 
-        font-size: 1rem !important; 
+        font-weight: 600 !important; color: #0f172a !important; margin: 0 !important; font-size: 1rem !important; 
     }
 </style>
 """, unsafe_allow_html=True)
@@ -360,9 +312,9 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
 
 # ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI =================
 with header_container:
-    # Ô bao tiêu đề trên cùng: margin-top = 0 để chạm mép trần giới hạn bởi padding. margin-bottom = 2rem để cân đối với padding-top 2rem của container nền mờ
+    # Ở đây: margin-top: 0px (chạm viền trên padding 35px), margin-bottom: 35px (đẩy ô KPI xuống 35px). Chính giữa hoàn hảo.
     st.markdown("""
-    <div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 2rem;">
+    <div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 35px;">
         <div style="font-size: 32px; font-weight: 900; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
     </div>
     """, unsafe_allow_html=True)
