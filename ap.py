@@ -69,18 +69,10 @@ st.markdown("""
 
     /* ================= 2. QUẢN LÝ LỀ KHUNG CHỨA (stMain) ================= */
     [data-testid="stMain"] { 
-        padding-top: 60px !important;    
-        padding-bottom: 60px !important; 
-        padding-left: 10px !important;   /* Cách Sidebar đúng 10px */
-        padding-right: 20px !important;  /* Cách mép phải màn hình 20px */
+        padding: 0 !important; 
         overflow: hidden !important; 
     }
     [data-testid="stMain"] > div:first-child { padding: 0 !important; }
-
-    /* Khi đóng Sidebar -> Tự động chuyển lề trái thành 20px để đối xứng */
-    [data-testid="stAppViewContainer"]:has([data-testid="stSidebar"][aria-expanded="false"]) [data-testid="stMain"] {
-        padding-left: 20px !important;
-    }
 
     /* ================= 3. KHỐI KÍNH BỘ LỌC (SIDEBAR) ================= */
     [data-testid="stSidebar"] {
@@ -88,6 +80,7 @@ st.markdown("""
         border: none !important;
         width: 320px !important; 
         min-width: 320px !important;
+        max-width: 320px !important;
     }
     [data-testid="stSidebarResizer"] { display: none !important; }
 
@@ -100,7 +93,7 @@ st.markdown("""
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         
         margin: 60px 0px 60px 20px !important;
-        width: calc(100% - 20px) !important; 
+        width: 300px !important; 
         height: calc(100vh - 120px) !important;
         overflow: hidden !important; 
     }
@@ -127,7 +120,7 @@ st.markdown("""
     }
     div.row-widget.stSelectbox, div.row-widget.stMultiSelect { margin-bottom: -5px !important; }
 
-    /* ================= 4. KHỐI KÍNH CHÍNH (BẢNG & KPI) ================= */
+    /* ================= 4. KHỐI KÍNH CHÍNH (BẢNG & KPI) - TỰ ĐỘNG MỞ RỘNG ================= */
     .block-container { 
         background-color: rgba(255, 255, 255, 0.35) !important; 
         backdrop-filter: blur(20px) !important; 
@@ -136,21 +129,36 @@ st.markdown("""
         border-radius: 24px !important; 
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         
-        margin: 0 !important; 
+        margin-top: 60px !important;     
+        margin-bottom: 60px !important;  
         
-        /* ĐỆM 30PX TUYỆT ĐỐI: Ép mọi thành phần bên trong lùi vào, không bao giờ chạm viền */
+        /* BỨC TƯỜNG ĐỆM 30PX: Ép mọi đối tượng bên trong cách đều viền 30px tuyệt đối */
         padding: 30px !important; 
         
-        width: 100% !important; 
-        max-width: 100% !important; 
-        height: 100% !important; 
+        height: calc(100vh - 120px) !important; 
         
         display: flex !important;
         flex-direction: column !important;
         overflow: hidden !important; 
     }
 
-    /* TRIỆT TIÊU KHOẢNG TRỐNG ÂM CỦA STREAMLIT COLUMNS ĐỂ KHÔNG BỊ TRÀN VIỀN */
+    /* KHI MỞ BỘ LỌC: Cách Sidebar đúng 10px, cách mép phải 20px */
+    [data-testid="stAppViewContainer"]:has([data-testid="stSidebar"][aria-expanded="true"]) .block-container {
+        margin-left: 350px !important;
+        margin-right: 20px !important;
+        width: auto !important;
+        max-width: none !important;
+    }
+
+    /* KHI ĐÓNG BỘ LỌC: Tự động bung rộng ra, cách đều hai bên 20px */
+    [data-testid="stAppViewContainer"]:has([data-testid="stSidebar"][aria-expanded="false"]) .block-container {
+        margin-left: 20px !important;
+        margin-right: 20px !important;
+        width: auto !important;
+        max-width: none !important;
+    }
+
+    /* Khử khoảng trống âm của Streamlit Columns để không bị tràn viền */
     .block-container [data-testid="stHorizontalBlock"] {
         margin-left: 0 !important;
         margin-right: 0 !important;
@@ -158,15 +166,11 @@ st.markdown("""
         max-width: 100% !important;
     }
     .block-container [data-testid="column"] {
-        padding-left: 5px !important;
-        padding-right: 5px !important;
+        padding-left: 6px !important;
+        padding-right: 6px !important;
     }
-    .block-container [data-testid="column"]:first-child {
-        padding-left: 0 !important;
-    }
-    .block-container [data-testid="column"]:last-child {
-        padding-right: 0 !important;
-    }
+    .block-container [data-testid="column"]:first-child { padding-left: 0 !important; }
+    .block-container [data-testid="column"]:last-child { padding-right: 0 !important; }
 
     /* ================= 5. HIỆU ỨNG FLEX - KÉO DÃN BẢNG SÁT ĐÁY ĐỆM ================= */
     .block-container > div[data-testid="stVerticalBlock"] {
