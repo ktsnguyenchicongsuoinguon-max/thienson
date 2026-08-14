@@ -18,7 +18,7 @@ def get_base64_image(image_path):
 background_image_path = "background.jpg" 
 bg_base64 = get_base64_image(background_image_path)
 
-# LỚP NỀN ĐÁ CỐ ĐỊNH, KHÔNG BỊ TRƯỢT KHI CUỘN
+# LỚP NỀN ĐÁ CỐ ĐỊNH
 if bg_base64:
     bg_css = f"""
     <style>
@@ -49,17 +49,23 @@ else:
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* ================= 1. XÓA BỎ HOÀN TOÀN THANH CUỘN PHÍA NGOÀI ================= */
-    /* Ẩn thanh cuộn của trình duyệt và Streamlit trên Chrome, Safari, Edge */
-    html::-webkit-scrollbar, body::-webkit-scrollbar, 
-    [data-testid="stAppViewContainer"]::-webkit-scrollbar, 
-    [data-testid="stMain"]::-webkit-scrollbar {
+    /* ================= 1. KHÓA CHẾT TOÀN BỘ TRANG (KHÔNG CHO CUỘN) ================= */
+    html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"], [data-testid="stMain"] > div {
+        overflow: hidden !important; 
+        height: 100vh !important;
+        max-height: 100vh !important;
+        width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Ẩn hoàn toàn tất cả thanh cuộn bên ngoài */
+    ::-webkit-scrollbar {
         display: none !important;
         width: 0px !important;
         height: 0px !important;
     }
-    /* Ẩn thanh cuộn trên Firefox và các trình duyệt khác */
-    html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
+    * {
         scrollbar-width: none !important;
         -ms-overflow-style: none !important;
     }
@@ -70,7 +76,7 @@ st.markdown("""
         padding-bottom: 0 !important;
     }
 
-    /* ================= 2. KHỐI KÍNH MỜ (ÔM VỪA KHÍT NỘI DUNG, KHÔNG CÓ THANH CUỘN TRONG) ================= */
+    /* ================= 2. KHỐI KÍNH MỜ CỐ ĐỊNH BẤT ĐỘNG (KHÔNG CUỘN) ================= */
     .stMainBlockContainer, .block-container, [data-testid="stAppViewBlockContainer"] { 
         padding-top: 30px !important;    
         padding-bottom: 30px !important; 
@@ -83,9 +89,10 @@ st.markdown("""
         margin-top: 60px !important;     
         margin-bottom: 60px !important;  
         
-        /* Để chiều cao tự động co giãn theo bảng, không dùng height cố định nữa */
-        height: auto !important; 
-        overflow: visible !important;
+        /* Khóa cứng chiều cao tuyệt đối, chặn mọi hành vi cuộn bên trong khối kính */
+        height: calc(100vh - 120px) !important; 
+        max-height: calc(100vh - 120px) !important;
+        overflow: hidden !important; 
         
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; 
@@ -131,7 +138,7 @@ st.markdown("""
         font-weight: 800 !important; font-size: 14px !important;
     }
 
-    /* ================= 5. KHỐI BAO TIÊU ĐỀ CĂN GIỮA ================= */
+    /* ================= 5. KHỐI BAO TIÊU ĐỀ ================= */
     .title-card {
         border-radius: 16px; 
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.05); 
