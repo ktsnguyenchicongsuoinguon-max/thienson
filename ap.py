@@ -46,30 +46,23 @@ else:
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* ================= CĂN CHỈNH KHOẢNG HỞ NỀN ĐÁ TRÊN & PADDING ================= */
+    /* ================= KHÓA VỊ TRÍ NỀN MỜ (KHÔNG DI CHUYỂN NỮA) ================= */
     .block-container { 
-        padding-top: 30px !important;    
-        padding-bottom: 30px !important; 
+        padding-top: 2rem !important;    /* Khoảng đệm dội từ viền xuống đúng 2rem */
+        padding-bottom: 2rem !important; 
         background-color: rgba(255, 255, 255, 0.35) !important; 
         backdrop-filter: blur(20px) !important; 
         -webkit-backdrop-filter: blur(20px) !important;
         border-radius: 24px;
-        margin-top: 60px !important;     
-        margin-bottom: 100px !important; /* Đẩy lề dưới lên 100px để không lẹm vào logo Streamlit */
+        margin-top: 40px !important;     /* Cố định lề trên, chừa đủ không gian cho nút Share lọt vào nền đá */
+        margin-bottom: 80px !important;  /* Nâng đáy lên lộ nền đá dưới */
         box-shadow: 0 10px 40px rgba(0,0,0,0.15);
         border: 1px solid rgba(255, 255, 255, 0.4); 
     }
 
-    /* Xóa các khoảng đệm ngầm của Streamlit làm lệch tỷ lệ */
-    .stApp > header + div {
-        padding-bottom: 0 !important;
-    }
-
-    /* THANH HEADER TÀNG HÌNH & VỪA KHÍT NỀN ĐÁ */
-    header[data-testid="stHeader"] { 
-        background: transparent !important; 
-        height: 60px !important; 
-    }
+    /* THANH HEADER TÀNG HÌNH & ẨN HẲN LOGO STREAMLIT (GIẢI QUYẾT TRIỆT ĐỂ BỊ LẸM) */
+    header[data-testid="stHeader"] { background: transparent !important; }
+    footer { display: none !important; } /* Ẩn hoàn toàn logo "Made with Streamlit" để đáy sạch sẽ 100% */
     .stAppDeployButton { display: none !important; }
 
     /* ================= SIDEBAR ================= */
@@ -311,8 +304,9 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
 
 # ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI =================
 with header_container:
+    # Lề dưới 2rem giúp cân đối với Padding trên 2rem của khối kính tổng, giữ ô chữ Báo Cáo chính giữa hoàn hảo.
     st.markdown("""
-    <div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 30px;">
+    <div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 2rem;">
         <div style="font-size: 32px; font-weight: 900; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
     </div>
     """, unsafe_allow_html=True)
