@@ -109,16 +109,27 @@ st.markdown("""
         border-radius: 12px !important;
     }
 
-    /* LINK TẢI EXCEL TÙY CHỈNH: CĂN PHẢI TUYỆT ĐỐI */
+    /* ================= KHỐI BAO TIÊU ĐỀ (GIỐNG HỆT KPI) ================= */
+    .title-card {
+        border-radius: 24px; 
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.05); 
+        background-color: rgba(255, 255, 255, 0.25) !important; 
+        backdrop-filter: blur(15px); 
+        -webkit-backdrop-filter: blur(15px);
+        border: none !important;
+    }
+
+    /* LINK TẢI EXCEL TÙY CHỈNH: ĐẨY LÊN NẰM TRONG KHỐI TIÊU ĐỀ */
     .custom-download-link {
         display: block;
         float: right;
         text-align: right;
-        color: #64748b !important;
+        color: #0A3622 !important;
         font-size: 13.5px !important;
-        font-weight: 600 !important;
+        font-weight: 700 !important;
         text-decoration: none !important;
-        margin-top: -42px !important; 
+        margin-top: -52px !important; /* Đẩy link lên nằm trong ô bao tiêu đề */
+        margin-right: 25px !important; /* Căn vào lề trong của ô bao */
         margin-bottom: 15px !important;
         position: relative;
         z-index: 9999;
@@ -135,13 +146,12 @@ st.markdown("""
         padding: 20px 18px; 
         border-radius: 24px; 
         border: none !important; 
-        /* Đổ bóng đa lớp giúp khối KPI nổi bật rõ rệt trên nền trong suốt */
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.05); 
         display: flex; 
         align-items: center; 
         margin-bottom: 15px; 
         min-height: 120px; 
-        background-color: rgba(255, 255, 255, 0.25) !important; /* Độ trong suốt cao, để lộ vân đá rõ nét */
+        background-color: rgba(255, 255, 255, 0.25) !important; 
         backdrop-filter: blur(15px); 
         -webkit-backdrop-filter: blur(15px);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -344,7 +354,11 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
 
 # ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI SHADOW =================
 with header_container:
-    st.markdown("<h2 style='text-align: center; color: #198754; font-weight: 900; margin-top: 10px; margin-bottom: 25px;'>BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</h2>", unsafe_allow_html=True)
+    st.markdown("""
+    <div class="title-card" style="padding: 20px; margin-top: 10px; margin-bottom: 25px;">
+        <h2 style='text-align: center; color: #0A3622; font-weight: 900; margin: 0; text-shadow: 0 2px 8px rgba(0,0,0,0.2);'>BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</h2>
+    </div>
+    """, unsafe_allow_html=True)
 
 with kpi_container:
     p_projects = df_display.get('Dự Án', pd.Series()).nunique()
@@ -386,8 +400,12 @@ with kpi_container:
 
 # ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & LINK TẢI SÁT MÉP =================
 with table_container:
-    # Tiêu đề bảng căn giữa tuyệt đối
-    st.markdown("<h4 style='text-align: center; color: #198754; margin-top: 35px; margin-bottom: 25px; font-weight: 800;'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>", unsafe_allow_html=True)
+    # Tiêu đề bảng được bọc trong ô kính mờ
+    st.markdown("""
+    <div class="title-card" style="padding: 15px 20px; margin-top: 35px; margin-bottom: 25px;">
+        <h4 style='text-align: center; color: #0A3622; font-weight: 900; margin: 0; text-shadow: 0 2px 6px rgba(0,0,0,0.15);'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Xử lý xuất Excel
     def generate_excel_with_colors(df_data):
@@ -442,7 +460,7 @@ with table_container:
         mime_type = "text/csv"
         filename = "Bao_cao_tien_do_Thien_Son.csv"
 
-    # Link Tải Excel Text Sạch Sẽ - NẰM SÁT LỀ PHẢI
+    # Link Tải Excel Text Sạch Sẽ - NẰM GỌN TRONG MÉT PHẢI Ô BAO
     download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}">Tải Excel</a>'
     st.markdown(download_html, unsafe_allow_html=True)
 
