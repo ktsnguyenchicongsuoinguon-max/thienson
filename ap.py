@@ -46,31 +46,22 @@ else:
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* ================= CĂN CHỈNH KHOẢNG HỞ NỀN ĐÁ TRÊN / DƯỚI & PADDING ================= */
+    /* ================= CỐ ĐỊNH NỀN TỔNG THỂ NHƯ BẢN GỐC (KHÔNG DI CHUYỂN NỮA) ================= */
     .block-container { 
-        padding-top: 35px !important;    /* Khoảng cách dội từ viền mờ xuống tiêu đề */
-        padding-bottom: 35px !important; 
+        padding-top: 2rem !important; 
+        padding-bottom: 2rem !important; 
         background-color: rgba(255, 255, 255, 0.35) !important; 
         backdrop-filter: blur(20px) !important; 
         -webkit-backdrop-filter: blur(20px) !important;
         border-radius: 24px;
-        margin-top: 80px !important;     /* Đẩy nền mờ xuống 80px để hàng nút Share nằm ngay chính giữa nền đá */
-        margin-bottom: 120px !important; /* Kéo đáy nền lên cao (120px) để không bị lẹm vào logo Streamlit */
+        margin-top: 30px !important; 
+        margin-bottom: 30px !important; 
         box-shadow: 0 10px 40px rgba(0,0,0,0.15);
         border: 1px solid rgba(255, 255, 255, 0.4); 
     }
 
-    /* Xóa khoảng đệm ngầm của Streamlit */
-    .stApp > header + div {
-        padding-bottom: 0 !important;
-    }
-
     /* THANH HEADER TÀNG HÌNH */
-    header[data-testid="stHeader"] { 
-        background: transparent !important; 
-        height: 60px !important; 
-    }
-    footer[data-testid="stFooter"] { display: none !important; }
+    header[data-testid="stHeader"] { background: transparent !important; }
     .stAppDeployButton { display: none !important; }
 
     /* ================= SIDEBAR ================= */
@@ -312,8 +303,9 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
 
 # ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI =================
 with header_container:
+    # margin-top: 0px (chạm trần padding 2rem của khối nền lớn). margin-bottom: 2rem (đẩy ô KPI xuống bằng đúng khoảng padding trên). Ô chữ sẽ nằm chính giữa hoàn hảo.
     st.markdown("""
-    <div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 35px;">
+    <div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 2rem;">
         <div style="font-size: 32px; font-weight: 900; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
     </div>
     """, unsafe_allow_html=True)
