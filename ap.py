@@ -58,25 +58,24 @@ st.markdown("""
     * { 
         scrollbar-width: none !important; 
         -ms-overflow-style: none !important; 
-        box-sizing: border-box !important; /* QUAN TRỌNG: Ép padding nằm gọn trong khối */
+        box-sizing: border-box !important; 
     }
 
-    /* Header trong suốt để bảo vệ nút Mũi Tên thu/phóng */
+    /* Giữ Header trong suốt để nút Mũi tên luôn bấm được */
     header[data-testid="stHeader"] { background: transparent !important; box-shadow: none !important; }
     [data-testid="stHeaderActionElements"], .stAppDeployButton { display: none !important; }
     footer { display: none !important; }
-
-    [data-testid="stMain"] { padding: 0 !important; overflow: hidden !important; }
-    [data-testid="stMain"] > div:first-child { padding: 0 !important; }
 
     /* ================= 2. KHỐI KÍNH BỘ LỌC (SIDEBAR) ================= */
     [data-testid="stSidebar"] {
         background-color: transparent !important;
         border: none !important;
+        width: 320px !important; 
+        min-width: 320px !important;
     }
     [data-testid="stSidebarResizer"] { display: none !important; }
 
-    /* Phủ lớp kính mờ lên lõi nội dung bên trong Sidebar để tạo khối */
+    /* KÍNH MỜ BỘ LỌC */
     [data-testid="stSidebar"] > div:first-child {
         background-color: rgba(255, 255, 255, 0.35) !important;
         backdrop-filter: blur(20px) !important;
@@ -85,22 +84,18 @@ st.markdown("""
         border-radius: 24px !important;
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         
-        /* CĂN LỀ SIDEBAR: Cách mép trái màn hình ĐÚNG 20px, Trên/dưới 60px */
+        /* CĂN LỀ: Mép trái cách 20px */
         margin: 60px 0px 60px 20px !important;
-        
-        /* Cắt 20px từ lề trái để khối vừa khít khoảng trống của Sidebar mặc định */
         width: calc(100% - 20px) !important; 
         height: calc(100vh - 120px) !important;
         overflow: hidden !important; 
     }
 
-    /* KHÓA CỨNG BỘ LỌC KHÔNG CHO CUỘN LÊN XUỐNG */
     [data-testid="stSidebarUserContent"] {
         padding: 5px 20px 20px 20px !important;
         overflow: hidden !important; 
     }
 
-    /* Thu gọn font chữ và khoảng cách trong bộ lọc để hiển thị vừa vặn */
     .sidebar-title {
         display: flex; align-items: center; gap: 8px;
         font-size: 13px; font-weight: 700; color: #0f172a;
@@ -127,51 +122,58 @@ st.markdown("""
         border-radius: 24px !important; 
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         
-        /* KHE HỞ 10PX: Streamlit tự dồn khối chính sát Sidebar.
-           Ta tạo lề trái 10px thì 2 khối sẽ cách nhau đúng 10px! Lề phải cách viền 20px */
-        margin: 60px 20px 60px 10px !important;  
+        /* CĂN LỀ: Trái 10px (cách sidebar đúng 10px), Phải 20px */
+        margin-top: 60px !important;     
+        margin-bottom: 60px !important;  
+        margin-left: 10px !important;  
+        margin-right: 20px !important; 
         
-        /* CÁCH ĐỀU NỘI DUNG 20PX: Tăng lớp đệm tứ phía lên 20px để chống chạm viền */
-        padding: 20px 20px 20px 20px !important; 
+        /* PADDING 30PX: Đẩy mọi đối tượng cách xa viền 30px, KHÔNG BAO GIỜ chạm viền */
+        padding: 30px 30px 30px 30px !important; 
         
         width: auto !important; 
         max-width: none !important; 
         height: calc(100vh - 120px) !important; 
         
-        /* BIẾN KHỐI CHÍNH THÀNH KHUNG ĐÀN HỒI (FLEX) ĐỂ KÉO DÃN BẢNG */
+        /* Chuyển khối chính thành khung Flex để kéo dãn Bảng */
         display: flex !important;
         flex-direction: column !important;
-        overflow: hidden !important; 
     }
 
-    /* Khi đóng Sidebar, khối chính tự động lùi phải tạo lề trái 20px cân đối */
+    /* Tự động lùi trái 20px khi ĐÓNG bộ lọc */
     [data-testid="stAppViewContainer"]:has([data-testid="stSidebar"][aria-expanded="false"]) .block-container {
         margin-left: 20px !important;
     }
 
-    /* KÉO DÃN BẢNG XUỐNG SÁT ĐÁY: Bảng tự động bóp giãn chiếm toàn bộ không gian còn lại */
-    [data-testid="stVerticalBlock"] {
+    /* ================= 4. HIỆU ỨNG FLEX - KÉO DÃN BẢNG SÁT ĐÁY ================= */
+    /* QUAN TRỌNG: Không dùng overflow hidden bừa bãi để giữ lại Shadow của KPI */
+    .block-container > div[data-testid="stVerticalBlock"] {
+        flex-grow: 1 !important;
         display: flex !important;
         flex-direction: column !important;
-        flex-grow: 1 !important;
-        height: 100% !important;
-        overflow: hidden !important;
+        min-height: 0 !important; 
     }
     
-    /* Chốt cứng các phần tử (KPI, Tiêu đề) không bị ép lùn xuống */
-    [data-testid="stVerticalBlock"] > div { flex-shrink: 0 !important; }
+    /* Chốt cứng Tiêu đề, KPI, Thanh trạng thái (Không cho bóp méo) */
+    .block-container > div[data-testid="stVerticalBlock"] > div {
+        flex-shrink: 0 !important;
+    }
     
-    /* Riêng thùng chứa Bảng Dữ Liệu thì cho bung rộng hết cỡ */
-    [data-testid="stVerticalBlock"] > div:has([data-testid="stDataFrame"]) {
+    /* Chỉ cho phép THÙNG CHỨA BẢNG bung rộng hết cỡ xuống sát đáy */
+    div.element-container:has([data-testid="stDataFrame"]) {
         flex-grow: 1 !important;
         flex-shrink: 1 !important;
-        height: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
         min-height: 0 !important;
-        overflow: hidden !important; 
     }
-
-    [data-testid="stDataFrame"] { width: 100% !important; height: 100% !important; }
-    [data-testid="stDataFrame"] > div { width: 100% !important; height: 100% !important; }
+    
+    [data-testid="stDataFrame"] { 
+        flex-grow: 1 !important;
+        width: 100% !important; 
+        min-height: 0 !important;
+    }
+    [data-testid="stDataFrame"] > div { height: 100% !important; }
 
     /* Thanh cuộn mượt mà dành riêng cho Bảng dữ liệu */
     [data-testid="stDataFrame"] div::-webkit-scrollbar { width: 8px !important; height: 8px !important; display: block !important; }
@@ -179,7 +181,7 @@ st.markdown("""
     [data-testid="stDataFrame"] div::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.3) !important; border-radius: 10px !important; }
     [data-testid="stDataFrame"] div::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.5) !important; }
 
-    /* ================= 4. CÁC THÀNH PHẦN BÊN TRONG ================= */
+    /* ================= 5. TRANG TRÍ ĐỐI TƯỢNG BÊN TRONG ================= */
     div[data-testid="stDataFrame"] th {
         background-color: rgba(226, 232, 240, 0.9) !important; 
         color: #0F172A !important;
@@ -206,18 +208,18 @@ st.markdown("""
     }
     .custom-download-link:hover { color: #198754 !important; text-decoration: underline !important; }
 
+    /* LẤY LẠI BÓNG ĐỔ VÀ ĐƯỜNG BO HOÀN HẢO CHO KPI */
     .kpi-card {
         width: 100%; padding: 20px 18px; 
-        border-radius: 24px; 
+        border-radius: 24px !important; 
         border: 1px solid rgba(255, 255, 255, 0.4) !important; 
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.05) !important; 
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; 
         display: flex; align-items: center; margin-bottom: 15px; min-height: 120px; 
         background-color: rgba(255, 255, 255, 0.35) !important; 
         backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
-        overflow: visible !important;
     }
-    .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25), 0 10px 20px rgba(0, 0, 0, 0.12) !important; }
+    .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1) !important; }
     .kpi-icon-wrapper {
         width: 65px; height: 65px; border-radius: 20px; 
         display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 18px;
@@ -474,6 +476,4 @@ styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
     'props': [('background-color', 'rgba(226, 232, 240, 0.9)'), ('color', '#0F172A'), ('font-weight', 'bold')]
 }])
 
-# Bảng sẽ tự động căng giãn hết chiều cao nhờ thuộc tính flex-grow trong CSS, 
-# không cần truyền tham số height cứng nữa.
 st.dataframe(styled_df, use_container_width=True, hide_index=True)
