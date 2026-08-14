@@ -46,44 +46,42 @@ else:
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* ================= NGĂN CHẶN STREAMLIT TỰ ĐỘNG ĐẨY NỀN LÊN XUỐNG ================= */
-    /* Khóa chặt tính năng dynamic padding của Streamlit */
-    .stApp > header + div {
-        padding-top: 0 !important;
+    /* ================= 1. KHÓA CHẾT SỰ CAN THIỆP JS CỦA STREAMLIT ================= */
+    /* Triệt tiêu tự động bù trừ khoảng cách header */
+    [data-testid="stMain"] {
+        padding-top: 0px !important;
+        margin-top: 0px !important;
     }
 
-    /* ================= CĂN CHỈNH KHOẢNG HỞ NỀN ĐÁ TRÊN / DƯỚI ================= */
-    .block-container { 
-        padding-top: 2rem !important;    /* Khoảng đệm dội từ viền xuống đúng 2rem để cân bằng với chữ */
-        padding-bottom: 2rem !important; 
+    /* Đóng băng hoàn toàn khối nền mờ (Bắt buộc dùng nhiều selector để đè code nội bộ) */
+    .stMainBlockContainer, .block-container, [data-testid="stAppViewBlockContainer"] { 
+        padding-top: 30px !important;    /* Khoảng cách viền mờ dội xuống đúng 30px */
+        padding-bottom: 30px !important; 
         background-color: rgba(255, 255, 255, 0.35) !important; 
         backdrop-filter: blur(20px) !important; 
         -webkit-backdrop-filter: blur(20px) !important;
-        border-radius: 24px;
-        margin-top: 60px !important;     /* Cố định lề trên 60px để nút Share nằm ngay chính giữa nền đá */
-        margin-bottom: 80px !important;  /* Lề dưới 80px rộng rãi để logo Streamlit nằm ngoài, không lẹm vào nền */
-        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-        border: 1px solid rgba(255, 255, 255, 0.4); 
-        position: relative !important;   /* Khóa vị trí khối */
+        border-radius: 24px !important;
+        margin-top: 60px !important;     /* Vạch cứng nền đá trên 60px để nút Share nằm giữa */
+        margin-bottom: 80px !important;  /* Nâng đáy nền lên, hở vân đá dưới */
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
+        border: 1px solid rgba(255, 255, 255, 0.4) !important; 
+        transition: none !important;     /* KHÓA CHẶT HIỆU ỨNG NHẢY DI CHUYỂN */
+        animation: none !important;
+        transform: none !important;
     }
 
-    /* THANH HEADER TÀNG HÌNH & CỐ ĐỊNH CAO 60PX */
+    /* ================= 2. THANH HEADER (NÚT SHARE) & ẨN LOGO ================= */
     header[data-testid="stHeader"] { 
         background: transparent !important; 
-        height: 60px !important; 
-        position: fixed !important;
+        height: 60px !important;         /* Chiều cao fix đúng 60px bằng lề nền đá trên */
+        position: absolute !important;   /* Tháo khỏi luồng DOM để không đẩy layout */
         top: 0 !important;
+        z-index: 99999 !important;
     }
     .stAppDeployButton { display: none !important; }
+    footer[data-testid="stFooter"], footer { display: none !important; } /* Diệt cỏ tận gốc logo mặc định */
 
-    /* Đảm bảo Footer (logo streamlit) nằm đè lên trên ảnh nền nhưng dưới khối kính */
-    footer[data-testid="stFooter"] { 
-        background: transparent !important;
-        position: fixed !important;
-        bottom: 0 !important;
-    }
-
-    /* ================= SIDEBAR ================= */
+    /* ================= 3. SIDEBAR ================= */
     section[data-testid="stSidebar"] {
         background-color: rgba(255, 255, 255, 0.45) !important;
         backdrop-filter: blur(20px) !important;
@@ -98,8 +96,6 @@ st.markdown("""
     .sidebar-title .material-symbols-rounded {
         font-size: 20px; color: #198754;
     }
-
-    /* ĐỒNG BỘ: Ô CHỌN TRONG SIDEBAR */
     section[data-testid="stSidebar"] div[data-baseweb="select"] > div,
     section[data-testid="stSidebar"] div[data-baseweb="input"] > div {
         background-color: rgba(255, 255, 255, 0.25) !important;
@@ -115,7 +111,7 @@ st.markdown("""
         font-weight: 800 !important; font-size: 14px !important;
     }
 
-    /* ================= KHỐI BAO TIÊU ĐỀ ================= */
+    /* ================= 4. KHỐI BAO TIÊU ĐỀ ================= */
     .title-card {
         border-radius: 16px; 
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.05); 
@@ -139,7 +135,7 @@ st.markdown("""
         color: #198754 !important; text-decoration: underline !important;
     }
 
-    /* ================= KHỐI KPI ================= */
+    /* ================= 5. KHỐI KPI ================= */
     .kpi-card {
         width: 100%; padding: 20px 18px; border-radius: 24px; border: none !important; 
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.05); 
@@ -164,7 +160,7 @@ st.markdown("""
     }
     .kpi-value { font-size: 1.8rem; font-weight: 900; color: #0f172a; }
     
-    /* ================= THANH TRẠNG THÁI ================= */
+    /* ================= 6. THANH TRẠNG THÁI ================= */
     div[data-testid="stRadio"] { width: 100% !important; }
     div[data-testid="stRadio"] > div[role="radiogroup"] {
         display: flex; flex-direction: row; justify-content: center; gap: 35px; 
@@ -322,9 +318,9 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
 
 # ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI =================
 with header_container:
-    # Ở đây: margin-top: 0px (chạm viền trên padding 2rem), margin-bottom: 2rem (đẩy ô KPI xuống 2rem). Chính giữa hoàn hảo.
+    # margin-bottom: 30px sẽ cân bằng lại hoàn hảo với padding-top: 30px bên trên, giúp chữ đóng đinh ở chính giữa.
     st.markdown("""
-    <div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 2rem;">
+    <div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 30px;">
         <div style="font-size: 32px; font-weight: 900; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
     </div>
     """, unsafe_allow_html=True)
