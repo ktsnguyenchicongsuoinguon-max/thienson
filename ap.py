@@ -6,7 +6,7 @@ import os
 from datetime import datetime, timedelta
 
 # ================= 1. THIẾT LẬP GIAO DIỆN =================
-st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", page_icon="logothienson.png", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", page_icon="logothienson.png", layout="wide", initial_sidebar_state="expanded")
 
 # ================= HÀM ĐỌC ẢNH LOCAL LÀM BACKGROUND =================
 def get_base64_image(image_path):
@@ -49,34 +49,40 @@ else:
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* ================= 1. KHÓA CUỘN TRÌNH DUYỆT VÀ ẨN THANH CUỘN TOÀN TRANG ================= */
+    /* ================= 1. BẢO VỆ CẤU TRÚC GỐC & CHỐNG TRÀN ================= */
     html, body {
         overflow: hidden !important; 
         margin: 0 !important; padding: 0 !important;
     }
-    
     ::-webkit-scrollbar { display: none !important; width: 0px !important; height: 0px !important; }
-    * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
+    
+    * { 
+        scrollbar-width: none !important; 
+        -ms-overflow-style: none !important; 
+        box-sizing: border-box !important; /* QUAN TRỌNG: Ép mọi padding nằm gọn bên trong viền */
+    }
 
-    header[data-testid="stHeader"] { display: none !important; }
-    footer[data-testid="stFooter"], footer { display: none !important; }
+    /* Giữ lại Header làm trong suốt để bấm được nút Mũi Tên */
+    header[data-testid="stHeader"] { background: transparent !important; box-shadow: none !important; }
     .stAppDeployButton { display: none !important; }
+    footer { display: none !important; }
 
-    /* Ép khung chứa chính hiển thị dạng Flex để quản lý khoảng cách 2 khối */
-    [data-testid="stAppViewContainer"] {
-        display: flex !important;
-        flex-direction: row !important;
-        overflow: hidden !important;
-    }
-
-    [data-testid="stMain"] {
-        flex-grow: 1 !important;
-        overflow: hidden !important;
-        padding: 0 !important;
-    }
+    /* Triệt tiêu lớp khoảng trống vô hình của Streamlit */
+    [data-testid="stMain"] { padding: 0 !important; overflow: hidden !important; }
+    [data-testid="stMain"] > div:first-child { padding: 0 !important; }
 
     /* ================= 2. KHỐI KÍNH BỘ LỌC (SIDEBAR) ================= */
+    /* Vỏ bọc Sidebar: Đặt chiều rộng cố định, nền tàng hình */
     section[data-testid="stSidebar"] {
+        background-color: transparent !important;
+        border: none !important;
+        width: 320px !important; 
+        min-width: 320px !important;
+    }
+    [data-testid="stSidebarResizer"] { display: none !important; }
+
+    /* Lõi Sidebar: Nơi phủ lớp kính mờ */
+    section[data-testid="stSidebar"] > div:first-child {
         background-color: rgba(255, 255, 255, 0.35) !important;
         backdrop-filter: blur(20px) !important;
         -webkit-backdrop-filter: blur(20px) !important;
@@ -84,38 +90,29 @@ st.markdown("""
         border-radius: 24px !important;
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         
-        position: relative !important;
-        width: 300px !important;
-        min-width: 300px !important;
+        /* Margin tạo thành khối lơ lửng: Trái 20px, Trên/dưới 60px */
+        margin: 60px 0px 60px 20px !important;
         
-        /* CĂN LỀ: Trái 20px, Trên/Dưới 60px */
-        margin-top: 60px !important;
-        margin-bottom: 60px !important;
-        margin-left: 20px !important;
-        margin-right: 0px !important;
-        
-        height: calc(100vh - 120px) !important; 
+        /* Chiều rộng lõi = Chiều rộng vỏ (320px) - Lề trái (20px) = 300px */
+        width: 300px !important; 
+        height: calc(100vh - 120px) !important;
+        overflow: hidden !important; 
     }
 
-    [data-testid="stSidebarResizer"] { display: none !important; }
-    
+    /* Khóa nội dung bộ lọc không cho cuộn */
     [data-testid="stSidebarUserContent"] {
-        padding: 10px 20px 20px 20px !important;
-        overflow-y: auto !important;
+        padding: 5px 20px 20px 20px !important;
+        overflow-y: hidden !important; 
         overflow-x: hidden !important;
-        height: 100% !important;
     }
 
+    /* Thu gọn font chữ và khoảng cách trong bộ lọc */
     .sidebar-title {
         display: flex; align-items: center; gap: 8px;
-        font-size: 14px; font-weight: 700; color: #0f172a;
-        margin-top: 22px; 
-        margin-bottom: 6px; 
-        text-transform: uppercase;
+        font-size: 13px; font-weight: 700; color: #0f172a;
+        margin-top: 10px; margin-bottom: 2px; text-transform: uppercase;
     }
-    .sidebar-title .material-symbols-rounded {
-        font-size: 20px; color: #198754;
-    }
+    .sidebar-title .material-symbols-rounded { font-size: 18px; color: #198754; }
     
     section[data-testid="stSidebar"] div[data-baseweb="select"] > div,
     section[data-testid="stSidebar"] div[data-baseweb="input"] > div {
@@ -123,10 +120,14 @@ st.markdown("""
         backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.6) !important;
         border-radius: 12px !important;
+        min-height: 34px !important;
+    }
+    div.row-widget.stSelectbox, div.row-widget.stMultiSelect {
+        margin-bottom: -5px !important;
     }
 
     /* ================= 3. KHỐI KÍNH CHÍNH (BẢNG & KPI) ================= */
-    .stMainBlockContainer, .block-container, [data-testid="stAppViewBlockContainer"] { 
+    .block-container { 
         background-color: rgba(255, 255, 255, 0.35) !important; 
         backdrop-filter: blur(20px) !important; 
         -webkit-backdrop-filter: blur(20px) !important;
@@ -134,22 +135,28 @@ st.markdown("""
         border-radius: 24px !important; 
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         
-        /* CĂN LỀ CHUẨN: Cách Sidebar đúng 10px, Cách mép phải 20px, Trên/Dưới 60px */
-        margin-top: 60px !important;     
-        margin-bottom: 60px !important;  
-        margin-left: 10px !important;  
-        margin-right: 20px !important; 
-        
+        /* QUAN TRỌNG: Căn lề chuẩn xác. 
+           Bên trái 10px (cách Sidebar). Bên phải 20px (cách mép phải màn hình) */
+        margin: 60px 20px 60px 10px !important;  
         padding: 25px 30px !important; 
         
-        height: calc(100vh - 120px) !important; 
-        max-height: calc(100vh - 120px) !important;
-        width: calc(100vw - 300px - 50px) !important; /* Tự động co giãn theo màn hình */
+        /* DÙNG WIDTH: AUTO. Box sẽ tự động co lại để vừa vặn giữa 2 khoảng lề, KHÔNG BAO GIỜ TRÀN VIỀN */
+        width: auto !important; 
         max-width: none !important; 
+        height: calc(100vh - 120px) !important; 
         
         overflow-y: auto !important; 
         overflow-x: hidden !important; 
     }
+
+    /* LOGIC THÔNG MINH: Khi ĐÓNG bộ lọc, đổi lề trái khối chính thành 20px để cân bằng */
+    [data-testid="stAppViewContainer"]:has(section[data-testid="stSidebar"][aria-expanded="false"]) .block-container {
+        margin-left: 20px !important;
+    }
+
+    /* KHÓA CHẶT BẢNG VÀ KPI, Ép nằm gọn trong khung */
+    [data-testid="stVerticalBlock"] { max-width: 100% !important; overflow: hidden !important; }
+    [data-testid="stDataFrame"] { width: 100% !important; max-width: 100% !important; }
 
     /* Thanh cuộn mượt mà riêng cho khối chính */
     .block-container::-webkit-scrollbar { width: 8px !important; display: block !important; }
@@ -170,7 +177,7 @@ st.markdown("""
         background-color: rgba(255, 255, 255, 0.25) !important; 
         backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
         border: none !important;
-        width: fit-content; 
+        width: fit-content; max-width: 100% !important;
         margin-left: auto; margin-right: auto; 
         display: flex; align-items: center; justify-content: center;
     }
@@ -250,13 +257,13 @@ def load_data():
 df = load_data()
 
 
-# ================= 3. SIDEBAR BỘ LỌC =================
+# ================= 3. KHỐI SIDEBAR BỘ LỌC =================
 with st.sidebar:
     col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
     with col_logo2:
         st.image("logothienson.png", use_container_width=True) 
         
-    st.markdown("<h3 style='text-align: left; margin-top: 5px; margin-bottom: 10px; color: #0f172a; font-size: 15px;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: left; margin-top: 0px; margin-bottom: 5px; color: #0f172a; font-size: 15px;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
     
     unique_projects = [p for p in df.get('Dự Án', pd.Series()).unique() if p != '']
     st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">domain</span> DỰ ÁN</div>', unsafe_allow_html=True)
@@ -308,12 +315,12 @@ with st.sidebar:
         elif len(date_range) == 1: start_date = end_date = date_range[0]
 
 
-# ================= 4. KHỐI CHÍNH (BÊN PHẢI) =================
+# ================= 4. KHỐI CHÍNH (BẢNG & KPI) =================
 
-# ----------------- ĐÃ ĐỔI ĐỘ ĐẬM (FONT-WEIGHT) TỪ 900 XUỐNG 700 -----------------
+# ----------------- ĐỘ ĐẬM (FONT-WEIGHT) Ở MỨC 600 MẢNH MAI -----------------
 st.markdown("""
 <div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 25px;">
-    <div style="font-size: 32px; font-weight: 700; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
+    <div style="font-size: 32px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -377,15 +384,15 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
     if col in df_display.columns: df_display = df_display.drop(columns=[col])
     if col in df_export.columns: df_export = df_export.drop(columns=[col])
 
-# ----------------- ĐÃ ĐỔI ĐỘ ĐẬM (FONT-WEIGHT) TỪ 900 XUỐNG 700 -----------------
+# ----------------- ĐỘ ĐẬM (FONT-WEIGHT) Ở MỨC 600 MẢNH MAI -----------------
 st.markdown("""
 <div class="title-card" style="padding: 8px 24px; margin-top: 25px; margin-bottom: 25px;">
-    <div style="font-size: 22px; font-weight: 700; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2;">BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</div>
+    <div style="font-size: 22px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2;">BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</div>
 </div>
 """, unsafe_allow_html=True)
 
 def generate_excel_with_colors(df_data):
-    output = io.BytesIO()
+    output = io.IOBytes()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         df_data.to_excel(writer, index=False, sheet_name='TienDo')
     output.seek(0)
@@ -448,7 +455,7 @@ def color_rows(row):
 
 styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
     'selector': 'th',
-    'props': [('background-color', 'rgba(226, 232, 240, 0.9)'), ('color', '#0f172a'), ('font-weight', 'bold')]
+    'props': [('background-color', 'rgba(226, 232, 240, 0.9)'), ('color', '#0F172A'), ('font-weight', 'bold')]
 }])
 
 st.dataframe(styled_df, use_container_width=True, hide_index=True, height=550)
