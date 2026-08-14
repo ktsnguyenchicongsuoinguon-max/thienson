@@ -18,7 +18,7 @@ def get_base64_image(image_path):
 background_image_path = "background.jpg" 
 bg_base64 = get_base64_image(background_image_path)
 
-# LỚP NỀN ĐÁ CỐ ĐỊNH, KHÔNG BỊ TRƯỢT KHI CUỘN
+# 1. GHIM CHẾT ẢNH NỀN VÀO LỚP SÂU NHẤT, TUYỆT ĐỐI KHÔNG DI CHUYỂN
 if bg_base64:
     bg_css = f"""
     <style>
@@ -56,7 +56,7 @@ st.markdown("""
         padding: 0 !important;
     }
 
-    /* Ẩn thanh cuộn toàn trang */
+    /* Ẩn hoàn toàn thanh cuộn toàn trang (Global Scrollbar) */
     ::-webkit-scrollbar {
         width: 0px !important;
         background: transparent !important;
@@ -69,93 +69,47 @@ st.markdown("""
         padding-bottom: 0px !important;
     }
 
-    /* ================= 2. KHỐI KÍNH MỜ CHÍNH = CỬA SỔ APP ================= */
-    .stMainBlockContainer, .block-container, [data-testid="stAppViewBlockContainer"] { 
-        padding-top: 30px !important;    
-        padding-bottom: 30px !important; 
-        
-        /* ĐỐI XỨNG LỀ: Trái 10px (cách Sidebar 10px), Phải 20px (Cân bằng với Sidebar) */
-        margin-top: 60px !important;     
-        margin-bottom: 60px !important;  
-        margin-left: 10px !important;
-        margin-right: 20px !important;
-        
-        /* Khóa cứng chiều cao: 100% màn hình trừ đi 120px (60 trên + 60 dưới) */
-        height: calc(100vh - 120px) !important; 
-        max-height: calc(100vh - 120px) !important;
-        
-        /* CHO PHÉP CUỘN BÊN TRONG KHỐI KÍNH */
-        overflow-y: auto !important; 
-        overflow-x: hidden !important; 
-        
-        /* ĐỒNG NHẤT MÀU VÀ ĐỘ BO GÓC */
-        background-color: rgba(255, 255, 255, 0.35) !important; 
-        backdrop-filter: blur(20px) !important; 
-        -webkit-backdrop-filter: blur(20px) !important;
-        border-radius: 24px !important;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
-        border: 1px solid rgba(255, 255, 255, 0.4) !important; 
-    }
-
-    /* Tùy chỉnh thanh cuộn cho riêng khối kính mờ chính */
-    .block-container::-webkit-scrollbar { width: 8px !important; display: block !important; }
-    .block-container::-webkit-scrollbar-track { background: transparent !important; margin: 20px 0 !important; }
-    .block-container::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.3) !important; border-radius: 10px !important; }
-    .block-container::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.5) !important; }
-
-    /* ================= 3. THANH HEADER (SHARE) & ẨN LOGO DƯỚI ĐÁY ================= */
-    header[data-testid="stHeader"] { 
-        background: transparent !important; 
-        height: 60px !important; 
-    }
-    .stAppDeployButton { display: none !important; }
-    footer[data-testid="stFooter"], footer { display: none !important; }
-
-    /* ================= 4. KHỐI SIDEBAR KÍNH MỜ (ĐỒNG NHẤT KHỐI CHÍNH) ================= */
+    /* ================= 2. KHỐI KÍNH BỘ LỌC (SIDEBAR) ================= */
     section[data-testid="stSidebar"] {
-        /* Đồng nhất màu và độ kính */
+        /* ĐỒNG BỘ MÀU, KÍNH MỜ, ĐỘ BO GÓC NHƯ KHỐI CHÍNH */
         background-color: rgba(255, 255, 255, 0.35) !important;
         backdrop-filter: blur(20px) !important;
         -webkit-backdrop-filter: blur(20px) !important;
-        
-        /* BO GÓC 24PX Y HỆT KHỐI CHÍNH */
-        border-radius: 24px !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important;
+        border-radius: 24px !important; 
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         
-        /* Cùng khoảng hở trên/dưới 60px, Lề trái 20px */
+        /* CĂN LỀ: Trái 20px, Trên 60px, Dưới 60px */
         margin-top: 60px !important;
         margin-bottom: 60px !important;
         margin-left: 20px !important;
-        height: calc(100vh - 120px) !important;
+        margin-right: 0px !important;
         
-        /* ÉP NỘI DUNG TUÂN THỦ GÓC BO TRÒN */
-        overflow: hidden !important; 
+        height: calc(100vh - 120px) !important;
+        overflow: hidden !important; /* Ép nội dung tôn trọng góc bo viền */
     }
-    
-    /* Xóa thanh kéo giãn để không làm vuông góc viền phải của Sidebar */
+
+    /* XÓA THANH KÉO GIÃN ĐỂ BẢO TOÀN GÓC BO VIỀN PHẢI SIDEBAR */
     [data-testid="stSidebarResizer"] {
         display: none !important;
     }
 
-    /* Đảm bảo nội dung bên trong Sidebar cuộn được */
-    [data-testid="stSidebarContent"] {
-        background: transparent !important;
-        padding-top: 15px !important;
-        padding-bottom: 20px !important;
+    /* Kích hoạt thanh cuộn bên trong khối Sidebar */
+    [data-testid="stSidebarUserContent"], [data-testid="stSidebarContent"], .stSidebarContent {
         height: 100% !important;
-        overflow-y: auto !important; 
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        padding: 25px 20px !important;
     }
     
-    [data-testid="stSidebarContent"]::-webkit-scrollbar { width: 6px !important; display: block !important; }
-    [data-testid="stSidebarContent"]::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.2) !important; border-radius: 10px; }
-    [data-testid="stSidebarContent"]::-webkit-scrollbar-track { background: transparent !important; margin: 20px 0; }
+    [data-testid="stSidebarUserContent"]::-webkit-scrollbar { width: 6px !important; display: block !important;}
+    [data-testid="stSidebarUserContent"]::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.2) !important; border-radius: 10px; }
 
-    /* ĐỊNH DẠNG CÁC Ô LỌC CÁCH ĐỀU NHAU TĂM TẮP */
+    /* ĐỊNH DẠNG CÁC Ô LỌC CÁCH ĐỀU NHAU */
     .sidebar-title {
         display: flex; align-items: center; gap: 8px;
         font-size: 14px; font-weight: 700; color: #0f172a;
-        margin-top: 22px; /* Đẩy khoảng cách đều đặn */
+        margin-top: 24px; /* Tách đều các mục */
         margin-bottom: 8px; 
         text-transform: uppercase;
     }
@@ -163,15 +117,57 @@ st.markdown("""
         font-size: 20px; color: #198754;
     }
     
-    /* Làm trong suốt các ô nhập liệu bên trong sidebar */
     section[data-testid="stSidebar"] div[data-baseweb="select"] > div,
     section[data-testid="stSidebar"] div[data-baseweb="input"] > div {
         background-color: rgba(255, 255, 255, 0.4) !important;
         backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.6) !important;
         border-radius: 12px !important;
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.05) !important;
     }
+
+    /* ================= 3. KHỐI KÍNH CHÍNH (BẢNG & KPI) ================= */
+    .stMainBlockContainer, .block-container, [data-testid="stAppViewBlockContainer"] { 
+        /* ĐỒNG BỘ MÀU, KÍNH MỜ, ĐỘ BO GÓC NHƯ SIDEBAR */
+        background-color: rgba(255, 255, 255, 0.35) !important; 
+        backdrop-filter: blur(20px) !important; 
+        -webkit-backdrop-filter: blur(20px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.4) !important; 
+        border-radius: 24px !important; 
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
+        
+        /* CĂN LỀ: Tách Sidebar 10px, Cách lề phải 20px, Trên/Dưới 60px */
+        margin-top: 60px !important;     
+        margin-bottom: 60px !important;  
+        margin-left: 10px !important;  
+        margin-right: 20px !important; 
+        
+        padding: 30px !important; 
+        
+        height: calc(100vh - 120px) !important; 
+        max-height: calc(100vh - 120px) !important;
+        
+        /* Chìa khóa để margin-right 20px hoạt động: Dùng width auto thay vì ép 100% */
+        width: auto !important; 
+        max-width: 100% !important;
+        
+        /* Kích hoạt thanh cuộn bên trong khối kính */
+        overflow-y: auto !important; 
+        overflow-x: hidden !important; 
+    }
+
+    /* Thanh cuộn cho riêng khối kính mờ chính */
+    .block-container::-webkit-scrollbar { width: 8px !important; display: block !important; }
+    .block-container::-webkit-scrollbar-track { background: transparent !important; margin: 20px 0 !important; }
+    .block-container::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.3) !important; border-radius: 10px !important; }
+    .block-container::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.5) !important; }
+
+    /* ================= 4. THANH HEADER (SHARE) & LOGO DƯỚI ĐÁY ================= */
+    header[data-testid="stHeader"] { 
+        background: transparent !important; 
+        height: 60px !important; 
+    }
+    .stAppDeployButton { display: none !important; }
+    footer[data-testid="stFooter"], footer { display: none !important; }
 
     /* LÀM ĐẬM HEADER BẢNG */
     div[data-testid="stDataFrame"] th {
@@ -281,7 +277,7 @@ with st.sidebar:
     with col_logo2:
         st.image("logothienson.png", use_container_width=True) 
         
-    st.markdown("<h3 style='text-align: left; margin-top: 5px; margin-bottom: 15px; color: #0f172a;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: left; margin-top: 5px; margin-bottom: 10px; color: #0f172a;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
     
     unique_projects = [p for p in df.get('Dự Án', pd.Series()).unique() if p != '']
     st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">domain</span> DỰ ÁN</div>', unsafe_allow_html=True)
