@@ -62,25 +62,15 @@ st.markdown("""
         box-sizing: border-box !important; 
     }
 
-    /* Giữ Header trong suốt để nút Mũi tên luôn bấm được */
+    /* Giữ Header trong suốt để nút Mũi tên thu/phóng luôn bấm được */
     header[data-testid="stHeader"] { background: transparent !important; box-shadow: none !important; }
     [data-testid="stHeaderActionElements"], .stAppDeployButton { display: none !important; }
     footer { display: none !important; }
 
-    /* ================= 2. QUẢN LÝ LỀ KHUNG CHỨA (stMain) ================= */
-    [data-testid="stMain"] { 
-        padding: 0 !important; 
-        overflow: hidden !important; 
-    }
-    [data-testid="stMain"] > div:first-child { padding: 0 !important; }
-
-    /* ================= 3. KHỐI KÍNH BỘ LỌC (SIDEBAR) ================= */
+    /* ================= 2. KHỐI KÍNH BỘ LỌC (SIDEBAR) ================= */
     [data-testid="stSidebar"] {
         background-color: transparent !important;
         border: none !important;
-        width: 320px !important; 
-        min-width: 320px !important;
-        max-width: 320px !important;
     }
     [data-testid="stSidebarResizer"] { display: none !important; }
 
@@ -93,7 +83,7 @@ st.markdown("""
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         
         margin: 60px 0px 60px 20px !important;
-        width: 300px !important; 
+        width: calc(100% - 20px) !important; 
         height: calc(100vh - 120px) !important;
         overflow: hidden !important; 
     }
@@ -120,7 +110,7 @@ st.markdown("""
     }
     div.row-widget.stSelectbox, div.row-widget.stMultiSelect { margin-bottom: -5px !important; }
 
-    /* ================= 4. KHỐI KÍNH CHÍNH (BẢNG & KPI) - TỰ ĐỘNG MỞ RỘNG ================= */
+    /* ================= 3. KHỐI KÍNH CHÍNH (BẢNG & KPI) ================= */
     .block-container { 
         background-color: rgba(255, 255, 255, 0.35) !important; 
         backdrop-filter: blur(20px) !important; 
@@ -129,10 +119,12 @@ st.markdown("""
         border-radius: 24px !important; 
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         
-        margin-top: 60px !important;     
-        margin-bottom: 60px !important;  
+        /* Tự động co giãn theo không gian chuẩn của Streamlit, không bị lệch khung */
+        width: calc(100% - 40px) !important;
+        max-width: 100% !important;
+        margin: 60px 20px !important;  
         
-        /* BỨC TƯỜNG ĐỆM 30PX: Ép mọi đối tượng bên trong cách đều viền 30px tuyệt đối */
+        /* ĐỆM 30PX AN TOÀN: Bắt buộc mọi đối tượng lùi vào trong, tuyệt đối không chạm viền */
         padding: 30px !important; 
         
         height: calc(100vh - 120px) !important; 
@@ -142,52 +134,25 @@ st.markdown("""
         overflow: hidden !important; 
     }
 
-    /* KHI MỞ BỘ LỌC: Cách Sidebar đúng 10px, cách mép phải 20px */
-    [data-testid="stAppViewContainer"]:has([data-testid="stSidebar"][aria-expanded="true"]) .block-container {
-        margin-left: 350px !important;
-        margin-right: 20px !important;
-        width: auto !important;
-        max-width: none !important;
-    }
-
-    /* KHI ĐÓNG BỘ LỌC: Tự động bung rộng ra, cách đều hai bên 20px */
-    [data-testid="stAppViewContainer"]:has([data-testid="stSidebar"][aria-expanded="false"]) .block-container {
-        margin-left: 20px !important;
-        margin-right: 20px !important;
-        width: auto !important;
-        max-width: none !important;
-    }
-
-    /* Khử khoảng trống âm của Streamlit Columns để không bị tràn viền */
-    .block-container [data-testid="stHorizontalBlock"] {
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        width: 100% !important;
+    /* CHỐNG TRÀN VIỀN CHO MỌI THÀNH PHẦN BÊN TRONG KHỐI CHÍNH */
+    .block-container * {
         max-width: 100% !important;
     }
-    .block-container [data-testid="column"] {
-        padding-left: 6px !important;
-        padding-right: 6px !important;
-    }
-    .block-container [data-testid="column"]:first-child { padding-left: 0 !important; }
-    .block-container [data-testid="column"]:last-child { padding-right: 0 !important; }
 
-    /* ================= 5. HIỆU ỨNG FLEX - KÉO DÃN BẢNG SÁT ĐÁY ĐỆM ================= */
     .block-container > div[data-testid="stVerticalBlock"] {
         flex-grow: 1 !important;
         display: flex !important;
         flex-direction: column !important;
         min-height: 0 !important; 
         width: 100% !important;
-        max-width: 100% !important;
     }
     
     .block-container > div[data-testid="stVerticalBlock"] > div {
         flex-shrink: 0 !important;
         width: 100% !important;
-        max-width: 100% !important;
     }
     
+    /* BẢNG DỮ LIỆU: Tự động đàn hồi và cuộn nội bộ khi quá khổ */
     div.element-container:has([data-testid="stDataFrame"]) {
         flex-grow: 1 !important;
         flex-shrink: 1 !important;
@@ -195,29 +160,28 @@ st.markdown("""
         flex-direction: column !important;
         min-height: 0 !important;
         width: 100% !important;
-        max-width: 100% !important;
     }
     
     [data-testid="stDataFrame"] { 
         flex-grow: 1 !important;
         width: 100% !important; 
-        max-width: 100% !important;
         min-height: 0 !important;
+        overflow-x: auto !important;
     }
+    
     [data-testid="stDataFrame"] > div { 
         height: 100% !important; 
         width: 100% !important; 
-        max-width: 100% !important;
         overflow: auto !important; 
     }
 
-    /* Thanh cuộn mượt mà dành riêng cho Bảng dữ liệu */
+    /* Thanh cuộn mượt mà riêng cho bảng dữ liệu */
     [data-testid="stDataFrame"] div::-webkit-scrollbar { width: 8px !important; height: 8px !important; display: block !important; }
     [data-testid="stDataFrame"] div::-webkit-scrollbar-track { background: transparent !important; }
     [data-testid="stDataFrame"] div::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.3) !important; border-radius: 10px !important; }
     [data-testid="stDataFrame"] div::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.5) !important; }
 
-    /* ================= 6. TRANG TRÍ ĐỐI TƯỢNG BÊN TRONG ================= */
+    /* ================= 4. TRANG TRÍ ĐỐI TƯỢNG BÊN TRONG ================= */
     div[data-testid="stDataFrame"] th {
         background-color: rgba(226, 232, 240, 0.9) !important; 
         color: #0F172A !important;
