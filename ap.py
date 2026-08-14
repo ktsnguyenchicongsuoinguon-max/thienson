@@ -18,27 +18,30 @@ def get_base64_image(image_path):
 background_image_path = "background.jpg" 
 bg_base64 = get_base64_image(background_image_path)
 
+# 1. GHIM CHẾT ẢNH NỀN VÀO LỚP SÂU NHẤT, TUYỆT ĐỐI KHÔNG DI CHUYỂN
 if bg_base64:
     bg_css = f"""
     <style>
-        .stApp {{
+        .stApp::before {{
+            content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-image: url("data:image/jpeg;base64,{bg_base64}");
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            background-size: cover; background-position: center; background-repeat: no-repeat;
+            z-index: -99999;
         }}
+        .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"] {{ background: transparent !important; }}
     </style>
     """
     st.markdown(bg_css, unsafe_allow_html=True)
 else:
     st.markdown("""
     <style>
-        .stApp { 
+        .stApp::before { 
+            content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-image: url("https://img.freepik.com/free-photo/green-marble-texture-background_23-2150383431.jpg"); 
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            background-size: cover; background-position: center; background-repeat: no-repeat;
+            z-index: -99999;
         }
+        .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"] { background: transparent !important; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -46,34 +49,52 @@ else:
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* ================= CĂN CHỈNH KHOẢNG HỞ NỀN ĐÁ TRÊN / DƯỚI & PADDING ================= */
-    .block-container { 
-        padding-top: 30px !important;    /* Khoảng cách dội từ viền mờ xuống tiêu đề */
+    /* ================= 2. KHÓA THANH CUỘN TOÀN TRANG ================= */
+    /* Triệt tiêu hoàn toàn khả năng cuộn trang mặc định của Streamlit */
+    html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
+        overflow: hidden !important; 
+    }
+
+    /* ================= 3. KHỐI KÍNH MỜ = CỬA SỔ APP CỐ ĐỊNH ================= */
+    .stMainBlockContainer, .block-container, [data-testid="stAppViewBlockContainer"] { 
+        padding-top: 30px !important;    
         padding-bottom: 30px !important; 
         background-color: rgba(255, 255, 255, 0.35) !important; 
         backdrop-filter: blur(20px) !important; 
         -webkit-backdrop-filter: blur(20px) !important;
-        border-radius: 24px;
-        margin-top: 65px !important;     /* Căn 65px để hàng nút Share nằm ngay chính giữa nền đá */
-        margin-bottom: 65px !important;  /* Cân bằng với bên trên */
-        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-        border: 1px solid rgba(255, 255, 255, 0.4); 
+        border-radius: 24px !important;
+        
+        /* CỐ ĐỊNH KHOẢNG HỞ: 60px trên (để hàng Share vừa khít), 80px dưới (không lẹm logo) */
+        margin-top: 60px !important;     
+        margin-bottom: 80px !important;  
+        
+        /* KHÓA CHIỀU CAO VÀ KÍCH HOẠT THANH CUỘN TRONG KHỐI KÍNH */
+        height: calc(100vh - 140px) !important; 
+        max-height: calc(100vh - 140px) !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
+        border: 1px solid rgba(255, 255, 255, 0.4) !important; 
     }
 
-    /* Xóa khoảng đệm ngầm của Streamlit */
-    .stApp > header + div {
-        padding-bottom: 0 !important;
-    }
+    /* Tùy chỉnh thanh cuộn bên trong khối kính */
+    .block-container::-webkit-scrollbar { width: 8px; }
+    .block-container::-webkit-scrollbar-track { background: transparent; }
+    .block-container::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.3); border-radius: 10px; }
+    .block-container::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.5); }
 
-    /* THANH HEADER TÀNG HÌNH */
+    /* ================= 4. THANH HEADER (SHARE) & LOGO ================= */
     header[data-testid="stHeader"] { 
         background: transparent !important; 
-        height: 60px !important; 
+        height: 60px !important; /* Chiều cao đúng bằng khoảng hở nền đá 60px */
     }
-    footer[data-testid="stFooter"] { display: none !important; }
     .stAppDeployButton { display: none !important; }
+    
+    /* ẨN VĨNH VIỄN LOGO "Made with Streamlit" ĐỂ ĐÁY SẠCH SẼ */
+    footer[data-testid="stFooter"], footer { display: none !important; }
 
-    /* ================= SIDEBAR ================= */
+    /* ================= 5. SIDEBAR ================= */
     section[data-testid="stSidebar"] {
         background-color: rgba(255, 255, 255, 0.45) !important;
         backdrop-filter: blur(20px) !important;
@@ -88,8 +109,6 @@ st.markdown("""
     .sidebar-title .material-symbols-rounded {
         font-size: 20px; color: #198754;
     }
-
-    /* ĐỒNG BỘ: Ô CHỌN TRONG SIDEBAR */
     section[data-testid="stSidebar"] div[data-baseweb="select"] > div,
     section[data-testid="stSidebar"] div[data-baseweb="input"] > div {
         background-color: rgba(255, 255, 255, 0.25) !important;
@@ -105,7 +124,7 @@ st.markdown("""
         font-weight: 800 !important; font-size: 14px !important;
     }
 
-    /* ================= KHỐI BAO TIÊU ĐỀ ================= */
+    /* ================= 6. KHỐI BAO TIÊU ĐỀ ================= */
     .title-card {
         border-radius: 16px; 
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.05); 
@@ -129,7 +148,7 @@ st.markdown("""
         color: #198754 !important; text-decoration: underline !important;
     }
 
-    /* ================= KHỐI KPI ================= */
+    /* ================= 7. KHỐI KPI ================= */
     .kpi-card {
         width: 100%; padding: 20px 18px; border-radius: 24px; border: none !important; 
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.05); 
@@ -312,9 +331,9 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
 
 # ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI =================
 with header_container:
-    # margin-bottom: 30px để đồng bộ với padding-top: 30px của class .block-container
+    # Ở đây: margin-top: 0px (chạm viền trên padding 30px của kính), margin-bottom: 30px (đẩy ô KPI xuống 30px). Chính giữa hoàn hảo.
     st.markdown("""
-    <div class="title-card" style="padding: 10px 24px; margin-top: 0px; margin-bottom: 30px;">
+    <div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 30px;">
         <div style="font-size: 32px; font-weight: 900; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
     </div>
     """, unsafe_allow_html=True)
