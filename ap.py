@@ -86,6 +86,8 @@ st.markdown("""
     [data-testid="stSidebar"] {
         background-color: transparent !important;
         border: none !important;
+        width: 320px !important; 
+        min-width: 320px !important;
     }
     [data-testid="stSidebarResizer"] { display: none !important; }
 
@@ -136,7 +138,7 @@ st.markdown("""
         
         margin: 0 !important; 
         
-        /* PADDING 30PX CHUẨN XÁC: Ép mọi đối tượng bên trong cách đều viền 30px */
+        /* ĐỆM 30PX TUYỆT ĐỐI: Ép mọi thành phần bên trong lùi vào, không bao giờ chạm viền */
         padding: 30px !important; 
         
         width: 100% !important; 
@@ -148,7 +150,25 @@ st.markdown("""
         overflow: hidden !important; 
     }
 
-    /* ================= 5. CHỐNG TRÀN VIỀN CHO MỌI THÀNH PHẦN BÊN TRONG ================= */
+    /* TRIỆT TIÊU KHOẢNG TRỐNG ÂM CỦA STREAMLIT COLUMNS ĐỂ KHÔNG BỊ TRÀN VIỀN */
+    .block-container [data-testid="stHorizontalBlock"] {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    .block-container [data-testid="column"] {
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+    .block-container [data-testid="column"]:first-child {
+        padding-left: 0 !important;
+    }
+    .block-container [data-testid="column"]:last-child {
+        padding-right: 0 !important;
+    }
+
+    /* ================= 5. HIỆU ỨNG FLEX - KÉO DÃN BẢNG SÁT ĐÁY ĐỆM ================= */
     .block-container > div[data-testid="stVerticalBlock"] {
         flex-grow: 1 !important;
         display: flex !important;
@@ -158,14 +178,12 @@ st.markdown("""
         max-width: 100% !important;
     }
     
-    /* Ép tất cả các hàng bên trong (KPI, Tiêu đề, Radio, Download) không bao giờ vượt quá độ rộng cho phép (-60px cho 2 bên đệm) */
     .block-container > div[data-testid="stVerticalBlock"] > div {
         flex-shrink: 0 !important;
         width: 100% !important;
-        max-width: calc(100% - 0px) !important;
+        max-width: 100% !important;
     }
     
-    /* KHÓA CỨNG BẢNG DỮ LIỆU: Bắt buộc nằm gọn trong vùng đệm 30px */
     div.element-container:has([data-testid="stDataFrame"]) {
         flex-grow: 1 !important;
         flex-shrink: 1 !important;
@@ -182,8 +200,6 @@ st.markdown("""
         max-width: 100% !important;
         min-height: 0 !important;
     }
-    
-    /* Khung chứa bảng có thanh cuộn nội bộ khi cần thiết */
     [data-testid="stDataFrame"] > div { 
         height: 100% !important; 
         width: 100% !important; 
