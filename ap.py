@@ -46,24 +46,42 @@ else:
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* ================= KHÓA VỊ TRÍ NỀN MỜ (KHÔNG DI CHUYỂN NỮA) ================= */
+    /* ================= NGĂN CHẶN STREAMLIT TỰ ĐỘNG ĐẨY NỀN LÊN XUỐNG ================= */
+    /* Khóa chặt tính năng dynamic padding của Streamlit */
+    .stApp > header + div {
+        padding-top: 0 !important;
+    }
+
+    /* ================= CĂN CHỈNH KHOẢNG HỞ NỀN ĐÁ TRÊN / DƯỚI ================= */
     .block-container { 
-        padding-top: 2rem !important;    /* Khoảng đệm dội từ viền xuống đúng 2rem */
+        padding-top: 2rem !important;    /* Khoảng đệm dội từ viền xuống đúng 2rem để cân bằng với chữ */
         padding-bottom: 2rem !important; 
         background-color: rgba(255, 255, 255, 0.35) !important; 
         backdrop-filter: blur(20px) !important; 
         -webkit-backdrop-filter: blur(20px) !important;
         border-radius: 24px;
-        margin-top: 40px !important;     /* Cố định lề trên, chừa đủ không gian cho nút Share lọt vào nền đá */
-        margin-bottom: 80px !important;  /* Nâng đáy lên lộ nền đá dưới */
+        margin-top: 60px !important;     /* Cố định lề trên 60px để nút Share nằm ngay chính giữa nền đá */
+        margin-bottom: 80px !important;  /* Lề dưới 80px rộng rãi để logo Streamlit nằm ngoài, không lẹm vào nền */
         box-shadow: 0 10px 40px rgba(0,0,0,0.15);
         border: 1px solid rgba(255, 255, 255, 0.4); 
+        position: relative !important;   /* Khóa vị trí khối */
     }
 
-    /* THANH HEADER TÀNG HÌNH & ẨN HẲN LOGO STREAMLIT (GIẢI QUYẾT TRIỆT ĐỂ BỊ LẸM) */
-    header[data-testid="stHeader"] { background: transparent !important; }
-    footer { display: none !important; } /* Ẩn hoàn toàn logo "Made with Streamlit" để đáy sạch sẽ 100% */
+    /* THANH HEADER TÀNG HÌNH & CỐ ĐỊNH CAO 60PX */
+    header[data-testid="stHeader"] { 
+        background: transparent !important; 
+        height: 60px !important; 
+        position: fixed !important;
+        top: 0 !important;
+    }
     .stAppDeployButton { display: none !important; }
+
+    /* Đảm bảo Footer (logo streamlit) nằm đè lên trên ảnh nền nhưng dưới khối kính */
+    footer[data-testid="stFooter"] { 
+        background: transparent !important;
+        position: fixed !important;
+        bottom: 0 !important;
+    }
 
     /* ================= SIDEBAR ================= */
     section[data-testid="stSidebar"] {
@@ -304,7 +322,7 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
 
 # ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI =================
 with header_container:
-    # Lề dưới 2rem giúp cân đối với Padding trên 2rem của khối kính tổng, giữ ô chữ Báo Cáo chính giữa hoàn hảo.
+    # Ở đây: margin-top: 0px (chạm viền trên padding 2rem), margin-bottom: 2rem (đẩy ô KPI xuống 2rem). Chính giữa hoàn hảo.
     st.markdown("""
     <div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 2rem;">
         <div style="font-size: 32px; font-weight: 900; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
