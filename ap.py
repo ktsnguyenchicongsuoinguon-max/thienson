@@ -49,15 +49,15 @@ else:
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* Nền tổng thể: Đẩy lề trên (margin-top) xuống thấp hơn và thu gọn padding-top để lộ nền đá */
+    /* Nền tổng thể: Chỉnh lại margin-top về 50px để ôm vừa hàng share/menu phía trên */
     .block-container { 
-        padding-top: 1.2rem !important; /* Gọt bớt khoảng trống thừa phía trên cùng */
+        padding-top: 1.2rem !important; 
         padding-bottom: 2rem !important; 
         background-color: rgba(255, 255, 255, 0.35) !important; 
         backdrop-filter: blur(20px) !important; 
         -webkit-backdrop-filter: blur(20px) !important;
         border-radius: 24px;
-        margin-top: 75px; /* Đẩy khối nền xuống 75px để phần đá phía trên lộ ra nhiều hơn */
+        margin-top: 50px; /* Căn lại khoảng cách phía trên vừa vặn hơn */
         margin-bottom: 30px;
         box-shadow: 0 10px 40px rgba(0,0,0,0.15);
         border: 1px solid rgba(255, 255, 255, 0.4); 
@@ -71,7 +71,7 @@ st.markdown("""
         border-right: 1px solid rgba(255, 255, 255, 0.3);
     }
 
-    /* THANH HEADER TÀNG HÌNH */
+    /* THANH HEADER TÀNG HÌNH (Chỉ tàng hình thanh nền, giữ lại các nút bấm) */
     header[data-testid="stHeader"] { background: transparent !important; }
     .stAppDeployButton { display: none !important; }
 
@@ -152,12 +152,13 @@ st.markdown("""
         padding: 20px 18px; 
         border-radius: 24px; 
         border: none !important; 
+        /* Đổ bóng đa lớp giúp khối KPI nổi bật rõ rệt trên nền trong suốt */
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.05); 
         display: flex; 
         align-items: center; 
         margin-bottom: 15px; 
         min-height: 120px; 
-        background-color: rgba(255, 255, 255, 0.25) !important; 
+        background-color: rgba(255, 255, 255, 0.25) !important; /* Độ trong suốt cao, để lộ vân đá rõ nét */
         backdrop-filter: blur(15px); 
         -webkit-backdrop-filter: blur(15px);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -360,7 +361,7 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
 
 # ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI SHADOW =================
 with header_container:
-    # Ô bao tiêu đề trên cùng, đã giảm padding để ôm gọn chữ
+    # Ô bao tiêu đề trên cùng
     st.markdown("""
     <div class="title-card" style="padding: 8px 24px; margin-top: 5px; margin-bottom: 25px;">
         <div style="font-size: 32px; font-weight: 900; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
