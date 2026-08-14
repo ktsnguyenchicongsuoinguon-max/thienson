@@ -64,13 +64,13 @@ st.markdown("""
         -webkit-backdrop-filter: blur(20px) !important;
         border-radius: 24px !important;
         
-        /* CỐ ĐỊNH KHOẢNG HỞ: 60px trên (để hàng Share vừa khít), 80px dưới (không lẹm logo) */
+        /* ĐỐI XỨNG HOÀN HẢO: 60px trên, 60px dưới */
         margin-top: 60px !important;     
-        margin-bottom: 80px !important;  
+        margin-bottom: 60px !important;  
         
         /* KHÓA CHIỀU CAO VÀ KÍCH HOẠT THANH CUỘN TRONG KHỐI KÍNH */
-        height: calc(100vh - 140px) !important; 
-        max-height: calc(100vh - 140px) !important;
+        height: calc(100vh - 120px) !important; /* 100vh trừ đi 60px top và 60px bottom */
+        max-height: calc(100vh - 120px) !important;
         overflow-y: auto !important;
         overflow-x: hidden !important;
         
@@ -173,7 +173,7 @@ st.markdown("""
     }
     .kpi-value { font-size: 1.8rem; font-weight: 900; color: #0f172a; }
     
-    /* ================= THANH TRẠNG THÁI ================= */
+    /* ================= 8. THANH TRẠNG THÁI ================= */
     div[data-testid="stRadio"] { width: 100% !important; }
     div[data-testid="stRadio"] > div[role="radiogroup"] {
         display: flex; flex-direction: row; justify-content: center; gap: 35px; 
@@ -331,7 +331,6 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
 
 # ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI =================
 with header_container:
-    # Ở đây: margin-top: 0px (chạm viền trên padding 30px của kính), margin-bottom: 30px (đẩy ô KPI xuống 30px). Chính giữa hoàn hảo.
     st.markdown("""
     <div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 30px;">
         <div style="font-size: 32px; font-weight: 900; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
