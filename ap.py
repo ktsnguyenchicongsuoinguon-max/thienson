@@ -59,7 +59,7 @@ st.markdown("""
     * { 
         scrollbar-width: none !important; 
         -ms-overflow-style: none !important; 
-        box-sizing: border-box !important; /* QUAN TRỌNG: Ép padding không làm phình khối */
+        box-sizing: border-box !important; 
     }
 
     /* Giữ Header trong suốt để nút Mũi tên luôn bấm được */
@@ -69,21 +69,26 @@ st.markdown("""
 
     /* ================= 2. QUẢN LÝ LỀ KHUNG CHỨA (stMain) ================= */
     [data-testid="stMain"] { 
-        padding: 0 !important; 
+        padding-top: 60px !important;    
+        padding-bottom: 60px !important; 
+        padding-left: 10px !important;   /* Cách Sidebar đúng 10px */
+        padding-right: 20px !important;  /* Cách mép phải màn hình 20px */
         overflow: hidden !important; 
     }
-    /* ĐÃ XÓA DÒNG CODE GÂY LỖI MẤT PADDING TRƯỚC ĐÂY */
+    [data-testid="stMain"] > div:first-child { padding: 0 !important; }
+
+    /* Khi đóng Sidebar -> Tự động chuyển lề trái thành 20px để đối xứng */
+    [data-testid="stAppViewContainer"]:has([data-testid="stSidebar"][aria-expanded="false"]) [data-testid="stMain"] {
+        padding-left: 20px !important;
+    }
 
     /* ================= 3. KHỐI KÍNH BỘ LỌC (SIDEBAR) ================= */
     [data-testid="stSidebar"] {
         background-color: transparent !important;
         border: none !important;
-        width: 320px !important; 
-        min-width: 320px !important;
     }
     [data-testid="stSidebarResizer"] { display: none !important; }
 
-    /* LỚP KÍNH BỘ LỌC LÕI */
     [data-testid="stSidebar"] > div:first-child {
         background-color: rgba(255, 255, 255, 0.35) !important;
         backdrop-filter: blur(20px) !important;
@@ -92,9 +97,7 @@ st.markdown("""
         border-radius: 24px !important;
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         
-        /* CĂN LỀ: Mép trái cách màn hình ĐÚNG 20px */
         margin: 60px 0px 60px 20px !important;
-        
         width: calc(100% - 20px) !important; 
         height: calc(100vh - 120px) !important;
         overflow: hidden !important; 
@@ -102,7 +105,7 @@ st.markdown("""
 
     [data-testid="stSidebarUserContent"] {
         padding: 5px 20px 20px 20px !important;
-        overflow: hidden !important; /* Khóa bộ lọc không cuộn */
+        overflow: hidden !important; 
     }
 
     .sidebar-title {
@@ -131,50 +134,35 @@ st.markdown("""
         border-radius: 24px !important; 
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         
-        /* CĂN LỀ NGOÀI: 
-           - Lề trái 10px (Kết hợp với độ rộng Sidebar tạo ra khe hở chính xác 10px) 
-           - Lề phải 20px (Cách mép màn hình 20px) */
-        margin: 60px 20px 60px 10px !important;  
+        margin: 0 !important; 
         
-        /* CĂN LỀ TRONG (CHỐNG SÁT VIỀN): Tạo bức tường 30px bảo vệ ở mọi cạnh */
+        /* BỨC TƯỜNG ĐỆM 30PX: Bắt buộc mọi đối tượng bên trong cách đều viền đúng 30px */
         padding: 30px !important; 
         
-        width: auto !important; 
-        max-width: none !important; 
-        height: calc(100vh - 120px) !important; 
+        /* TRẢ LẠI KÍCH THƯỚC CHUẨN: Bung rộng lấp kín stMain */
+        width: 100% !important; 
+        max-width: 100% !important; 
+        height: 100% !important; 
         
-        /* Chuyển khối chính thành khung Flex để kéo dãn Bảng */
         display: flex !important;
         flex-direction: column !important;
         overflow: hidden !important; 
     }
 
-    /* CÂN BẰNG LỀ TRÁI KHI ẨN BỘ LỌC */
-    [data-testid="stAppViewContainer"]:has([data-testid="stSidebar"][aria-expanded="false"]) .block-container {
-        margin-left: 20px !important;
-    }
-
     /* ================= 5. HIỆU ỨNG FLEX - KÉO DÃN BẢNG SÁT ĐÁY ĐỆM ================= */
-    .block-container > div {
+    .block-container > div[data-testid="stVerticalBlock"] {
+        flex-grow: 1 !important;
         display: flex !important;
         flex-direction: column !important;
-        flex-grow: 1 !important;
-        height: 100% !important;
-    }
-
-    [data-testid="stVerticalBlock"] {
-        display: flex !important;
-        flex-direction: column !important;
-        flex-grow: 1 !important;
-        height: 100% !important;
+        min-height: 0 !important; 
+        width: 100% !important;
+        max-width: 100% !important;
     }
     
-    /* Chốt cứng chiều cao Tiêu đề, KPI, Thanh trạng thái (Không cho xô lệch) */
-    [data-testid="stVerticalBlock"] > div {
+    .block-container > div[data-testid="stVerticalBlock"] > div {
         flex-shrink: 0 !important;
     }
     
-    /* BẢNG TỔNG HỢP: Tự động đàn hồi lấp đầy khoảng trống bên dưới, chạm vạch padding 30px */
     div.element-container:has([data-testid="stDataFrame"]) {
         flex-grow: 1 !important;
         flex-shrink: 1 !important;
@@ -188,14 +176,13 @@ st.markdown("""
         width: 100% !important; 
         min-height: 0 !important;
     }
-    
-    /* Tạo thanh cuộn nội bộ cho Bảng */
     [data-testid="stDataFrame"] > div { 
         height: 100% !important; 
         width: 100% !important; 
         overflow: auto !important; 
     }
 
+    /* Thanh cuộn mượt mà dành riêng cho Bảng dữ liệu */
     [data-testid="stDataFrame"] div::-webkit-scrollbar { width: 8px !important; height: 8px !important; display: block !important; }
     [data-testid="stDataFrame"] div::-webkit-scrollbar-track { background: transparent !important; }
     [data-testid="stDataFrame"] div::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.3) !important; border-radius: 10px !important; }
