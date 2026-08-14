@@ -49,13 +49,17 @@ else:
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* ================= 2. KHÓA THANH CUỘN TOÀN TRANG ================= */
-    /* Triệt tiêu hoàn toàn khả năng cuộn trang mặc định của Streamlit */
-    html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
-        overflow: hidden !important; 
+    /* ================= 2. ĐIỀU CHỈNH KHỐI KÍNH MỜ (TỰ ĐỘNG CO GIÃN, KHÔNG CÓ CUỘN TRONG) ================= */
+    /* Triệt tiêu tự động bù trừ khoảng cách header */
+    [data-testid="stMain"] {
+        padding-top: 0px !important;
+        margin-top: 0px !important;
+    }
+    .stApp > header + div {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
     }
 
-    /* ================= 3. KHỐI KÍNH MỜ = CỬA SỔ APP CỐ ĐỊNH ================= */
     .stMainBlockContainer, .block-container, [data-testid="stAppViewBlockContainer"] { 
         padding-top: 30px !important;    
         padding-bottom: 30px !important; 
@@ -64,37 +68,29 @@ st.markdown("""
         -webkit-backdrop-filter: blur(20px) !important;
         border-radius: 24px !important;
         
-        /* ĐỐI XỨNG HOÀN HẢO: 60px trên, 60px dưới */
+        /* CỐ ĐỊNH KHOẢNG HỞ NỀN ĐÁ: 60px trên, 60px dưới */
         margin-top: 60px !important;     
         margin-bottom: 60px !important;  
         
-        /* KHÓA CHIỀU CAO VÀ KÍCH HOẠT THANH CUỘN TRONG KHỐI KÍNH */
-        height: calc(100vh - 120px) !important; /* 100vh trừ đi 60px top và 60px bottom */
-        max-height: calc(100vh - 120px) !important;
-        overflow-y: auto !important;
-        overflow-x: hidden !important;
+        /* Chiều cao tự động ôm sát nội dung (KHÔNG BỊ CUỘN BÊN TRONG) */
+        height: auto !important; 
+        overflow: visible !important;
         
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; 
     }
 
-    /* Tùy chỉnh thanh cuộn bên trong khối kính */
-    .block-container::-webkit-scrollbar { width: 8px; }
-    .block-container::-webkit-scrollbar-track { background: transparent; }
-    .block-container::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.3); border-radius: 10px; }
-    .block-container::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.5); }
-
-    /* ================= 4. THANH HEADER (SHARE) & LOGO ================= */
+    /* ================= 3. THANH HEADER (SHARE) & LOGO ================= */
     header[data-testid="stHeader"] { 
         background: transparent !important; 
-        height: 60px !important; /* Chiều cao đúng bằng khoảng hở nền đá 60px */
+        height: 60px !important; /* Chiều cao đúng bằng khoảng hở nền đá 60px để nằm giữa */
     }
     .stAppDeployButton { display: none !important; }
     
-    /* ẨN VĨNH VIỄN LOGO "Made with Streamlit" ĐỂ ĐÁY SẠCH SẼ */
+    /* ẨN VĨNH VIỄN LOGO "Made with Streamlit" ĐỂ ĐÁY SẠCH SẼ NHƯ TRONG ẢNH */
     footer[data-testid="stFooter"], footer { display: none !important; }
 
-    /* ================= 5. SIDEBAR ================= */
+    /* ================= 4. SIDEBAR ================= */
     section[data-testid="stSidebar"] {
         background-color: rgba(255, 255, 255, 0.45) !important;
         backdrop-filter: blur(20px) !important;
@@ -124,7 +120,7 @@ st.markdown("""
         font-weight: 800 !important; font-size: 14px !important;
     }
 
-    /* ================= 6. KHỐI BAO TIÊU ĐỀ ================= */
+    /* ================= 5. KHỐI BAO TIÊU ĐỀ ================= */
     .title-card {
         border-radius: 16px; 
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.05); 
@@ -148,7 +144,7 @@ st.markdown("""
         color: #198754 !important; text-decoration: underline !important;
     }
 
-    /* ================= 7. KHỐI KPI ================= */
+    /* ================= 6. KHỐI KPI ================= */
     .kpi-card {
         width: 100%; padding: 20px 18px; border-radius: 24px; border: none !important; 
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.05); 
@@ -173,7 +169,7 @@ st.markdown("""
     }
     .kpi-value { font-size: 1.8rem; font-weight: 900; color: #0f172a; }
     
-    /* ================= 8. THANH TRẠNG THÁI ================= */
+    /* ================= 7. THANH TRẠNG THÁI ================= */
     div[data-testid="stRadio"] { width: 100% !important; }
     div[data-testid="stRadio"] > div[role="radiogroup"] {
         display: flex; flex-direction: row; justify-content: center; gap: 35px; 
@@ -331,6 +327,7 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
 
 # ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI =================
 with header_container:
+    # margin-bottom 30px sẽ cân bằng với padding-top 30px bên trên, giúp tiêu đề lọt thỏm vào giữa hoàn hảo
     st.markdown("""
     <div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 30px;">
         <div style="font-size: 32px; font-weight: 900; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
