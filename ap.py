@@ -109,17 +109,20 @@ st.markdown("""
         border-radius: 12px !important;
     }
 
-    /* ================= KHỐI BAO TIÊU ĐỀ (GIỐNG HỆT KPI) ================= */
+    /* ================= KHỐI BAO TIÊU ĐỀ (BO VỪA KHÍT CHỮ & CĂN GIỮA) ================= */
     .title-card {
-        border-radius: 24px; 
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.05); 
+        border-radius: 20px; 
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.05); 
         background-color: rgba(255, 255, 255, 0.25) !important; 
         backdrop-filter: blur(15px); 
         -webkit-backdrop-filter: blur(15px);
         border: none !important;
+        width: fit-content; /* Thu nhỏ ô vừa đúng giới hạn chữ */
+        margin-left: auto;  /* Đẩy tự động lề trái để căn giữa */
+        margin-right: auto; /* Đẩy tự động lề phải để căn giữa */
     }
 
-    /* LINK TẢI EXCEL TÙY CHỈNH: ĐẨY LÊN NẰM TRONG KHỐI TIÊU ĐỀ */
+    /* LINK TẢI EXCEL TÙY CHỈNH */
     .custom-download-link {
         display: block;
         float: right;
@@ -128,8 +131,8 @@ st.markdown("""
         font-size: 13.5px !important;
         font-weight: 700 !important;
         text-decoration: none !important;
-        margin-top: -52px !important; /* Đẩy link lên nằm trong ô bao tiêu đề */
-        margin-right: 25px !important; /* Căn vào lề trong của ô bao */
+        margin-top: -35px !important; /* Đặt lại vị trí tương đối so với bảng */
+        margin-right: 5px !important;
         margin-bottom: 15px !important;
         position: relative;
         z-index: 9999;
@@ -146,12 +149,13 @@ st.markdown("""
         padding: 20px 18px; 
         border-radius: 24px; 
         border: none !important; 
+        /* Đổ bóng đa lớp giúp khối KPI nổi bật rõ rệt trên nền trong suốt */
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.05); 
         display: flex; 
         align-items: center; 
         margin-bottom: 15px; 
         min-height: 120px; 
-        background-color: rgba(255, 255, 255, 0.25) !important; 
+        background-color: rgba(255, 255, 255, 0.25) !important; /* Độ trong suốt cao, để lộ vân đá rõ nét */
         backdrop-filter: blur(15px); 
         -webkit-backdrop-filter: blur(15px);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -354,8 +358,9 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
 
 # ================= 7. HIỂN THỊ TIÊU ĐỀ & KPI SHADOW =================
 with header_container:
+    # Ô tiêu đề trên cùng bo gọn khít với văn bản
     st.markdown("""
-    <div class="title-card" style="padding: 20px; margin-top: 10px; margin-bottom: 25px;">
+    <div class="title-card" style="padding: 15px 40px; margin-top: 10px; margin-bottom: 25px;">
         <h2 style='text-align: center; color: #0A3622; font-weight: 900; margin: 0; text-shadow: 0 2px 8px rgba(0,0,0,0.2);'>BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</h2>
     </div>
     """, unsafe_allow_html=True)
@@ -400,9 +405,9 @@ with kpi_container:
 
 # ================= 8. HIỂN THỊ BẢNG DỮ LIỆU & LINK TẢI SÁT MÉP =================
 with table_container:
-    # Tiêu đề bảng được bọc trong ô kính mờ
+    # Ô tiêu đề bảng phía dưới bo gọn khít với văn bản
     st.markdown("""
-    <div class="title-card" style="padding: 15px 20px; margin-top: 35px; margin-bottom: 25px;">
+    <div class="title-card" style="padding: 12px 35px; margin-top: 35px; margin-bottom: 25px;">
         <h4 style='text-align: center; color: #0A3622; font-weight: 900; margin: 0; text-shadow: 0 2px 6px rgba(0,0,0,0.15);'>BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</h4>
     </div>
     """, unsafe_allow_html=True)
@@ -460,7 +465,7 @@ with table_container:
         mime_type = "text/csv"
         filename = "Bao_cao_tien_do_Thien_Son.csv"
 
-    # Link Tải Excel Text Sạch Sẽ - NẰM GỌN TRONG MÉT PHẢI Ô BAO
+    # Link Tải Excel Text Sạch Sẽ - NẰM SÁT LỀ PHẢI
     download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}">Tải Excel</a>'
     st.markdown(download_html, unsafe_allow_html=True)
 
