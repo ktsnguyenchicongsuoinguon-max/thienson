@@ -69,14 +69,16 @@ st.markdown("""
         padding-bottom: 0px !important;
     }
 
-    /* ================= 2. KHỐI KÍNH MỜ = CỬA SỔ APP CỐ ĐỊNH ================= */
+    /* ================= 2. KHỐI KÍNH MỜ CHÍNH = CỬA SỔ APP ================= */
     .stMainBlockContainer, .block-container, [data-testid="stAppViewBlockContainer"] { 
         padding-top: 30px !important;    
         padding-bottom: 30px !important; 
         
-        /* Đối xứng khoảng hở nền đá: 60px trên, 60px dưới */
+        /* Cố định khoảng hở nền đá: 60px trên, 60px dưới, 20px phải, 10px trái */
         margin-top: 60px !important;     
         margin-bottom: 60px !important;  
+        margin-right: 20px !important;
+        margin-left: 10px !important;
         
         /* Khóa cứng chiều cao: 100% màn hình trừ đi 120px (60 trên + 60 dưới) */
         height: calc(100vh - 120px) !important; 
@@ -94,22 +96,11 @@ st.markdown("""
         border: 1px solid rgba(255, 255, 255, 0.4) !important; 
     }
 
-    /* Tùy chỉnh thanh cuộn cho riêng khối kính mờ */
-    .block-container::-webkit-scrollbar {
-        width: 8px !important;
-        display: block !important;
-    }
-    .block-container::-webkit-scrollbar-track {
-        background: transparent !important;
-        margin: 20px 0 !important;
-    }
-    .block-container::-webkit-scrollbar-thumb {
-        background: rgba(15, 23, 42, 0.3) !important;
-        border-radius: 10px !important;
-    }
-    .block-container::-webkit-scrollbar-thumb:hover {
-        background: rgba(15, 23, 42, 0.5) !important;
-    }
+    /* Tùy chỉnh thanh cuộn cho riêng khối kính mờ chính */
+    .block-container::-webkit-scrollbar { width: 8px !important; display: block !important; }
+    .block-container::-webkit-scrollbar-track { background: transparent !important; margin: 20px 0 !important; }
+    .block-container::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.3) !important; border-radius: 10px !important; }
+    .block-container::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.5) !important; }
 
     /* ================= 3. THANH HEADER (SHARE) & LOGO DƯỚI ĐÁY ================= */
     header[data-testid="stHeader"] { 
@@ -119,27 +110,54 @@ st.markdown("""
     .stAppDeployButton { display: none !important; }
     footer[data-testid="stFooter"], footer { display: none !important; }
 
-    /* ================= 4. SIDEBAR ================= */
+    /* ================= 4. KHỐI SIDEBAR KÍNH MỜ (ĐỐI XỨNG KHỐI CHÍNH) ================= */
     section[data-testid="stSidebar"] {
-        background-color: rgba(255, 255, 255, 0.45) !important;
+        background-color: rgba(255, 255, 255, 0.35) !important; /* Cùng màu kính với khối chính */
         backdrop-filter: blur(20px) !important;
         -webkit-backdrop-filter: blur(20px) !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.3);
+        border-right: none !important;
+        border: 1px solid rgba(255, 255, 255, 0.4) !important;
+        border-radius: 24px !important;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
+        
+        /* Cùng khoảng hở 60px trên dưới và lề ngoài 20px */
+        margin-top: 60px !important;
+        margin-bottom: 60px !important;
+        margin-left: 20px !important;
+        height: calc(100vh - 120px) !important;
     }
+    
+    [data-testid="stSidebarContent"] {
+        background: transparent !important;
+        padding-top: 15px !important;
+        padding-bottom: 20px !important;
+    }
+    
+    /* Thanh cuộn cho sidebar */
+    [data-testid="stSidebarContent"]::-webkit-scrollbar { width: 6px !important; display: block !important; }
+    [data-testid="stSidebarContent"]::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.2) !important; border-radius: 10px; }
+    [data-testid="stSidebarContent"]::-webkit-scrollbar-track { background: transparent !important; margin: 20px 0; }
+
+    /* ĐỊNH DẠNG CÁC Ô LỌC CÁCH ĐỀU NHAU TĂM TẮP */
     .sidebar-title {
         display: flex; align-items: center; gap: 8px;
         font-size: 14px; font-weight: 700; color: #0f172a;
-        margin-bottom: 5px; margin-top: 12px; text-transform: uppercase;
+        margin-top: 22px; /* Đẩy khoảng cách đều đặn */
+        margin-bottom: 8px; 
+        text-transform: uppercase;
     }
     .sidebar-title .material-symbols-rounded {
         font-size: 20px; color: #198754;
     }
+    
+    /* Làm trong suốt và sắc nét các ô nhập liệu bên trong sidebar */
     section[data-testid="stSidebar"] div[data-baseweb="select"] > div,
     section[data-testid="stSidebar"] div[data-baseweb="input"] > div {
-        background-color: rgba(255, 255, 255, 0.25) !important;
+        background-color: rgba(255, 255, 255, 0.4) !important;
         backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.4) !important;
+        border: 1px solid rgba(255, 255, 255, 0.6) !important;
         border-radius: 12px !important;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.05) !important;
     }
 
     /* LÀM ĐẬM HEADER BẢNG */
@@ -250,7 +268,7 @@ with st.sidebar:
     with col_logo2:
         st.image("logothienson.png", use_container_width=True) 
         
-    st.markdown("<h3 style='text-align: left; margin-top: 10px; margin-bottom: 10px; color: #0f172a;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: left; margin-top: 5px; margin-bottom: 15px; color: #0f172a;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
     
     unique_projects = [p for p in df.get('Dự Án', pd.Series()).unique() if p != '']
     st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">domain</span> DỰ ÁN</div>', unsafe_allow_html=True)
@@ -278,8 +296,7 @@ with st.sidebar:
     st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">engineering</span> CÁN BỘ TRIỂN KHAI</div>', unsafe_allow_html=True)
     selected_cb = st.multiselect("CÁN BỘ TRIỂN KHAI", options=cb_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
 
-    # BỘ LỌC THỜI GIAN
-    st.markdown("<br>", unsafe_allow_html=True)
+    # BỘ LỌC THỜI GIAN (Đã xóa thẻ <br> thừa)
     st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">calendar_month</span> KHOẢNG THỜI GIAN</div>', unsafe_allow_html=True)
     time_filter = st.selectbox("KHOẢNG THỜI GIAN", 
                                ["Tất cả", "Hôm nay", "Tuần này", "Tháng này", "Năm nay", "Tùy chọn khoảng ngày"],
