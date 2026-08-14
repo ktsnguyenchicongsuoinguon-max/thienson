@@ -73,6 +73,8 @@ st.markdown("""
         flex-grow: 1 !important;
         overflow: hidden !important;
         padding: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
     }
 
     /* ================= 2. KHỐI KÍNH BỘ LỌC (SIDEBAR) ================= */
@@ -84,10 +86,6 @@ st.markdown("""
         border-radius: 24px !important;
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         
-        position: relative !important;
-        width: 300px !important;
-        min-width: 300px !important;
-        
         /* CĂN LỀ: Trái 20px, Trên/Dưới 60px */
         margin-top: 60px !important;
         margin-bottom: 60px !important;
@@ -95,6 +93,8 @@ st.markdown("""
         margin-right: 0px !important;
         
         height: calc(100vh - 120px) !important; 
+        
+        /* GỠ BỎ LỆNH ÉP CỨNG WIDTH ĐỂ KHỐI CÓ THỂ TỰ ĐỘNG ẨN/MỞ MƯỢT MÀ */
     }
 
     [data-testid="stSidebarResizer"] { display: none !important; }
@@ -144,7 +144,10 @@ st.markdown("""
         
         height: calc(100vh - 120px) !important; 
         max-height: calc(100vh - 120px) !important;
-        width: calc(100vw - 300px - 50px) !important; /* Tự động co giãn theo màn hình */
+        
+        /* TRẢ QUYỀN TỰ CO GIÃN ĐỂ KHỐI TRÀN KÍN MÀN HÌNH KHI ẨN BỘ LỌC */
+        width: auto !important; 
+        flex: 1 !important;
         max-width: none !important; 
         
         overflow-y: auto !important; 
