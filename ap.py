@@ -55,21 +55,17 @@ st.markdown("""
         margin: 0 !important; padding: 0 !important;
     }
     
-    /* Tàng hình toàn bộ thanh cuộn trên web (Giao diện sạch sẽ 100%) */
     ::-webkit-scrollbar { display: none !important; width: 0px !important; height: 0px !important; }
     * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
 
-    /* Ẩn Header gốc của Streamlit để tránh đẩy lệch margin */
     header[data-testid="stHeader"] { display: none !important; }
     footer[data-testid="stFooter"], footer { display: none !important; }
     .stAppDeployButton { display: none !important; }
 
-    /* Triệt tiêu khoảng trống thừa của Streamlit */
     [data-testid="stMain"] > div:first-child { padding: 0 !important; }
 
     /* ================= 2. KHỐI KÍNH BỘ LỌC (SIDEBAR) ================= */
     section[data-testid="stSidebar"] {
-        /* Màu kính mờ chuẩn */
         background-color: rgba(255, 255, 255, 0.35) !important;
         backdrop-filter: blur(20px) !important;
         -webkit-backdrop-filter: blur(20px) !important;
@@ -77,29 +73,25 @@ st.markdown("""
         border-radius: 24px !important;
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         
-        /* CĂN LỀ SIDEBAR: Trái 20px, Trên 60px, Dưới 60px */
         margin-top: 60px !important;
         margin-bottom: 60px !important;
         margin-left: 20px !important;
         
-        height: calc(100vh - 120px) !important; /* Fix chiều cao tuyệt đối */
+        height: calc(100vh - 120px) !important; 
     }
 
-    /* Xóa thanh kéo giãn để giữ nguyên viền bo tròn bên phải của Sidebar */
     [data-testid="stSidebarResizer"] { display: none !important; }
     
-    /* Ẩn thanh cuộn nội dung Sidebar nhưng vẫn cho lăn chuột */
     [data-testid="stSidebarUserContent"] {
         padding: 10px 20px 20px 20px !important;
         overflow-y: auto !important;
         overflow-x: hidden !important;
     }
 
-    /* ĐỊNH DẠNG CÁC Ô LỌC TRONG SIDEBAR */
     .sidebar-title {
         display: flex; align-items: center; gap: 8px;
         font-size: 14px; font-weight: 700; color: #0f172a;
-        margin-top: 22px; /* Khoảng cách đều nhau */
+        margin-top: 22px; 
         margin-bottom: 6px; 
         text-transform: uppercase;
     }
@@ -117,7 +109,6 @@ st.markdown("""
 
     /* ================= 3. KHỐI KÍNH CHÍNH (BẢNG & KPI) ================= */
     .stMainBlockContainer, .block-container, [data-testid="stAppViewBlockContainer"] { 
-        /* Màu kính mờ đồng nhất với Sidebar */
         background-color: rgba(255, 255, 255, 0.35) !important; 
         backdrop-filter: blur(20px) !important; 
         -webkit-backdrop-filter: blur(20px) !important;
@@ -125,19 +116,16 @@ st.markdown("""
         border-radius: 24px !important; 
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         
-        /* CĂN LỀ KHỐI CHÍNH: Cách Sidebar 10px, Cách viền phải 20px, Trên/Dưới 60px */
         margin-top: 60px !important;     
         margin-bottom: 60px !important;  
-        margin-left: 10px !important;  /* <- Tạo khe hở 10px hoàn hảo */
+        margin-left: 10px !important;  
         margin-right: 20px !important; 
         
         padding: 25px 30px !important; 
         
-        /* Fix chiều cao để không bị tràn nền */
         height: calc(100vh - 120px) !important; 
-        max-width: none !important; /* Xóa giới hạn độ rộng */
+        max-width: none !important; 
         
-        /* Vẫn cho phép lăn chuột nội dung bên trong khối kính */
         overflow-y: auto !important; 
         overflow-x: hidden !important; 
     }
@@ -193,7 +181,7 @@ st.markdown("""
     div[data-testid="stRadio"] { width: 100% !important; }
     div[data-testid="stRadio"] > div[role="radiogroup"] {
         display: flex; flex-direction: row; justify-content: center; gap: 35px; 
-        margin-top: 10px; margin-bottom: 25px; flex-wrap: wrap; background-color: transparent !important; 
+        margin-top: 15px; margin-bottom: 25px; flex-wrap: wrap; background-color: transparent !important; 
     }
     div[data-testid="stRadio"] > div[role="radiogroup"] > label {
         cursor: pointer; background: transparent !important; border: none !important; box-shadow: none !important; padding: 5px !important;
@@ -294,9 +282,14 @@ with st.sidebar:
 
 
 # ================= 4. KHỐI CHÍNH (BÊN PHẢI) =================
-status_options = ["Tất cả", "Chưa bắt đầu", "Đang triển khai", "Đã hoàn thành", "Tạm dừng"]
-actual_status = st.radio("Bộ lọc Trạng Thái", options=status_options, horizontal=True, label_visibility="collapsed")
 
+st.markdown("""
+<div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 25px;">
+    <div style="font-size: 32px; font-weight: 900; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
+</div>
+""", unsafe_allow_html=True)
+
+# THU THẬP VÀ XỬ LÝ DỮ LIỆU ĐỂ HIỂN THỊ KPI
 df_display = df.copy()
 if start_date and end_date and 'Ngày_Bat_Dau_Obj' in df_display.columns and 'Ngày_Hoan_Thanh_Obj' in df_display.columns:
     start_ts = pd.to_datetime(start_date)
@@ -310,18 +303,6 @@ if selected_hd: df_display = df_display[df_display['Hợp Đồng - PLHĐ'].isin
 if selected_hm: df_display = df_display[df_display['Hạng Mục'].isin(selected_hm)]
 if selected_ql: df_display = df_display[df_display['Cán Bộ Quản Lý'].isin(selected_ql)]
 if selected_cb: df_display = df_display[df_display[cb_col].isin(selected_cb)]
-if actual_status != "Tất cả": df_display = df_display[df_display.get('Trạng Thái', '') == actual_status]
-
-df_export = df_display.copy()
-for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
-    if col in df_display.columns: df_display = df_display.drop(columns=[col])
-    if col in df_export.columns: df_export = df_export.drop(columns=[col])
-
-st.markdown("""
-<div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 25px;">
-    <div style="font-size: 32px; font-weight: 900; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
-</div>
-""", unsafe_allow_html=True)
 
 p_projects = df_display.get('Dự Án', pd.Series()).nunique()
 p_categories = df_display.get('Hạng Mục', pd.Series()).nunique()
@@ -357,6 +338,21 @@ with r2_c1: st.markdown(render_transparent_shadow_kpi("Đã hoàn thành", p_don
 with r2_c2: st.markdown(render_transparent_shadow_kpi("Đang triển khai", p_inprogress, "sync", "#cff4fc", "#0dcaf0"), unsafe_allow_html=True)
 with r2_c3: st.markdown(render_transparent_shadow_kpi("Chưa bắt đầu", p_notstarted, "hourglass_empty", "#e2e3e5", "#6c757d"), unsafe_allow_html=True)
 with r2_c4: st.markdown(render_transparent_shadow_kpi("Vướng mắc", p_paused, "error", "#f8d7da", "#dc3545"), unsafe_allow_html=True)
+
+
+# DI CHUYỂN BỘ LỌC TRẠNG THÁI XUỐNG DƯỚI KPI
+status_options = ["Tất cả", "Chưa bắt đầu", "Đang triển khai", "Đã hoàn thành", "Tạm dừng"]
+actual_status = st.radio("Bộ lọc Trạng Thái", options=status_options, horizontal=True, label_visibility="collapsed")
+
+# LỌC LẠI DỮ LIỆU ĐỂ HIỂN THỊ LÊN BẢNG THEO TRẠNG THÁI (Vì KPI cần đếm đủ, nhưng bảng thì chỉ hiện cái đang chọn)
+if actual_status != "Tất cả": 
+    df_display = df_display[df_display.get('Trạng Thái', '') == actual_status]
+
+df_export = df_display.copy()
+for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
+    if col in df_display.columns: df_display = df_display.drop(columns=[col])
+    if col in df_export.columns: df_export = df_export.drop(columns=[col])
+
 
 st.markdown("""
 <div class="title-card" style="padding: 8px 24px; margin-top: 25px; margin-bottom: 25px;">
