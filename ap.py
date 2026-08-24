@@ -55,7 +55,7 @@ st.markdown("""
     [data-testid="stHeaderActionElements"], .stAppDeployButton { display: none !important; }
     footer { display: none !important; }
 
-    /* ĐIỀU CHỈNH KHOẢNG CÁCH TRÊN DƯỚI 20PX CHO KHUNG BỘ LỌC (SIDEBAR) */
+    /* KHOẢNG CÁCH TRÊN DƯỚI 20PX CHO KHUNG BỘ LỌC (SIDEBAR) */
     [data-testid="stSidebar"] { background-color: transparent !important; border: none !important; }
     [data-testid="stSidebarResizer"] { display: none !important; }
     [data-testid="stSidebar"] > div:first-child {
@@ -63,9 +63,9 @@ st.markdown("""
         backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important;
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important; 
-        margin: 20px 0px 20px 20px !important; /* Cách trên 20px, cách dưới 20px */
+        margin: 20px 0px 20px 20px !important; 
         width: calc(100% - 20px) !important; 
-        height: calc(100vh - 40px) !important; /* Chiều cao tối ưu */
+        height: calc(100vh - 40px) !important; 
         overflow: hidden !important; 
     }
     [data-testid="stSidebarUserContent"] { padding: 5px 20px 20px 20px !important; overflow: hidden !important; }
@@ -78,21 +78,21 @@ st.markdown("""
     }
     div.row-widget.stSelectbox, div.row-widget.stMultiSelect { margin-bottom: -5px !important; }
 
-    /* ĐIỀU CHỈNH KHOẢNG CÁCH TRÊN DƯỚI 20PX CHO KHUNG CHÍNH */
+    /* KHOẢNG CÁCH TRÊN DƯỚI 20PX CHO KHUNG CHÍNH */
     .block-container { 
         background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         width: calc(100% - 40px) !important; max-width: 100% !important; 
-        margin: 20px 20px !important; /* Cách trên 20px, cách dưới 20px */
+        margin: 20px 20px !important; 
         padding: 25px 30px !important; 
-        height: calc(100vh - 40px) !important; /* Mở rộng chiều cao khung chính */
+        height: calc(100vh - 40px) !important; 
         display: flex !important; flex-direction: column !important; overflow: hidden !important; 
     }
     .block-container * { max-width: 100% !important; }
     .block-container > div[data-testid="stVerticalBlock"] { flex-grow: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; }
     .block-container > div[data-testid="stVerticalBlock"] > div { flex-shrink: 0 !important; width: 100% !important; }
     
-    /* TĂNG CHIỀU CAO VÀ ĐỘ GIÃN NỞ CHO BẢNG CHI TIẾT CÔNG VIỆC */
+    /* BẢNG CHI TIẾT CÔNG VIỆC */
     div.element-container:has([data-testid="stDataFrame"]) { flex-grow: 1 !important; flex-shrink: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; }
     [data-testid="stDataFrame"] { flex-grow: 1 !important; width: 100% !important; min-height: 0 !important; overflow-x: auto !important; }
     [data-testid="stDataFrame"] > div { height: 100% !important; width: 100% !important; overflow: auto !important; }
@@ -106,7 +106,7 @@ st.markdown("""
     .custom-download-link { display: block; float: right; text-align: right; color: #0A3622 !important; font-size: 13.5px !important; font-weight: 700 !important; text-decoration: none !important; margin-top: -30px !important; margin-right: 0px !important; margin-bottom: 5px !important; position: relative; z-index: 9999; cursor: pointer; }
     .custom-download-link:hover { color: #198754 !important; text-decoration: underline !important; }
 
-    /* KIẾN TRÚC CHO 10 Ô KPI */
+    /* 10 Ô KPI */
     .kpi-card { width: 100%; padding: 10px 12px; border-radius: 18px !important; border: 1px solid rgba(255, 255, 255, 0.4) !important; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 10px; min-height: 85px; background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden !important; }
     .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 5px 10px rgba(0, 0, 0, 0.1) !important; }
     .kpi-icon-wrapper { position: absolute; left: 12px; width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; z-index: 0; opacity: 0.95; }
@@ -116,14 +116,14 @@ st.markdown("""
     .kpi-value { font-size: 2.2rem; font-weight: 900; color: #0f172a; line-height: 1.1; text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8); }
     
     div[data-testid="stRadio"] { width: 100% !important; }
-    div[data-testid="stRadio"] > div[role="radiogroup"] { display: flex; flex-direction: row; justify-content: center; gap: 35px; margin-top: 5px; margin-bottom: 15px; flex-wrap: wrap; background-color: transparent !important; }
+    div[data-testid="stRadio"] > div[role="radiogroup"] { display: flex; flex-direction: row; justify-content: center; gap: 30px; margin-top: 5px; margin-bottom: 15px; flex-wrap: wrap; background-color: transparent !important; }
     div[data-testid="stRadio"] > div[role="radiogroup"] > label { cursor: pointer; background: transparent !important; border: none !important; box-shadow: none !important; padding: 2px !important; }
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label p { font-weight: 600 !important; color: #0f172a !important; margin: 0 !important; font-size: 1rem !important; }
+    div[data-testid="stRadio"] > div[role="radiogroup"] > label p { font-weight: 600 !important; color: #0f172a !important; margin: 0 !important; font-size: 0.95rem !important; }
 </style>
 """, unsafe_allow_html=True)
 
 
-# ================= 2. ĐỌC DỮ LIỆU TỪ GOOGLE SHEETS (TỰ ĐỘNG CẬP NHẬT KHI TẢI LẠI TRANG) =================
+# ================= 2. ĐỌC DỮ LIỆU TỪ GOOGLE SHEETS =================
 @st.cache_data(ttl=0, show_spinner=False)
 def load_data():
     sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
@@ -295,11 +295,19 @@ with r2_c3: st.markdown(render_transparent_shadow_kpi("Chưa bắt đầu", p_no
 with r2_c4: st.markdown(render_transparent_shadow_kpi("Tạm dừng", p_paused, "pause_circle", "#fff3cd", "#ffc107"), unsafe_allow_html=True)
 with r2_c5: st.markdown(render_transparent_shadow_kpi("Vướng mắc", p_issues, "error", "#f8d7da", "#dc3545"), unsafe_allow_html=True)
 
-status_options = ["Tất cả", "Chưa bắt đầu", "Đang triển khai", "Đã hoàn thành", "Tạm dừng"]
+# ĐÃ THÊM "VƯỚNG MẮC" VÀO HÀNG LỰA CHỌN TRẠNG THÁI NGANG
+status_options = ["Tất cả", "Chưa bắt đầu", "Đang triển khai", "Đã hoàn thành", "Tạm dừng", "Vướng mắc"]
 actual_status = st.radio("Bộ lọc Trạng Thái", options=status_options, horizontal=True, label_visibility="collapsed")
 
-if actual_status != "Tất cả": 
-    df_display = df_display[df_display.get('Trạng Thái', '') == actual_status]
+if actual_status != "Tất cả":
+    if actual_status == "Vướng mắc":
+        if 'Vướng Mắc' in df_display.columns:
+            _iss = df_display['Vướng Mắc'].astype(str).str.strip().str.lower()
+            df_display = df_display[(_iss != '') & (_iss != 'nan') & (_iss != 'none') & (_iss != 'null')]
+        else:
+            df_display = df_display.iloc[0:0] # Trả về bảng trống nếu không tìm thấy cột
+    else:
+        df_display = df_display[df_display.get('Trạng Thái', '') == actual_status]
 
 df_export = df_display.copy()
 for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
