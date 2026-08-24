@@ -55,14 +55,18 @@ st.markdown("""
     [data-testid="stHeaderActionElements"], .stAppDeployButton { display: none !important; }
     footer { display: none !important; }
 
+    /* ĐIỀU CHỈNH KHOẢNG CÁCH TRÊN DƯỚI 20PX CHO KHUNG BỘ LỌC (SIDEBAR) */
     [data-testid="stSidebar"] { background-color: transparent !important; border: none !important; }
     [data-testid="stSidebarResizer"] { display: none !important; }
     [data-testid="stSidebar"] > div:first-child {
         background-color: rgba(255, 255, 255, 0.35) !important;
         backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important; margin: 60px 0px 60px 20px !important;
-        width: calc(100% - 20px) !important; height: calc(100vh - 120px) !important; overflow: hidden !important; 
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important; 
+        margin: 20px 0px 20px 20px !important; /* Cách trên 20px, cách dưới 20px */
+        width: calc(100% - 20px) !important; 
+        height: calc(100vh - 40px) !important; /* Chiều cao tối ưu */
+        overflow: hidden !important; 
     }
     [data-testid="stSidebarUserContent"] { padding: 5px 20px 20px 20px !important; overflow: hidden !important; }
     .sidebar-title { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #0f172a; margin-top: 10px; margin-bottom: 2px; text-transform: uppercase; }
@@ -74,17 +78,21 @@ st.markdown("""
     }
     div.row-widget.stSelectbox, div.row-widget.stMultiSelect { margin-bottom: -5px !important; }
 
+    /* ĐIỀU CHỈNH KHOẢNG CÁCH TRÊN DƯỚI 20PX CHO KHUNG CHÍNH */
     .block-container { 
         background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
-        width: calc(100% - 40px) !important; max-width: 100% !important; margin: 60px 20px !important;  
-        padding: 30px !important; height: calc(100vh - 120px) !important; 
+        width: calc(100% - 40px) !important; max-width: 100% !important; 
+        margin: 20px 20px !important; /* Cách trên 20px, cách dưới 20px */
+        padding: 25px 30px !important; 
+        height: calc(100vh - 40px) !important; /* Mở rộng chiều cao khung chính */
         display: flex !important; flex-direction: column !important; overflow: hidden !important; 
     }
     .block-container * { max-width: 100% !important; }
     .block-container > div[data-testid="stVerticalBlock"] { flex-grow: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; }
     .block-container > div[data-testid="stVerticalBlock"] > div { flex-shrink: 0 !important; width: 100% !important; }
     
+    /* TĂNG CHIỀU CAO VÀ ĐỘ GIÃN NỞ CHO BẢNG CHI TIẾT CÔNG VIỆC */
     div.element-container:has([data-testid="stDataFrame"]) { flex-grow: 1 !important; flex-shrink: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; }
     [data-testid="stDataFrame"] { flex-grow: 1 !important; width: 100% !important; min-height: 0 !important; overflow-x: auto !important; }
     [data-testid="stDataFrame"] > div { height: 100% !important; width: 100% !important; overflow: auto !important; }
@@ -95,21 +103,21 @@ st.markdown("""
 
     div[data-testid="stDataFrame"] th { background-color: rgba(226, 232, 240, 0.9) !important; color: #0F172A !important; font-weight: 800 !important; font-size: 14px !important; }
     .title-card { border-radius: 16px; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.05); background-color: rgba(255, 255, 255, 0.25) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: none !important; width: fit-content; max-width: 100% !important; margin-left: auto; margin-right: auto; display: flex; align-items: center; justify-content: center; }
-    .custom-download-link { display: block; float: right; text-align: right; color: #0A3622 !important; font-size: 13.5px !important; font-weight: 700 !important; text-decoration: none !important; margin-top: -35px !important; margin-right: 0px !important; margin-bottom: 10px !important; position: relative; z-index: 9999; cursor: pointer; }
+    .custom-download-link { display: block; float: right; text-align: right; color: #0A3622 !important; font-size: 13.5px !important; font-weight: 700 !important; text-decoration: none !important; margin-top: -30px !important; margin-right: 0px !important; margin-bottom: 5px !important; position: relative; z-index: 9999; cursor: pointer; }
     .custom-download-link:hover { color: #198754 !important; text-decoration: underline !important; }
 
     /* KIẾN TRÚC CHO 10 Ô KPI */
-    .kpi-card { width: 100%; padding: 12px 15px; border-radius: 20px !important; border: 1px solid rgba(255, 255, 255, 0.4) !important; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 15px; min-height: 95px; background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden !important; }
-    .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1) !important; }
-    .kpi-icon-wrapper { position: absolute; left: 15px; width: 70px; height: 70px; border-radius: 18px; display: flex; align-items: center; justify-content: center; z-index: 0; opacity: 0.95; }
-    .kpi-icon-wrapper .material-symbols-rounded { font-size: 60px; } 
+    .kpi-card { width: 100%; padding: 10px 12px; border-radius: 18px !important; border: 1px solid rgba(255, 255, 255, 0.4) !important; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 10px; min-height: 85px; background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden !important; }
+    .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 5px 10px rgba(0, 0, 0, 0.1) !important; }
+    .kpi-icon-wrapper { position: absolute; left: 12px; width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; z-index: 0; opacity: 0.95; }
+    .kpi-icon-wrapper .material-symbols-rounded { font-size: 48px; } 
     .kpi-details { display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1; text-align: center; }
-    .kpi-title { font-size: 1.2rem; font-weight: 800; opacity: 0.85; text-transform: uppercase; margin-bottom: 2px; white-space: nowrap; color: #0f172a; text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8); }
-    .kpi-value { font-size: 2.5rem; font-weight: 900; color: #0f172a; line-height: 1.1; text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8); }
+    .kpi-title { font-size: 1.1rem; font-weight: 800; opacity: 0.85; text-transform: uppercase; margin-bottom: 2px; white-space: nowrap; color: #0f172a; text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8); }
+    .kpi-value { font-size: 2.2rem; font-weight: 900; color: #0f172a; line-height: 1.1; text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8); }
     
     div[data-testid="stRadio"] { width: 100% !important; }
-    div[data-testid="stRadio"] > div[role="radiogroup"] { display: flex; flex-direction: row; justify-content: center; gap: 35px; margin-top: 10px; margin-bottom: 20px; flex-wrap: wrap; background-color: transparent !important; }
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label { cursor: pointer; background: transparent !important; border: none !important; box-shadow: none !important; padding: 5px !important; }
+    div[data-testid="stRadio"] > div[role="radiogroup"] { display: flex; flex-direction: row; justify-content: center; gap: 35px; margin-top: 5px; margin-bottom: 15px; flex-wrap: wrap; background-color: transparent !important; }
+    div[data-testid="stRadio"] > div[role="radiogroup"] > label { cursor: pointer; background: transparent !important; border: none !important; box-shadow: none !important; padding: 2px !important; }
     div[data-testid="stRadio"] > div[role="radiogroup"] > label p { font-weight: 600 !important; color: #0f172a !important; margin: 0 !important; font-size: 1rem !important; }
 </style>
 """, unsafe_allow_html=True)
@@ -163,7 +171,7 @@ with st.sidebar:
     with col_logo2:
         st.image("logothienson.png", use_container_width=True) 
         
-    st.markdown("<h3 style='text-align: left; margin-top: 10px; margin-bottom: 5px; color: #0f172a; font-size: 15px;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: left; margin-top: 5px; margin-bottom: 5px; color: #0f172a; font-size: 15px;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
     
     unique_projects = [p for p in df.get('Dự Án', pd.Series()).unique() if p != '']
     st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">domain</span> DỰ ÁN</div>', unsafe_allow_html=True)
@@ -218,8 +226,8 @@ with st.sidebar:
 # ================= 4. KHỐI CHÍNH (BÊN PHẢI) =================
 
 st.markdown("""
-<div class="title-card" style="padding: 10px 30px; margin-top: 0px; margin-bottom: 25px;">
-    <div style="font-size: 32px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
+<div class="title-card" style="padding: 8px 25px; margin-top: 0px; margin-bottom: 15px;">
+    <div style="font-size: 28px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -299,8 +307,8 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
     if col in df_export.columns: df_export = df_export.drop(columns=[col])
 
 st.markdown("""
-<div class="title-card" style="padding: 8px 24px; margin-top: 25px; margin-bottom: 25px;">
-    <div style="font-size: 22px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2;">BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</div>
+<div class="title-card" style="padding: 6px 20px; margin-top: 15px; margin-bottom: 15px;">
+    <div style="font-size: 18px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2;">BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</div>
 </div>
 """, unsafe_allow_html=True)
 
