@@ -119,36 +119,61 @@ st.markdown("""
         border-radius: 24px !important; 
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         
+        /* Tự động co giãn theo không gian chuẩn của Streamlit, không bị lệch khung */
         width: calc(100% - 40px) !important;
         max-width: 100% !important;
         margin: 60px 20px !important;  
         
+        /* ĐỆM 30PX AN TOÀN: Bắt buộc mọi đối tượng lùi vào trong, tuyệt đối không chạm viền */
         padding: 30px !important; 
+        
         height: calc(100vh - 120px) !important; 
+        
         display: flex !important;
         flex-direction: column !important;
         overflow: hidden !important; 
     }
 
-    .block-container * { max-width: 100% !important; }
+    /* CHỐNG TRÀN VIỀN CHO MỌI THÀNH PHẦN BÊN TRONG KHỐI CHÍNH */
+    .block-container * {
+        max-width: 100% !important;
+    }
 
     .block-container > div[data-testid="stVerticalBlock"] {
-        flex-grow: 1 !important; display: flex !important; flex-direction: column !important;
-        min-height: 0 !important; width: 100% !important;
+        flex-grow: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        min-height: 0 !important; 
+        width: 100% !important;
     }
     
     .block-container > div[data-testid="stVerticalBlock"] > div {
-        flex-shrink: 0 !important; width: 100% !important;
+        flex-shrink: 0 !important;
+        width: 100% !important;
     }
     
-    /* BẢNG DỮ LIỆU ĐÀN HỒI KÉO DÀI */
+    /* BẢNG DỮ LIỆU: Tự động đàn hồi và cuộn nội bộ khi quá khổ */
     div.element-container:has([data-testid="stDataFrame"]) {
-        flex-grow: 1 !important; flex-shrink: 1 !important; display: flex !important;
-        flex-direction: column !important; min-height: 0 !important; width: 100% !important;
+        flex-grow: 1 !important;
+        flex-shrink: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        min-height: 0 !important;
+        width: 100% !important;
     }
     
-    [data-testid="stDataFrame"] { flex-grow: 1 !important; width: 100% !important; min-height: 0 !important; overflow-x: auto !important; }
-    [data-testid="stDataFrame"] > div { height: 100% !important; width: 100% !important; overflow: auto !important; }
+    [data-testid="stDataFrame"] { 
+        flex-grow: 1 !important;
+        width: 100% !important; 
+        min-height: 0 !important;
+        overflow-x: auto !important;
+    }
+    
+    [data-testid="stDataFrame"] > div { 
+        height: 100% !important; 
+        width: 100% !important; 
+        overflow: auto !important; 
+    }
 
     /* Thanh cuộn mượt mà riêng cho bảng dữ liệu */
     [data-testid="stDataFrame"] div::-webkit-scrollbar { width: 8px !important; height: 8px !important; display: block !important; }
@@ -158,31 +183,38 @@ st.markdown("""
 
     /* ================= 4. TRANG TRÍ ĐỐI TƯỢNG BÊN TRONG ================= */
     div[data-testid="stDataFrame"] th {
-        background-color: rgba(226, 232, 240, 0.9) !important; color: #0F172A !important;
+        background-color: rgba(226, 232, 240, 0.9) !important; 
+        color: #0F172A !important;
         font-weight: 800 !important; font-size: 14px !important;
     }
 
     .title-card {
-        border-radius: 16px; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.05); 
-        background-color: rgba(255, 255, 255, 0.25) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-        border: none !important; width: fit-content; max-width: 100% !important;
-        margin-left: auto; margin-right: auto; display: flex; align-items: center; justify-content: center;
+        border-radius: 16px; 
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.05); 
+        background-color: rgba(255, 255, 255, 0.25) !important; 
+        backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+        border: none !important;
+        width: fit-content; max-width: 100% !important;
+        margin-left: auto; margin-right: auto; 
+        display: flex; align-items: center; justify-content: center;
     }
 
     .custom-download-link {
-        display: block; float: right; text-align: right; color: #0A3622 !important; font-size: 13.5px !important; 
-        font-weight: 700 !important; text-decoration: none !important; margin-top: -35px !important; 
-        margin-right: 0px !important; margin-bottom: 10px !important; position: relative; z-index: 9999; cursor: pointer;
+        display: block; float: right; text-align: right;
+        color: #0A3622 !important; font-size: 13.5px !important; font-weight: 700 !important;
+        text-decoration: none !important;
+        margin-top: -35px !important; margin-right: 0px !important; margin-bottom: 10px !important;
+        position: relative; z-index: 9999; cursor: pointer;
     }
     .custom-download-link:hover { color: #198754 !important; text-decoration: underline !important; }
 
-    /* KIẾN TRÚC MỚI CHO 10 Ô KPI (5 CỘT) */
+    /* ================= KIẾN TRÚC MỚI CHO 10 Ô KPI - PHÓNG TO ================= */
     .kpi-card {
-        width: 100%; padding: 15px 12px; /* Thu nhỏ padding để vừa 5 cột */
+        width: 100%; padding: 18px 15px; /* Tăng padding để cân đối với icon to */
         border-radius: 20px !important; 
         border: 1px solid rgba(255, 255, 255, 0.4) !important; 
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; 
-        display: flex; align-items: center; margin-bottom: 15px; min-height: 100px; 
+        display: flex; align-items: center; margin-bottom: 15px; min-height: 115px; /* Tăng chiều cao tối thiểu */
         background-color: rgba(255, 255, 255, 0.35) !important; 
         backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -190,16 +222,16 @@ st.markdown("""
     }
     .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1) !important; }
     .kpi-icon-wrapper {
-        width: 50px; height: 50px; border-radius: 16px; /* Thu nhỏ icon để tiết kiệm diện tích */
-        display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 12px;
+        width: 60px; height: 60px; border-radius: 18px; /* Phóng to khung chứa Icon */
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 15px;
     }
-    .kpi-icon-wrapper .material-symbols-rounded { font-size: 28px; }
+    .kpi-icon-wrapper .material-symbols-rounded { font-size: 34px; } /* Phóng to Icon */
     .kpi-details { flex-grow: 1; overflow: hidden; }
     .kpi-title {
-        font-size: 0.75rem; font-weight: 800; opacity: 0.85; text-transform: uppercase; margin-bottom: 4px; 
+        font-size: 0.9rem; font-weight: 800; opacity: 0.85; text-transform: uppercase; margin-bottom: 4px; /* Phóng to Tiêu đề */
         white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #0f172a;
     }
-    .kpi-value { font-size: 1.5rem; font-weight: 900; color: #0f172a; }
+    .kpi-value { font-size: 1.9rem; font-weight: 900; color: #0f172a; } /* Phóng to Số liệu */
     
     div[data-testid="stRadio"] { width: 100% !important; }
     div[data-testid="stRadio"] > div[role="radiogroup"] {
@@ -328,16 +360,20 @@ if selected_cb: df_display = df_display[df_display[cb_col].isin(selected_cb)]
 
 # --- TÍNH TOÁN 10 CHỈ SỐ KPI ---
 p_projects = df_display.get('Dự Án', pd.Series()).nunique()
-p_contracts = df_display.get('Hợp Đồng - PLHĐ', pd.Series()).nunique() # KPI Mới: Đếm số Hợp đồng
+p_contracts = df_display.get('Hợp Đồng - PLHĐ', pd.Series()).nunique() # Cột KPI Hợp đồng
 p_categories = df_display.get('Hạng Mục', pd.Series()).nunique()
 p_total = len(df_display)
 p_prog = df_display['Tiến Độ (%)'].mean() if ('Tiến Độ (%)' in df_display.columns and p_total > 0) else 0
 
-p_done = len(df_display[df_display.get('Trạng Thái', '') == 'Đã hoàn thành']) if 'Trạng Thái' in df_display.columns else 0
-p_inprogress = len(df_display[df_display.get('Trạng Thái', '') == 'Đang triển khai']) if 'Trạng Thái' in df_display.columns else 0
-p_notstarted = len(df_display[df_display.get('Trạng Thái', '') == 'Chưa bắt đầu']) if 'Trạng Thái' in df_display.columns else 0
-p_paused = len(df_display[df_display.get('Trạng Thái', '') == 'Tạm dừng']) if 'Trạng Thái' in df_display.columns else 0 # KPI Tạm dừng theo đúng Trạng Thái
-p_issues = len(df_display[df_display['Vướng Mắc'].astype(str).str.strip() != '']) if 'Vướng Mắc' in df_display.columns else 0 # KPI Vướng mắc tách riêng đếm cột Ghi chú
+if 'Trạng Thái' in df_display.columns:
+    p_done = len(df_display[df_display['Trạng Thái'].astype(str).str.strip() == 'Đã hoàn thành'])
+    p_inprogress = len(df_display[df_display['Trạng Thái'].astype(str).str.strip() == 'Đang triển khai'])
+    p_notstarted = len(df_display[df_display['Trạng Thái'].astype(str).str.strip() == 'Chưa bắt đầu'])
+    p_paused = len(df_display[df_display['Trạng Thái'].astype(str).str.strip() == 'Tạm dừng']) # KPI Tạm dừng
+else:
+    p_done = p_inprogress = p_notstarted = p_paused = 0
+
+p_issues = len(df_display[df_display.get('Vướng Mắc', pd.Series()).astype(str).str.strip() != '']) if 'Vướng Mắc' in df_display.columns else 0 # KPI Vướng mắc tách riêng đếm cột Ghi chú
 
 def render_transparent_shadow_kpi(title, value, icon_name, bg_color, icon_color):
     return f"""
@@ -365,7 +401,7 @@ r2_c1, r2_c2, r2_c3, r2_c4, r2_c5 = st.columns(5)
 with r2_c1: st.markdown(render_transparent_shadow_kpi("Đã hoàn thành", p_done, "check_circle", "#d1e7dd", "#198754"), unsafe_allow_html=True)
 with r2_c2: st.markdown(render_transparent_shadow_kpi("Đang triển khai", p_inprogress, "sync", "#cff4fc", "#0dcaf0"), unsafe_allow_html=True)
 with r2_c3: st.markdown(render_transparent_shadow_kpi("Chưa bắt đầu", p_notstarted, "hourglass_empty", "#e2e3e5", "#6c757d"), unsafe_allow_html=True)
-with r2_c4: st.markdown(render_transparent_shadow_kpi("Tạm dừng", p_paused, "pause_circle", "#fff3cd", "#ffc107"), unsafe_allow_html=True) # Màu vàng cam cảnh báo
+with r2_c4: st.markdown(render_transparent_shadow_kpi("Tạm dừng", p_paused, "pause_circle", "#fff3cd", "#ffc107"), unsafe_allow_html=True)
 with r2_c5: st.markdown(render_transparent_shadow_kpi("Vướng mắc", p_issues, "error", "#f8d7da", "#dc3545"), unsafe_allow_html=True)
 
 status_options = ["Tất cả", "Chưa bắt đầu", "Đang triển khai", "Đã hoàn thành", "Tạm dừng"]
