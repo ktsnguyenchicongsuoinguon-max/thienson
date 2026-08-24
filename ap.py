@@ -116,7 +116,7 @@ st.markdown("""
     .custom-download-link { display: block; float: right; text-align: right; color: #0A3622 !important; font-size: 13.5px !important; font-weight: 700 !important; text-decoration: none !important; margin-top: -30px !important; margin-right: 0px !important; margin-bottom: 5px !important; position: relative; z-index: 9999; cursor: pointer; }
     .custom-download-link:hover { color: #198754 !important; text-decoration: underline !important; }
 
-    /* 10 Ô KPI (KHUNG CHỨA ICON MÀU XANH LAM NHẠT #cfe2ff) */
+    /* 10 Ô KPI */
     .kpi-card { width: 100%; padding: 10px 12px; border-radius: 18px !important; border: 1px solid rgba(255, 255, 255, 0.4) !important; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 10px; min-height: 85px; background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden !important; }
     .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 5px 10px rgba(0, 0, 0, 0.1) !important; }
     .kpi-icon-wrapper { position: absolute; left: 12px; width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; z-index: 0; opacity: 0.95; background-color: #cfe2ff !important; color: #0d6efd !important; }
@@ -237,7 +237,7 @@ with st.sidebar:
 
 st.markdown("""
 <div class="title-card" style="padding: 8px 25px; margin-top: 0px; margin-bottom: 15px;">
-    <div style="font-size: 28px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO KẾ HOẠCH TIẾN ĐỘ & QUẢN LÝ THIẾT KẾ</div>
+    <div style="font-size: 26px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">TỔNG HỢP CÔNG VIỆC VÀ KẾ HOẠCH TRIỂN KHAI PTK</div>
 </div>
 """, unsafe_allow_html=True)
 
