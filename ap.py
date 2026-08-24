@@ -283,7 +283,7 @@ def load_data():
     
     df.columns = df.columns.str.strip()
     
-    # CHUẨN HÓA TÊN CỘT RÕ RÀNG (KHẮC PHỤC LỖI TRÙNG TÊN CỘT)
+    # CHUẨN HÓA TÊN CỘT RÕ RÀNG (KHẮC PHỤC LỖI TRÙNG TÊN CỘT & BAO HÀM NHIỀU CÁCH GỌI)
     rename_dict = {}
     for col in df.columns:
         c_low = str(col).lower().strip()
@@ -293,7 +293,7 @@ def load_data():
             rename_dict[col] = 'Tiến Độ (%)'
         elif c_low in ['đầu việc', 'đầu việc shopdrawing', 'hạng mục']: 
             rename_dict[col] = 'Hạng Mục'
-        elif c_low == 'ghi chú': 
+        elif c_low in ['ghi chú', 'vướng mắc', 'ý kiến', 'vuong mac', 'ghi chu']:  # <-- Đã mở rộng nhận diện
             rename_dict[col] = 'Vướng Mắc'
         elif c_low == 'dự án': 
             rename_dict[col] = 'Dự Án'
@@ -306,7 +306,7 @@ def load_data():
             
     df.rename(columns=rename_dict, inplace=True)
     
-    # Ép bỏ các cột trùng tên (Nếu có 2 cột cùng tên, giữ cột đầu tiên - CHỐNG LỖI ATTRIBUTE ERROR)
+    # Ép bỏ các cột trùng tên (Nếu có 2 cột cùng tên, giữ cột đầu tiên)
     df = df.loc[:, ~df.columns.duplicated()]
         
     cols_to_fill = ['Mã Dự Án', 'Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục']
@@ -407,7 +407,7 @@ if selected_hm and 'Hạng Mục' in df_display.columns: df_display = df_display
 if selected_ql and 'Cán Bộ Quản Lý' in df_display.columns: df_display = df_display[df_display['Cán Bộ Quản Lý'].isin(selected_ql)]
 if selected_cb and cb_col in df_display.columns: df_display = df_display[df_display[cb_col].isin(selected_cb)]
 
-# --- TÍNH TOÁN 10 CHỈ SỐ KPI ĐÃ ĐƯỢC CHỐNG LỖI ---
+# --- TÍNH TOÁN 10 CHỈ SỐ KPI ---
 p_projects = df_display.get('Dự Án', pd.Series()).nunique()
 p_contracts = df_display.get('Hợp Đồng - PLHĐ', pd.Series()).nunique()
 p_categories = df_display.get('Hạng Mục', pd.Series()).nunique()
@@ -422,7 +422,12 @@ if 'Trạng Thái' in df_display.columns:
 else:
     p_done = p_inprogress = p_notstarted = p_paused = 0
 
-p_issues = len(df_display[df_display.get('Vướng Mắc', pd.Series()).astype(str).str.strip() != '']) if 'Vướng Mắc' in df_display.columns else 0
+# TÍNH TOÁN CỘT VƯỚNG MẮC: CHỈ ĐẾM CÁC HÀNG CÓ CHỮ TRONG CỘT (LOẠI BỎ RỖNG)
+if 'Vướng Mắc' in df_display.columns:
+    _issues = df_display['Vướng Mắc'].astype(str).str.strip().str.lower()
+    p_issues = len(_issues[(_issues != '') & (_issues != 'nan') & (_issues != 'none')])
+else:
+    p_issues = 0
 
 def render_transparent_shadow_kpi(title, value, icon_name, bg_color, icon_color):
     return f"""
