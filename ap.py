@@ -110,12 +110,26 @@ st.markdown("""
     div[data-testid="stRadio"] > div[role="radiogroup"] { display: flex; flex-direction: row; justify-content: center; gap: 35px; margin-top: 10px; margin-bottom: 20px; flex-wrap: wrap; background-color: transparent !important; }
     div[data-testid="stRadio"] > div[role="radiogroup"] > label { cursor: pointer; background: transparent !important; border: none !important; box-shadow: none !important; padding: 5px !important; }
     div[data-testid="stRadio"] > div[role="radiogroup"] > label p { font-weight: 600 !important; color: #0f172a !important; margin: 0 !important; font-size: 1rem !important; }
+    
+    /* Làm đẹp nút Refresh */
+    div[data-testid="stButton"] button {
+        background-color: rgba(25, 135, 84, 0.85) !important;
+        color: white !important;
+        border-radius: 12px !important;
+        font-weight: bold !important;
+        border: 1px solid rgba(255,255,255,0.5) !important;
+        transition: all 0.3s ease !important;
+    }
+    div[data-testid="stButton"] button:hover {
+        background-color: rgba(25, 135, 84, 1) !important;
+        transform: scale(1.02);
+        box-shadow: 0 4px 12px rgba(25, 135, 84, 0.4) !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
 
 # ================= 2. ĐỌC DỮ LIỆU TỪ GOOGLE SHEETS =================
-# NÂNG CẤP: Tăng thời gian lưu Cache lên 300 giây (5 phút) để tăng tốc độ phản hồi
 @st.cache_data(ttl=300, show_spinner=False)
 def load_data():
     sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
@@ -153,8 +167,7 @@ def load_data():
         
     return df
 
-# NÂNG CẤP: Hiển thị thanh tiến trình khi Google Sheets đang tải
-with st.spinner("⏳ Đang đồng bộ dữ liệu mới nhất từ Google Sheets..."):
+with st.spinner("⏳ Đang tải dữ liệu mới..."):
     df = load_data()
 
 
@@ -164,7 +177,13 @@ with st.sidebar:
     with col_logo2:
         st.image("logothienson.png", use_container_width=True) 
         
-    st.markdown("<h3 style='text-align: left; margin-top: 0px; margin-bottom: 5px; color: #0f172a; font-size: 15px;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
+    # === NÚT CẬP NHẬT DỮ LIỆU NGAY ===
+    st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+    if st.button("🔄 CẬP NHẬT DỮ LIỆU NGAY", use_container_width=True):
+        st.cache_data.clear() # Xóa trí nhớ đệm ngay lập tức
+        st.rerun()          # Tải lại trang web
+        
+    st.markdown("<h3 style='text-align: left; margin-top: 15px; margin-bottom: 5px; color: #0f172a; font-size: 15px;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
     
     unique_projects = [p for p in df.get('Dự Án', pd.Series()).unique() if p != '']
     st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">domain</span> DỰ ÁN</div>', unsafe_allow_html=True)
