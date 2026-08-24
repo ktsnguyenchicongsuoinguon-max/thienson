@@ -330,8 +330,8 @@ def generate_excel_with_colors(df_data):
     ws = wb.active
     green_fill = PatternFill(start_color="A5D6A7", end_color="A5D6A7", fill_type="solid")
     red_fill = PatternFill(start_color="EF9A9A", end_color="EF9A9A", fill_type="solid")
-    gray_fill = PatternFill(start_color="F5F5F5", end_color="F5F5F5", fill_type="solid")
-    yellow_fill = PatternFill(start_color="FFF3CD", end_color="FFF3CD", fill_type="solid") # Màu vàng cam nhạt cho vướng mắc
+    gray_fill = PatternFill(start_color="D6D8DB", end_color="D6D8DB", fill_type="solid") # Màu ghi đậm cho Chưa bắt đầu
+    yellow_fill = PatternFill(start_color="FFEeba", end_color="FFEeba", fill_type="solid") # Màu vàng cam đậm cho Vướng mắc
 
     status_col_idx = None
     vướng_col_idx = None
@@ -342,13 +342,11 @@ def generate_excel_with_colors(df_data):
     for row_idx in range(2, ws.max_row + 1):
         fill_to_use = None
         
-        # Kiểm tra nếu có vướng mắc thì ưu tiên tô màu vàng cam nhạt
         if vướng_col_idx:
             v_val = str(ws.cell(row=row_idx, column=vướng_col_idx).value).strip().lower()
             if v_val and v_val not in ['nan', 'none', '']:
                 fill_to_use = yellow_fill
 
-        # Nếu không có vướng mắc thì tô màu theo Trạng Thái
         if not fill_to_use and status_col_idx:
             status_val = str(ws.cell(row=row_idx, column=status_col_idx).value).strip()
             if status_val == 'Đã hoàn thành': fill_to_use = green_fill
@@ -387,15 +385,14 @@ if 'Trạng Thái' in df_display.columns and 'Tiến Độ (%)' in df_display.co
     df_display = df_display.drop(columns=['Mức Ưu Tiên'])
 
 def color_rows(row):
-    # Kiểm tra cột Vướng Mắc, nếu có nội dung thì tô màu vàng cam nhạt
     vm = str(row.get('Vướng Mắc', '')).strip().lower()
     if vm and vm not in ['nan', 'none', '']:
-        return ['background-color: #fff3cd; color: #000;'] * len(row)
+        return ['background-color: #FFEeba; color: #000;'] * len(row)
         
     status = row.get('Trạng Thái', '')
     if status == 'Đã hoàn thành': return ['background-color: #a5d6a7; color: #000;'] * len(row)
     if status == 'Tạm dừng': return ['background-color: #ef9a9a; color: #000;'] * len(row)
-    if status == 'Chưa bắt đầu': return ['background-color: #f5f5f5; color: #000;'] * len(row)
+    if status == 'Chưa bắt đầu': return ['background-color: #d6d8db; color: #000;'] * len(row) # Màu ghi đậm trên web (#d6d8db)
     return ['background-color: #ffffff; color: #000;'] * len(row)
 
 styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
