@@ -18,7 +18,6 @@ def get_base64_image(image_path):
 background_image_path = "background.jpg" 
 bg_base64 = get_base64_image(background_image_path)
 
-# LỚP NỀN ĐÁ CỐ ĐỊNH, TUYỆT ĐỐI KHÔNG BỊ TRƯỢT KHI CUỘN
 if bg_base64:
     bg_css = f"""
     <style>
@@ -49,231 +48,75 @@ else:
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* ================= 1. KHÓA CUỘN & BOX-SIZING ================= */
-    html, body {
-        overflow: hidden !important; 
-        margin: 0 !important; padding: 0 !important;
-    }
+    html, body { overflow: hidden !important; margin: 0 !important; padding: 0 !important; }
     ::-webkit-scrollbar { display: none !important; }
-    
-    * { 
-        scrollbar-width: none !important; 
-        -ms-overflow-style: none !important; 
-        box-sizing: border-box !important; 
-    }
-
-    /* Giữ Header trong suốt để nút Mũi tên thu/phóng luôn bấm được */
+    * { scrollbar-width: none !important; -ms-overflow-style: none !important; box-sizing: border-box !important; }
     header[data-testid="stHeader"] { background: transparent !important; box-shadow: none !important; }
     [data-testid="stHeaderActionElements"], .stAppDeployButton { display: none !important; }
     footer { display: none !important; }
 
-    /* ================= 2. KHỐI KÍNH BỘ LỌC (SIDEBAR) ================= */
-    [data-testid="stSidebar"] {
-        background-color: transparent !important;
-        border: none !important;
-    }
+    [data-testid="stSidebar"] { background-color: transparent !important; border: none !important; }
     [data-testid="stSidebarResizer"] { display: none !important; }
-
     [data-testid="stSidebar"] > div:first-child {
         background-color: rgba(255, 255, 255, 0.35) !important;
-        backdrop-filter: blur(20px) !important;
-        -webkit-backdrop-filter: blur(20px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.4) !important;
-        border-radius: 24px !important;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
-        
-        margin: 60px 0px 60px 20px !important;
-        width: calc(100% - 20px) !important; 
-        height: calc(100vh - 120px) !important;
-        overflow: hidden !important; 
+        backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important; margin: 60px 0px 60px 20px !important;
+        width: calc(100% - 20px) !important; height: calc(100vh - 120px) !important; overflow: hidden !important; 
     }
-
-    [data-testid="stSidebarUserContent"] {
-        padding: 5px 20px 20px 20px !important;
-        overflow: hidden !important; 
-    }
-
-    .sidebar-title {
-        display: flex; align-items: center; gap: 8px;
-        font-size: 13px; font-weight: 700; color: #0f172a;
-        margin-top: 10px; margin-bottom: 2px; text-transform: uppercase;
-    }
+    [data-testid="stSidebarUserContent"] { padding: 5px 20px 20px 20px !important; overflow: hidden !important; }
+    .sidebar-title { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #0f172a; margin-top: 10px; margin-bottom: 2px; text-transform: uppercase; }
     .sidebar-title .material-symbols-rounded { font-size: 18px; color: #198754; }
     
-    [data-testid="stSidebar"] div[data-baseweb="select"] > div,
-    [data-testid="stSidebar"] div[data-baseweb="input"] > div {
-        background-color: rgba(255, 255, 255, 0.4) !important;
-        backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.6) !important;
-        border-radius: 12px !important;
-        min-height: 32px !important;
+    [data-testid="stSidebar"] div[data-baseweb="select"] > div, [data-testid="stSidebar"] div[data-baseweb="input"] > div {
+        background-color: rgba(255, 255, 255, 0.4) !important; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.6) !important; border-radius: 12px !important; min-height: 32px !important;
     }
     div.row-widget.stSelectbox, div.row-widget.stMultiSelect { margin-bottom: -5px !important; }
 
-    /* ================= 3. KHỐI KÍNH CHÍNH (BẢNG & KPI) ================= */
     .block-container { 
-        background-color: rgba(255, 255, 255, 0.35) !important; 
-        backdrop-filter: blur(20px) !important; 
-        -webkit-backdrop-filter: blur(20px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.4) !important; 
-        border-radius: 24px !important; 
-        box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
-        
-        /* Tự động co giãn theo không gian chuẩn của Streamlit, không bị lệch khung */
-        width: calc(100% - 40px) !important;
-        max-width: 100% !important;
-        margin: 60px 20px !important;  
-        
-        /* ĐỆM 30PX AN TOÀN: Bắt buộc mọi đối tượng lùi vào trong, tuyệt đối không chạm viền */
-        padding: 30px !important; 
-        
-        height: calc(100vh - 120px) !important; 
-        
-        display: flex !important;
-        flex-direction: column !important;
-        overflow: hidden !important; 
+        background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
+        width: calc(100% - 40px) !important; max-width: 100% !important; margin: 60px 20px !important;  
+        padding: 30px !important; height: calc(100vh - 120px) !important; 
+        display: flex !important; flex-direction: column !important; overflow: hidden !important; 
     }
-
-    /* CHỐNG TRÀN VIỀN CHO MỌI THÀNH PHẦN BÊN TRONG KHỐI CHÍNH */
-    .block-container * {
-        max-width: 100% !important;
-    }
-
-    .block-container > div[data-testid="stVerticalBlock"] {
-        flex-grow: 1 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        min-height: 0 !important; 
-        width: 100% !important;
-    }
+    .block-container * { max-width: 100% !important; }
+    .block-container > div[data-testid="stVerticalBlock"] { flex-grow: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; }
+    .block-container > div[data-testid="stVerticalBlock"] > div { flex-shrink: 0 !important; width: 100% !important; }
     
-    .block-container > div[data-testid="stVerticalBlock"] > div {
-        flex-shrink: 0 !important;
-        width: 100% !important;
-    }
-    
-    /* BẢNG DỮ LIỆU: Tự động đàn hồi và cuộn nội bộ khi quá khổ */
-    div.element-container:has([data-testid="stDataFrame"]) {
-        flex-grow: 1 !important;
-        flex-shrink: 1 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        min-height: 0 !important;
-        width: 100% !important;
-    }
-    
-    [data-testid="stDataFrame"] { 
-        flex-grow: 1 !important;
-        width: 100% !important; 
-        min-height: 0 !important;
-        overflow-x: auto !important;
-    }
-    
-    [data-testid="stDataFrame"] > div { 
-        height: 100% !important; 
-        width: 100% !important; 
-        overflow: auto !important; 
-    }
-
-    /* Thanh cuộn mượt mà riêng cho bảng dữ liệu */
+    div.element-container:has([data-testid="stDataFrame"]) { flex-grow: 1 !important; flex-shrink: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; }
+    [data-testid="stDataFrame"] { flex-grow: 1 !important; width: 100% !important; min-height: 0 !important; overflow-x: auto !important; }
+    [data-testid="stDataFrame"] > div { height: 100% !important; width: 100% !important; overflow: auto !important; }
     [data-testid="stDataFrame"] div::-webkit-scrollbar { width: 8px !important; height: 8px !important; display: block !important; }
     [data-testid="stDataFrame"] div::-webkit-scrollbar-track { background: transparent !important; }
     [data-testid="stDataFrame"] div::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.3) !important; border-radius: 10px !important; }
     [data-testid="stDataFrame"] div::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.5) !important; }
 
-    /* ================= 4. TRANG TRÍ ĐỐI TƯỢNG BÊN TRONG ================= */
-    div[data-testid="stDataFrame"] th {
-        background-color: rgba(226, 232, 240, 0.9) !important; 
-        color: #0F172A !important;
-        font-weight: 800 !important; font-size: 14px !important;
-    }
-
-    .title-card {
-        border-radius: 16px; 
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.05); 
-        background-color: rgba(255, 255, 255, 0.25) !important; 
-        backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-        border: none !important;
-        width: fit-content; max-width: 100% !important;
-        margin-left: auto; margin-right: auto; 
-        display: flex; align-items: center; justify-content: center;
-    }
-
-    .custom-download-link {
-        display: block; float: right; text-align: right;
-        color: #0A3622 !important; font-size: 13.5px !important; font-weight: 700 !important;
-        text-decoration: none !important;
-        margin-top: -35px !important; margin-right: 0px !important; margin-bottom: 10px !important;
-        position: relative; z-index: 9999; cursor: pointer;
-    }
+    div[data-testid="stDataFrame"] th { background-color: rgba(226, 232, 240, 0.9) !important; color: #0F172A !important; font-weight: 800 !important; font-size: 14px !important; }
+    .title-card { border-radius: 16px; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.05); background-color: rgba(255, 255, 255, 0.25) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: none !important; width: fit-content; max-width: 100% !important; margin-left: auto; margin-right: auto; display: flex; align-items: center; justify-content: center; }
+    .custom-download-link { display: block; float: right; text-align: right; color: #0A3622 !important; font-size: 13.5px !important; font-weight: 700 !important; text-decoration: none !important; margin-top: -35px !important; margin-right: 0px !important; margin-bottom: 10px !important; position: relative; z-index: 9999; cursor: pointer; }
     .custom-download-link:hover { color: #198754 !important; text-decoration: underline !important; }
 
-    /* ================= KIẾN TRÚC MỚI CHO 10 Ô KPI - CĂN GIỮA TUYỆT ĐỐI TOÀN Ô ================= */
-    .kpi-card {
-        width: 100%; padding: 12px 15px; 
-        border-radius: 20px !important; 
-        border: 1px solid rgba(255, 255, 255, 0.4) !important; 
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; 
-        
-        display: flex; 
-        align-items: center; 
-        justify-content: center; /* BẮT BUỘC CHỮ NẰM Ở CHÍNH GIỮA CỦA TOÀN BỘ Ô */
-        position: relative;      /* Làm mốc để Icon lơ lửng */
-        
-        margin-bottom: 15px; 
-        min-height: 95px; 
-        background-color: rgba(255, 255, 255, 0.35) !important; 
-        backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        overflow: hidden !important;
-    }
+    .kpi-card { width: 100%; padding: 12px 15px; border-radius: 20px !important; border: 1px solid rgba(255, 255, 255, 0.4) !important; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 15px; min-height: 95px; background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden !important; }
     .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1) !important; }
-    
-    .kpi-icon-wrapper {
-        position: absolute; /* Rút Icon ra khỏi luồng, để Chữ được căn giữa tự do */
-        left: 15px;         /* Vẫn neo Icon ở mép trái */
-        width: 70px; height: 70px; border-radius: 18px; 
-        display: flex; align-items: center; justify-content: center; 
-        z-index: 0;
-        opacity: 0.95;
-    }
+    .kpi-icon-wrapper { position: absolute; left: 15px; width: 70px; height: 70px; border-radius: 18px; display: flex; align-items: center; justify-content: center; z-index: 0; opacity: 0.95; }
     .kpi-icon-wrapper .material-symbols-rounded { font-size: 60px; } 
-    
-    .kpi-details { 
-        display: flex; flex-direction: column; align-items: center; justify-content: center; 
-        z-index: 1; /* Nổi lên trên Icon */
-        text-align: center;
-    }
-    
-    .kpi-title {
-        font-size: 1.2rem; font-weight: 800; opacity: 0.85; text-transform: uppercase; margin-bottom: 2px; 
-        white-space: nowrap; color: #0f172a;
-        text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8); /* Viền sáng bảo vệ chữ dễ đọc */
-    }
-    
-    .kpi-value { 
-        font-size: 2.5rem; font-weight: 900; color: #0f172a; 
-        line-height: 1.1; 
-        text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8); /* Viền sáng bảo vệ chữ dễ đọc */
-    }
+    .kpi-details { display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1; text-align: center; }
+    .kpi-title { font-size: 1.2rem; font-weight: 800; opacity: 0.85; text-transform: uppercase; margin-bottom: 2px; white-space: nowrap; color: #0f172a; text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8); }
+    .kpi-value { font-size: 2.5rem; font-weight: 900; color: #0f172a; line-height: 1.1; text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8); }
     
     div[data-testid="stRadio"] { width: 100% !important; }
-    div[data-testid="stRadio"] > div[role="radiogroup"] {
-        display: flex; flex-direction: row; justify-content: center; gap: 35px; 
-        margin-top: 10px; margin-bottom: 20px; flex-wrap: wrap; background-color: transparent !important; 
-    }
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label {
-        cursor: pointer; background: transparent !important; border: none !important; box-shadow: none !important; padding: 5px !important;
-    }
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label p {
-        font-weight: 600 !important; color: #0f172a !important; margin: 0 !important; font-size: 1rem !important; 
-    }
+    div[data-testid="stRadio"] > div[role="radiogroup"] { display: flex; flex-direction: row; justify-content: center; gap: 35px; margin-top: 10px; margin-bottom: 20px; flex-wrap: wrap; background-color: transparent !important; }
+    div[data-testid="stRadio"] > div[role="radiogroup"] > label { cursor: pointer; background: transparent !important; border: none !important; box-shadow: none !important; padding: 5px !important; }
+    div[data-testid="stRadio"] > div[role="radiogroup"] > label p { font-weight: 600 !important; color: #0f172a !important; margin: 0 !important; font-size: 1rem !important; }
 </style>
 """, unsafe_allow_html=True)
 
 
 # ================= 2. ĐỌC DỮ LIỆU TỪ GOOGLE SHEETS =================
-@st.cache_data(ttl=60)
+# NÂNG CẤP: Tăng thời gian lưu Cache lên 300 giây (5 phút) để tăng tốc độ phản hồi
+@st.cache_data(ttl=300, show_spinner=False)
 def load_data():
     sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
     try:
@@ -283,30 +126,19 @@ def load_data():
     
     df.columns = df.columns.str.strip()
     
-    # CHUẨN HÓA TÊN CỘT RÕ RÀNG (KHẮC PHỤC LỖI TRÙNG TÊN CỘT & BAO HÀM NHIỀU CÁCH GỌI)
     rename_dict = {}
     for col in df.columns:
         c_low = str(col).lower().strip()
-        if c_low == 'trạng thái': 
-            rename_dict[col] = 'Trạng Thái'
-        elif c_low == 'tiến độ (%)': 
-            rename_dict[col] = 'Tiến Độ (%)'
-        elif c_low in ['đầu việc', 'đầu việc shopdrawing', 'hạng mục']: 
-            rename_dict[col] = 'Hạng Mục'
-        elif c_low in ['ghi chú', 'vướng mắc', 'ý kiến', 'vuong mac', 'ghi chu', 'note', 'ghi chú/vướng mắc']: 
-            rename_dict[col] = 'Vướng Mắc'
-        elif c_low == 'dự án': 
-            rename_dict[col] = 'Dự Án'
-        elif c_low in ['cán bộ quản lý', 'người quản lý']: 
-            rename_dict[col] = 'Cán Bộ Quản Lý'
-        elif c_low in ['hợp đồng - plhđ', 'hợp đồng', 'số hợp đồng', 'hợp đồng plhđ']: 
-            rename_dict[col] = 'Hợp Đồng - PLHĐ'
-        elif c_low in ['cán bộ triển khai - sđt', 'người triển khai', 'cán bộ triển khai']: 
-            rename_dict[col] = 'Cán Bộ Triển Khai - SĐT'
+        if c_low == 'trạng thái': rename_dict[col] = 'Trạng Thái'
+        elif c_low == 'tiến độ (%)': rename_dict[col] = 'Tiến Độ (%)'
+        elif c_low in ['đầu việc', 'đầu việc shopdrawing', 'hạng mục']: rename_dict[col] = 'Hạng Mục'
+        elif c_low in ['ghi chú', 'vướng mắc', 'ý kiến', 'vuong mac', 'ghi chu', 'note', 'ghi chú/vướng mắc']: rename_dict[col] = 'Vướng Mắc'
+        elif c_low == 'dự án': rename_dict[col] = 'Dự Án'
+        elif c_low in ['cán bộ quản lý', 'người quản lý']: rename_dict[col] = 'Cán Bộ Quản Lý'
+        elif c_low in ['hợp đồng - plhđ', 'hợp đồng', 'số hợp đồng', 'hợp đồng plhđ']: rename_dict[col] = 'Hợp Đồng - PLHĐ'
+        elif c_low in ['cán bộ triển khai - sđt', 'người triển khai', 'cán bộ triển khai']: rename_dict[col] = 'Cán Bộ Triển Khai - SĐT'
             
     df.rename(columns=rename_dict, inplace=True)
-    
-    # Ép bỏ các cột trùng tên (Nếu có 2 cột cùng tên, giữ cột đầu tiên)
     df = df.loc[:, ~df.columns.duplicated()]
         
     cols_to_fill = ['Mã Dự Án', 'Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục']
@@ -315,16 +147,15 @@ def load_data():
             
     df = df.fillna('') 
     
-    if 'Ngày Bắt Đầu' in df.columns:
-        df['Ngày_Bat_Dau_Obj'] = pd.to_datetime(df['Ngày Bắt Đầu'].astype(str).str.strip(), format='%d/%m/%Y', errors='coerce')
-        
+    if 'Ngày Bắt Đầu' in df.columns: df['Ngày_Bat_Dau_Obj'] = pd.to_datetime(df['Ngày Bắt Đầu'].astype(str).str.strip(), format='%d/%m/%Y', errors='coerce')
     col_ht = 'Ngày hoàn thành' if 'Ngày hoàn thành' in df.columns else ('Ngày Hoàn Thành' if 'Ngày Hoàn Thành' in df.columns else None)
-    if col_ht:
-        df['Ngày_Hoan_Thanh_Obj'] = pd.to_datetime(df[col_ht].astype(str).str.strip(), format='%d/%m/%Y', errors='coerce')
+    if col_ht: df['Ngày_Hoan_Thanh_Obj'] = pd.to_datetime(df[col_ht].astype(str).str.strip(), format='%d/%m/%Y', errors='coerce')
         
     return df
 
-df = load_data()
+# NÂNG CẤP: Hiển thị thanh tiến trình khi Google Sheets đang tải
+with st.spinner("⏳ Đang đồng bộ dữ liệu mới nhất từ Google Sheets..."):
+    df = load_data()
 
 
 # ================= 3. KHỐI SIDEBAR BỘ LỌC =================
@@ -407,7 +238,7 @@ if selected_hm and 'Hạng Mục' in df_display.columns: df_display = df_display
 if selected_ql and 'Cán Bộ Quản Lý' in df_display.columns: df_display = df_display[df_display['Cán Bộ Quản Lý'].isin(selected_ql)]
 if selected_cb and cb_col in df_display.columns: df_display = df_display[df_display[cb_col].isin(selected_cb)]
 
-# --- TÍNH TOÁN 10 CHỈ SỐ KPI ĐÃ ĐƯỢC CHỐNG LỖI ---
+# --- TÍNH TOÁN 10 CHỈ SỐ KPI ---
 p_projects = df_display.get('Dự Án', pd.Series()).nunique()
 p_contracts = df_display.get('Hợp Đồng - PLHĐ', pd.Series()).nunique()
 p_categories = df_display.get('Hạng Mục', pd.Series()).nunique()
@@ -422,7 +253,6 @@ if 'Trạng Thái' in df_display.columns:
 else:
     p_done = p_inprogress = p_notstarted = p_paused = 0
 
-# TÍNH TOÁN CỘT VƯỚNG MẮC: CỨ CÓ CHỮ TRONG Ô LÀ TÍNH 1
 if 'Vướng Mắc' in df_display.columns:
     _issues = df_display['Vướng Mắc'].astype(str).str.strip().str.lower()
     p_issues = sum((_issues != '') & (_issues != 'nan') & (_issues != 'none') & (_issues != 'null'))
