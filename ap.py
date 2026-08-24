@@ -214,7 +214,7 @@ st.markdown("""
         border-radius: 20px !important; 
         border: 1px solid rgba(255, 255, 255, 0.4) !important; 
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; 
-        display: flex; align-items: center; margin-bottom: 15px; min-height: 115px; /* Giữ nguyên kích thước ô */
+        display: flex; align-items: center; margin-bottom: 15px; min-height: 115px; 
         background-color: rgba(255, 255, 255, 0.35) !important; 
         backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -223,7 +223,7 @@ st.markdown("""
     .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1) !important; }
     
     .kpi-icon-wrapper {
-        width: 60px; height: 60px; border-radius: 18px; /* Giữ nguyên khung Icon 60x60 */
+        width: 60px; height: 60px; border-radius: 18px; 
         display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 15px;
     }
     .kpi-icon-wrapper .material-symbols-rounded { font-size: 44px; } /* ĐÃ PHÓNG TO ICON LÊN 44PX */
@@ -252,17 +252,29 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# ================= 2. ĐỌC DỮ LIỆU TỪ GOOGLE SHEETS =================
+# ================= 2. ĐỌC DỮ LIỆU TỪ GOOGLE SHEETS THÔNG MINH (CHỐNG LỖI) =================
 @st.cache_data(ttl=60)
 def load_data():
+    # LINK MỚI ĐÃ ĐƯỢC CẬP NHẬT
     sheet_url = "https://docs.google.com/spreadsheets/d/1dOiPWgLE8o7YUeA6l_g_eF825PnkskRn/export?format=csv&gid=418096547"
-    df = pd.read_csv(sheet_url)
+    
+    try:
+        df = pd.read_csv(sheet_url)
+    except Exception:
+        return pd.DataFrame()
     
     df.columns = df.columns.str.strip()
     
-    if 'Đầu Việc' in df.columns: df.rename(columns={'Đầu Việc': 'Hạng Mục'}, inplace=True)
-    if 'Đầu Việc Shopdrawing' in df.columns: df.rename(columns={'Đầu Việc Shopdrawing': 'Hạng Mục'}, inplace=True)
-    if 'Ghi chú' in df.columns: df.rename(columns={'Ghi chú': 'Vướng Mắc'}, inplace=True)
+    # CHUẨN HÓA TÊN CỘT CHỐNG LỖI KEYERROR
+    for col in df.columns:
+        if col.lower() == 'trạng thái': df.rename(columns={col: 'Trạng Thái'}, inplace=True)
+        elif col.lower() == 'tiến độ (%)': df.rename(columns={col: 'Tiến Độ (%)'}, inplace=True)
+        elif col.lower() in ['đầu việc', 'đầu việc shopdrawing', 'hạng mục']: df.rename(columns={col: 'Hạng Mục'}, inplace=True)
+        elif col.lower() == 'ghi chú': df.rename(columns={col: 'Vướng Mắc'}, inplace=True)
+        elif col.lower() == 'dự án': df.rename(columns={col: 'Dự Án'}, inplace=True)
+        elif col.lower() in ['cán bộ quản lý', 'người quản lý']: df.rename(columns={col: 'Cán Bộ Quản Lý'}, inplace=True)
+        elif 'plhđ' in col.lower() or 'hợp đồng' in col.lower(): df.rename(columns={col: 'Hợp Đồng - PLHĐ'}, inplace=True)
+        elif 'triển khai' in col.lower(): df.rename(columns={col: 'Cán Bộ Triển Khai - SĐT'}, inplace=True)
         
     cols_to_fill = ['Mã Dự Án', 'Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục']
     for col in cols_to_fill:
@@ -362,7 +374,7 @@ if selected_hm: df_display = df_display[df_display['Hạng Mục'].isin(selected
 if selected_ql: df_display = df_display[df_display['Cán Bộ Quản Lý'].isin(selected_ql)]
 if selected_cb: df_display = df_display[df_display[cb_col].isin(selected_cb)]
 
-# --- TÍNH TOÁN 10 CHỈ SỐ KPI ---
+# --- TÍNH TOÁN 10 CHỈ SỐ KPI ĐÃ ĐƯỢC CHỐNG LỖI ---
 p_projects = df_display.get('Dự Án', pd.Series()).nunique()
 p_contracts = df_display.get('Hợp Đồng - PLHĐ', pd.Series()).nunique()
 p_categories = df_display.get('Hạng Mục', pd.Series()).nunique()
