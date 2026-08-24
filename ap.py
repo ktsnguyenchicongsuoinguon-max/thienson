@@ -106,7 +106,7 @@ st.markdown("""
     .custom-download-link { display: block; float: right; text-align: right; color: #0A3622 !important; font-size: 13.5px !important; font-weight: 700 !important; text-decoration: none !important; margin-top: -30px !important; margin-right: 0px !important; margin-bottom: 5px !important; position: relative; z-index: 9999; cursor: pointer; }
     .custom-download-link:hover { color: #198754 !important; text-decoration: underline !important; }
 
-    /* 10 Ô KPI (CHỮ MÀU ĐEN #0f172a, ICON MÀU XANH DƯƠNG ĐẬM #0d6efd) */
+    /* 10 Ô KPI */
     .kpi-card { width: 100%; padding: 10px 12px; border-radius: 18px !important; border: 1px solid rgba(255, 255, 255, 0.4) !important; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 10px; min-height: 85px; background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden !important; }
     .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 5px 10px rgba(0, 0, 0, 0.1) !important; }
     .kpi-icon-wrapper { position: absolute; left: 12px; width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; z-index: 0; opacity: 0.95; background-color: rgba(255, 255, 255, 0.5) !important; color: #0d6efd !important; }
@@ -167,7 +167,8 @@ with st.spinner("⏳ Đang tải dữ liệu mới nhất từ Google Sheets..."
 
 # ================= 3. KHỐI SIDEBAR BỘ LỌC =================
 with st.sidebar:
-    col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
+    # ĐIỀU CHỈNH TỶ LỆ CỘT ĐỂ LOGO HIỂN THỊ TO HƠN
+    col_logo1, col_logo2, col_logo3 = st.columns([0.1, 2.8, 0.1])
     with col_logo2:
         st.image("logothienson.png", use_container_width=True) 
         
