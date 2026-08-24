@@ -223,7 +223,7 @@ st.markdown("""
     .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1) !important; }
     
     .kpi-icon-wrapper {
-        width: 60px; height: 60px; border-radius: 18px; 
+        width: 60px; height: 60px; border-radius: 18px; /* Giữ nguyên khung Icon 60x60 */
         display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 15px;
     }
     .kpi-icon-wrapper .material-symbols-rounded { font-size: 44px; } /* ĐÃ PHÓNG TO ICON LÊN 44PX */
@@ -252,11 +252,11 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# ================= 2. ĐỌC DỮ LIỆU TỪ GOOGLE SHEETS THÔNG MINH (CHỐNG LỖI) =================
+# ================= 2. ĐỌC DỮ LIỆU TỪ GOOGLE SHEETS =================
 @st.cache_data(ttl=60)
 def load_data():
-    # LINK MỚI ĐÃ ĐƯỢC CẬP NHẬT
-    sheet_url = "https://docs.google.com/spreadsheets/d/1dOiPWgLE8o7YUeA6l_g_eF825PnkskRn/export?format=csv&gid=418096547"
+    # LINK DỮ LIỆU GỐC ĐÃ ĐƯỢC PHỤC HỒI
+    sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
     
     try:
         df = pd.read_csv(sheet_url)
@@ -368,11 +368,11 @@ if start_date and end_date and 'Ngày_Bat_Dau_Obj' in df_display.columns and 'Ng
     cond_end = df_display['Ngày_Hoan_Thanh_Obj'].between(start_ts, end_ts)
     df_display = df_display[cond_start | cond_end]
 
-if selected_projects: df_display = df_display[df_display['Dự Án'].isin(selected_projects)]
-if selected_hd: df_display = df_display[df_display['Hợp Đồng - PLHĐ'].isin(selected_hd)]
-if selected_hm: df_display = df_display[df_display['Hạng Mục'].isin(selected_hm)]
-if selected_ql: df_display = df_display[df_display['Cán Bộ Quản Lý'].isin(selected_ql)]
-if selected_cb: df_display = df_display[df_display[cb_col].isin(selected_cb)]
+if selected_projects and 'Dự Án' in df_display.columns: df_display = df_display[df_display['Dự Án'].isin(selected_projects)]
+if selected_hd and 'Hợp Đồng - PLHĐ' in df_display.columns: df_display = df_display[df_display['Hợp Đồng - PLHĐ'].isin(selected_hd)]
+if selected_hm and 'Hạng Mục' in df_display.columns: df_display = df_display[df_display['Hạng Mục'].isin(selected_hm)]
+if selected_ql and 'Cán Bộ Quản Lý' in df_display.columns: df_display = df_display[df_display['Cán Bộ Quản Lý'].isin(selected_ql)]
+if selected_cb and cb_col in df_display.columns: df_display = df_display[df_display[cb_col].isin(selected_cb)]
 
 # --- TÍNH TOÁN 10 CHỈ SỐ KPI ĐÃ ĐƯỢC CHỐNG LỖI ---
 p_projects = df_display.get('Dự Án', pd.Series()).nunique()
