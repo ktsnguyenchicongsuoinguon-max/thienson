@@ -208,44 +208,53 @@ st.markdown("""
     }
     .custom-download-link:hover { color: #198754 !important; text-decoration: underline !important; }
 
-    /* ================= KIẾN TRÚC MỚI CHO 10 Ô KPI - CĂN GIỮA VÀ ĐIỀU CHỈNH KÍCH THƯỚC ================= */
+    /* ================= KIẾN TRÚC MỚI CHO 10 Ô KPI - CĂN GIỮA TUYỆT ĐỐI TOÀN Ô ================= */
     .kpi-card {
-        width: 100%; padding: 12px 15px; /* Giảm padding trên dưới để cân đối */
+        width: 100%; padding: 12px 15px; 
         border-radius: 20px !important; 
         border: 1px solid rgba(255, 255, 255, 0.4) !important; 
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; 
-        display: flex; align-items: center; margin-bottom: 15px; 
-        min-height: 95px; /* Giảm chiều cao tối thiểu */
+        
+        display: flex; 
+        align-items: center; 
+        justify-content: center; /* BẮT BUỘC CHỮ NẰM Ở CHÍNH GIỮA CỦA TOÀN BỘ Ô */
+        position: relative;      /* Làm mốc để Icon lơ lửng */
+        
+        margin-bottom: 15px; 
+        min-height: 95px; 
         background-color: rgba(255, 255, 255, 0.35) !important; 
         backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
-        overflow: visible !important;
+        overflow: hidden !important;
     }
     .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1) !important; }
     
     .kpi-icon-wrapper {
-        width: 70px; height: 70px; border-radius: 18px; /* Khung Icon 70x70 */
-        display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 15px;
+        position: absolute; /* Rút Icon ra khỏi luồng, để Chữ được căn giữa tự do */
+        left: 15px;         /* Vẫn neo Icon ở mép trái */
+        width: 70px; height: 70px; border-radius: 18px; 
+        display: flex; align-items: center; justify-content: center; 
+        z-index: 0;
+        opacity: 0.95;
     }
-    .kpi-icon-wrapper .material-symbols-rounded { font-size: 60px; } /* Icon 60px */
+    .kpi-icon-wrapper .material-symbols-rounded { font-size: 60px; } 
     
     .kpi-details { 
-        flex-grow: 1; overflow: hidden; 
-        display: flex; flex-direction: column; align-items: center; justify-content: center; /* Căn giữa toàn bộ văn bản */
+        display: flex; flex-direction: column; align-items: center; justify-content: center; 
+        z-index: 1; /* Nổi lên trên Icon */
+        text-align: center;
     }
     
     .kpi-title {
-        font-size: 1.2rem; font-weight: 800; opacity: 0.85; text-transform: uppercase; margin-bottom: 2px; /* Tiêu đề 1.2rem */
-        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #0f172a;
-        text-align: center; /* Chữ căn giữa */
-        width: 100%;
+        font-size: 1.2rem; font-weight: 800; opacity: 0.85; text-transform: uppercase; margin-bottom: 2px; 
+        white-space: nowrap; color: #0f172a;
+        text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8); /* Viền sáng bảo vệ chữ dễ đọc */
     }
     
     .kpi-value { 
-        font-size: 2.5rem; font-weight: 900; color: #0f172a; /* Số liệu 2.5rem, đậm 900 */
-        text-align: center; /* Số liệu căn giữa */
-        line-height: 1.1; /* Thu gọn khoảng cách để cân đối trên dưới */
-        width: 100%;
+        font-size: 2.5rem; font-weight: 900; color: #0f172a; 
+        line-height: 1.1; 
+        text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8); /* Viền sáng bảo vệ chữ dễ đọc */
     }
     
     div[data-testid="stRadio"] { width: 100% !important; }
