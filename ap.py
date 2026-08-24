@@ -106,11 +106,11 @@ st.markdown("""
     .custom-download-link { display: block; float: right; text-align: right; color: #0A3622 !important; font-size: 13.5px !important; font-weight: 700 !important; text-decoration: none !important; margin-top: -30px !important; margin-right: 0px !important; margin-bottom: 5px !important; position: relative; z-index: 9999; cursor: pointer; }
     .custom-download-link:hover { color: #198754 !important; text-decoration: underline !important; }
 
-    /* 10 Ô KPI */
+    /* 10 Ô KPI (ĐÃ ĐỒNG BỘ ICON VỀ CHUNG 1 MÀU #0f172a) */
     .kpi-card { width: 100%; padding: 10px 12px; border-radius: 18px !important; border: 1px solid rgba(255, 255, 255, 0.4) !important; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 10px; min-height: 85px; background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden !important; }
     .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 5px 10px rgba(0, 0, 0, 0.1) !important; }
-    .kpi-icon-wrapper { position: absolute; left: 12px; width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; z-index: 0; opacity: 0.95; }
-    .kpi-icon-wrapper .material-symbols-rounded { font-size: 48px; } 
+    .kpi-icon-wrapper { position: absolute; left: 12px; width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; z-index: 0; opacity: 0.95; background-color: rgba(255, 255, 255, 0.5) !important; color: #0f172a !important; }
+    .kpi-icon-wrapper .material-symbols-rounded { font-size: 48px; color: #0f172a !important; } 
     .kpi-details { display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1; text-align: center; }
     .kpi-title { font-size: 1.1rem; font-weight: 800; opacity: 0.85; text-transform: uppercase; margin-bottom: 2px; white-space: nowrap; color: #0f172a; text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8); }
     .kpi-value { font-size: 2.2rem; font-weight: 900; color: #0f172a; line-height: 1.1; text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8); }
@@ -266,10 +266,11 @@ if 'Vướng Mắc' in df_display.columns:
 else:
     p_issues = 0
 
-def render_transparent_shadow_kpi(title, value, icon_name, bg_color, icon_color):
+def render_transparent_shadow_kpi(title, value, icon_name):
+    # Đã đồng bộ màu icon về chung #0f172a
     return f"""
     <div class="kpi-card">
-        <div class="kpi-icon-wrapper" style="background-color: {bg_color}; color: {icon_color};">
+        <div class="kpi-icon-wrapper">
             <span class="material-symbols-rounded">{icon_name}</span>
         </div>
         <div class="kpi-details">
@@ -281,19 +282,19 @@ def render_transparent_shadow_kpi(title, value, icon_name, bg_color, icon_color)
 
 # --- HÀNG 1: 5 Ô ---
 r1_c1, r1_c2, r1_c3, r1_c4, r1_c5 = st.columns(5)
-with r1_c1: st.markdown(render_transparent_shadow_kpi("Tổng Dự án", p_projects, "domain", "#cfe2ff", "#0d6efd"), unsafe_allow_html=True)
-with r1_c2: st.markdown(render_transparent_shadow_kpi("Hợp đồng", p_contracts, "description", "#cfe2ff", "#0d6efd"), unsafe_allow_html=True)
-with r1_c3: st.markdown(render_transparent_shadow_kpi("Hạng mục", p_categories, "folder_open", "#cfe2ff", "#0d6efd"), unsafe_allow_html=True)
-with r1_c4: st.markdown(render_transparent_shadow_kpi("Công việc", p_total, "assignment", "#cfe2ff", "#0d6efd"), unsafe_allow_html=True)
-with r1_c5: st.markdown(render_transparent_shadow_kpi("Tiến độ TB", f"{p_prog:.1f}%", "speed", "#e0cffc", "#6f42c1"), unsafe_allow_html=True)
+with r1_c1: st.markdown(render_transparent_shadow_kpi("Tổng Dự án", p_projects, "domain"), unsafe_allow_html=True)
+with r1_c2: st.markdown(render_transparent_shadow_kpi("Hợp đồng", p_contracts, "description"), unsafe_allow_html=True)
+with r1_c3: st.markdown(render_transparent_shadow_kpi("Hạng mục", p_categories, "folder_open"), unsafe_allow_html=True)
+with r1_c4: st.markdown(render_transparent_shadow_kpi("Công việc", p_total, "assignment"), unsafe_allow_html=True)
+with r1_c5: st.markdown(render_transparent_shadow_kpi("Tiến độ TB", f"{p_prog:.1f}%", "speed"), unsafe_allow_html=True)
 
 # --- HÀNG 2: 5 Ô ---
 r2_c1, r2_c2, r2_c3, r2_c4, r2_c5 = st.columns(5)
-with r2_c1: st.markdown(render_transparent_shadow_kpi("Đã hoàn thành", p_done, "check_circle", "#d1e7dd", "#198754"), unsafe_allow_html=True)
-with r2_c2: st.markdown(render_transparent_shadow_kpi("Đang triển khai", p_inprogress, "sync", "#cff4fc", "#0dcaf0"), unsafe_allow_html=True)
-with r2_c3: st.markdown(render_transparent_shadow_kpi("Chưa bắt đầu", p_notstarted, "hourglass_empty", "#e2e3e5", "#6c757d"), unsafe_allow_html=True)
-with r2_c4: st.markdown(render_transparent_shadow_kpi("Tạm dừng", p_paused, "pause_circle", "#fff3cd", "#ffc107"), unsafe_allow_html=True)
-with r2_c5: st.markdown(render_transparent_shadow_kpi("Vướng mắc", p_issues, "error", "#f8d7da", "#dc3545"), unsafe_allow_html=True)
+with r2_c1: st.markdown(render_transparent_shadow_kpi("Đã hoàn thành", p_done, "check_circle"), unsafe_allow_html=True)
+with r2_c2: st.markdown(render_transparent_shadow_kpi("Đang triển khai", p_inprogress, "sync"), unsafe_allow_html=True)
+with r2_c3: st.markdown(render_transparent_shadow_kpi("Chưa bắt đầu", p_notstarted, "hourglass_empty"), unsafe_allow_html=True)
+with r2_c4: st.markdown(render_transparent_shadow_kpi("Tạm dừng", p_paused, "pause_circle"), unsafe_allow_html=True)
+with r2_c5: st.markdown(render_transparent_shadow_kpi("Vướng mắc", p_issues, "error"), unsafe_allow_html=True)
 
 status_options = ["Tất cả", "Chưa bắt đầu", "Đang triển khai", "Đã hoàn thành", "Tạm dừng", "Vướng mắc"]
 actual_status = st.radio("Bộ lọc Trạng Thái", options=status_options, horizontal=True, label_visibility="collapsed")
@@ -330,8 +331,8 @@ def generate_excel_with_colors(df_data):
     ws = wb.active
     green_fill = PatternFill(start_color="A5D6A7", end_color="A5D6A7", fill_type="solid")
     red_fill = PatternFill(start_color="EF9A9A", end_color="EF9A9A", fill_type="solid")
-    gray_fill = PatternFill(start_color="D6D8DB", end_color="D6D8DB", fill_type="solid") # Màu ghi đậm cho Chưa bắt đầu
-    yellow_fill = PatternFill(start_color="FFEeba", end_color="FFEeba", fill_type="solid") # Màu vàng cam đậm cho Vướng mắc
+    gray_fill = PatternFill(start_color="ADB5BD", end_color="ADB5BD", fill_type="solid") # Màu ghi đậm hơn cho Chưa bắt đầu (#adb5bd)
+    yellow_fill = PatternFill(start_color="FFEeba", end_color="FFEeba", fill_type="solid") # Màu vàng cam cho Vướng mắc
 
     status_col_idx = None
     vướng_col_idx = None
@@ -392,7 +393,7 @@ def color_rows(row):
     status = row.get('Trạng Thái', '')
     if status == 'Đã hoàn thành': return ['background-color: #a5d6a7; color: #000;'] * len(row)
     if status == 'Tạm dừng': return ['background-color: #ef9a9a; color: #000;'] * len(row)
-    if status == 'Chưa bắt đầu': return ['background-color: #d6d8db; color: #000;'] * len(row) # Màu ghi đậm trên web (#d6d8db)
+    if status == 'Chưa bắt đầu': return ['background-color: #adb5bd; color: #000;'] * len(row) # Màu ghi đậm hơn trên web (#adb5bd)
     return ['background-color: #ffffff; color: #000;'] * len(row)
 
 styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
