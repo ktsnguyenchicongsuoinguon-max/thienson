@@ -250,7 +250,7 @@ st.markdown("""
 # ================= 2. ĐỌC DỮ LIỆU =================
 @st.cache_data(ttl=60)
 def load_data():
-    sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
+    sheet_url = "https://docs.google.com/spreadsheets/d/1dOiPWgLE8o7YUeA6l_g_eF825PnkskRn/export?format=csv&gid=418096547"
     df = pd.read_csv(sheet_url)
     
     df.columns = df.columns.str.strip()
