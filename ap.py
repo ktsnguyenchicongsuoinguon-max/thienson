@@ -69,6 +69,16 @@ st.markdown("""
         overflow: hidden !important; 
     }
     [data-testid="stSidebarUserContent"] { padding: 5px 20px 20px 20px !important; overflow: hidden !important; }
+    
+    /* ================= HIỆU ỨNG BÓNG ĐỔ CHO LOGO TRONG SIDEBAR ================= */
+    [data-testid="stSidebar"] img {
+        filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.25)) drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.15)) !important;
+        transition: transform 0.3s ease !important;
+    }
+    [data-testid="stSidebar"] img:hover {
+        transform: scale(1.03);
+    }
+
     .sidebar-title { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #0f172a; margin-top: 10px; margin-bottom: 2px; text-transform: uppercase; }
     .sidebar-title .material-symbols-rounded { font-size: 18px; color: #198754; }
     
@@ -167,7 +177,6 @@ with st.spinner("⏳ Đang tải dữ liệu mới nhất từ Google Sheets..."
 
 # ================= 3. KHỐI SIDEBAR BỘ LỌC =================
 with st.sidebar:
-    # ĐIỀU CHỈNH TỶ LỆ CỘT ĐỂ LOGO HIỂN THỊ TO HƠN
     col_logo1, col_logo2, col_logo3 = st.columns([0.1, 2.8, 0.1])
     with col_logo2:
         st.image("logothienson.png", use_container_width=True) 
