@@ -44,18 +44,9 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-# ================= NÚT BIỂU TƯỢNG CẬP NHẬT (CHỈ CÓ ICON) =================
-# Dùng HTML kết hợp nút bấm ẩn của Streamlit để tạo icon đồng bộ với thanh công cụ phía trên
-st.markdown("""
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
-""", unsafe_allow_html=True)
-
-if st.button("🔄", help="Cập nhật dữ liệu ngay"):
-    st.cache_data.clear()
-    st.rerun()
-
 # ================= CSS TÙY CHỈNH CHUYÊN SÂU =================
 st.markdown("""
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
     html, body { overflow: hidden !important; margin: 0 !important; padding: 0 !important; }
     ::-webkit-scrollbar { display: none !important; }
@@ -107,7 +98,7 @@ st.markdown("""
     .custom-download-link { display: block; float: right; text-align: right; color: #0A3622 !important; font-size: 13.5px !important; font-weight: 700 !important; text-decoration: none !important; margin-top: -35px !important; margin-right: 0px !important; margin-bottom: 10px !important; position: relative; z-index: 9999; cursor: pointer; }
     .custom-download-link:hover { color: #198754 !important; text-decoration: underline !important; }
 
-    /* KIẾN TRÚC MỚI CHO 10 Ô KPI */
+    /* KIẾN TRÚC CHO 10 Ô KPI */
     .kpi-card { width: 100%; padding: 12px 15px; border-radius: 20px !important; border: 1px solid rgba(255, 255, 255, 0.4) !important; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 15px; min-height: 95px; background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden !important; }
     .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1) !important; }
     .kpi-icon-wrapper { position: absolute; left: 15px; width: 70px; height: 70px; border-radius: 18px; display: flex; align-items: center; justify-content: center; z-index: 0; opacity: 0.95; }
@@ -120,44 +111,12 @@ st.markdown("""
     div[data-testid="stRadio"] > div[role="radiogroup"] { display: flex; flex-direction: row; justify-content: center; gap: 35px; margin-top: 10px; margin-bottom: 20px; flex-wrap: wrap; background-color: transparent !important; }
     div[data-testid="stRadio"] > div[role="radiogroup"] > label { cursor: pointer; background: transparent !important; border: none !important; box-shadow: none !important; padding: 5px !important; }
     div[data-testid="stRadio"] > div[role="radiogroup"] > label p { font-weight: 600 !important; color: #0f172a !important; margin: 0 !important; font-size: 1rem !important; }
-    
-    /* ================= BIẾN NÚT BẤM THÀNH NÚT ICON TRÒN GỌN GÀNG Ở GÓC TRÊN CÙNG ================= */
-    div[data-testid="stButton"] {
-        position: fixed;
-        top: 10px;
-        right: 220px; /* Nằm ngay cạnh cụm công cụ Share của Streamlit */
-        z-index: 999999;
-        width: 40px !important;
-    }
-    div[data-testid="stButton"] button {
-        background-color: rgba(255, 255, 255, 0.6) !important;
-        color: #0A3622 !important;
-        border-radius: 50% !important; /* Biến thành nút tròn */
-        width: 38px !important;
-        height: 38px !important;
-        min-height: 38px !important;
-        padding: 0 !important;
-        border: 1px solid rgba(0, 0, 0, 0.15) !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
-        transition: all 0.2s ease !important;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px !important;
-    }
-    div[data-testid="stButton"] button:hover {
-        background-color: rgba(25, 135, 84, 0.9) !important;
-        color: white !important;
-        transform: scale(1.1);
-        border-color: transparent !important;
-        box-shadow: 0 4px 12px rgba(25, 135, 84, 0.4) !important;
-    }
 </style>
 """, unsafe_allow_html=True)
 
 
-# ================= 2. ĐỌC DỮ LIỆU TỪ GOOGLE SHEETS =================
-@st.cache_data(ttl=300, show_spinner=False)
+# ================= 2. ĐỌC DỮ LIỆU TỪ GOOGLE SHEETS (TỰ ĐỘNG CẬP NHẬT KHI TẢI LẠI TRANG) =================
+@st.cache_data(ttl=0, show_spinner=False)
 def load_data():
     sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
     try:
@@ -194,7 +153,7 @@ def load_data():
         
     return df
 
-with st.spinner("⏳ Đang tải dữ liệu mới..."):
+with st.spinner("⏳ Đang tải dữ liệu mới nhất từ Google Sheets..."):
     df = load_data()
 
 
