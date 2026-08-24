@@ -255,9 +255,7 @@ st.markdown("""
 # ================= 2. ĐỌC DỮ LIỆU TỪ GOOGLE SHEETS =================
 @st.cache_data(ttl=60)
 def load_data():
-    # LINK DỮ LIỆU GỐC ĐÃ ĐƯỢC PHỤC HỒI
     sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
-    
     try:
         df = pd.read_csv(sheet_url)
     except Exception:
@@ -265,16 +263,31 @@ def load_data():
     
     df.columns = df.columns.str.strip()
     
-    # CHUẨN HÓA TÊN CỘT CHỐNG LỖI KEYERROR
+    # CHUẨN HÓA TÊN CỘT RÕ RÀNG (KHẮC PHỤC LỖI TRÙNG TÊN CỘT)
+    rename_dict = {}
     for col in df.columns:
-        if col.lower() == 'trạng thái': df.rename(columns={col: 'Trạng Thái'}, inplace=True)
-        elif col.lower() == 'tiến độ (%)': df.rename(columns={col: 'Tiến Độ (%)'}, inplace=True)
-        elif col.lower() in ['đầu việc', 'đầu việc shopdrawing', 'hạng mục']: df.rename(columns={col: 'Hạng Mục'}, inplace=True)
-        elif col.lower() == 'ghi chú': df.rename(columns={col: 'Vướng Mắc'}, inplace=True)
-        elif col.lower() == 'dự án': df.rename(columns={col: 'Dự Án'}, inplace=True)
-        elif col.lower() in ['cán bộ quản lý', 'người quản lý']: df.rename(columns={col: 'Cán Bộ Quản Lý'}, inplace=True)
-        elif 'plhđ' in col.lower() or 'hợp đồng' in col.lower(): df.rename(columns={col: 'Hợp Đồng - PLHĐ'}, inplace=True)
-        elif 'triển khai' in col.lower(): df.rename(columns={col: 'Cán Bộ Triển Khai - SĐT'}, inplace=True)
+        c_low = str(col).lower().strip()
+        if c_low == 'trạng thái': 
+            rename_dict[col] = 'Trạng Thái'
+        elif c_low == 'tiến độ (%)': 
+            rename_dict[col] = 'Tiến Độ (%)'
+        elif c_low in ['đầu việc', 'đầu việc shopdrawing', 'hạng mục']: 
+            rename_dict[col] = 'Hạng Mục'
+        elif c_low == 'ghi chú': 
+            rename_dict[col] = 'Vướng Mắc'
+        elif c_low == 'dự án': 
+            rename_dict[col] = 'Dự Án'
+        elif c_low in ['cán bộ quản lý', 'người quản lý']: 
+            rename_dict[col] = 'Cán Bộ Quản Lý'
+        elif c_low in ['hợp đồng - plhđ', 'hợp đồng', 'số hợp đồng', 'hợp đồng plhđ']: 
+            rename_dict[col] = 'Hợp Đồng - PLHĐ'
+        elif c_low in ['cán bộ triển khai - sđt', 'người triển khai', 'cán bộ triển khai']: 
+            rename_dict[col] = 'Cán Bộ Triển Khai - SĐT'
+            
+    df.rename(columns=rename_dict, inplace=True)
+    
+    # Ép bỏ các cột trùng tên (Nếu có 2 cột cùng tên, giữ cột đầu tiên - CHỐNG LỖI ATTRIBUTE ERROR)
+    df = df.loc[:, ~df.columns.duplicated()]
         
     cols_to_fill = ['Mã Dự Án', 'Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục']
     for col in cols_to_fill:
@@ -374,7 +387,7 @@ if selected_hm and 'Hạng Mục' in df_display.columns: df_display = df_display
 if selected_ql and 'Cán Bộ Quản Lý' in df_display.columns: df_display = df_display[df_display['Cán Bộ Quản Lý'].isin(selected_ql)]
 if selected_cb and cb_col in df_display.columns: df_display = df_display[df_display[cb_col].isin(selected_cb)]
 
-# --- TÍNH TOÁN 10 CHỈ SỐ KPI ĐÃ ĐƯỢC CHỐNG LỖI ---
+# --- TÍNH TOÁN 10 CHỈ SỐ KPI ---
 p_projects = df_display.get('Dự Án', pd.Series()).nunique()
 p_contracts = df_display.get('Hợp Đồng - PLHĐ', pd.Series()).nunique()
 p_categories = df_display.get('Hạng Mục', pd.Series()).nunique()
