@@ -293,7 +293,7 @@ def load_data():
             rename_dict[col] = 'Tiến Độ (%)'
         elif c_low in ['đầu việc', 'đầu việc shopdrawing', 'hạng mục']: 
             rename_dict[col] = 'Hạng Mục'
-        elif c_low in ['ghi chú', 'vướng mắc', 'ý kiến', 'vuong mac', 'ghi chu']:  # <-- Đã mở rộng nhận diện
+        elif c_low in ['ghi chú', 'vướng mắc', 'ý kiến', 'vuong mac', 'ghi chu', 'note', 'ghi chú/vướng mắc']: 
             rename_dict[col] = 'Vướng Mắc'
         elif c_low == 'dự án': 
             rename_dict[col] = 'Dự Án'
@@ -407,7 +407,7 @@ if selected_hm and 'Hạng Mục' in df_display.columns: df_display = df_display
 if selected_ql and 'Cán Bộ Quản Lý' in df_display.columns: df_display = df_display[df_display['Cán Bộ Quản Lý'].isin(selected_ql)]
 if selected_cb and cb_col in df_display.columns: df_display = df_display[df_display[cb_col].isin(selected_cb)]
 
-# --- TÍNH TOÁN 10 CHỈ SỐ KPI ---
+# --- TÍNH TOÁN 10 CHỈ SỐ KPI ĐÃ ĐƯỢC CHỐNG LỖI ---
 p_projects = df_display.get('Dự Án', pd.Series()).nunique()
 p_contracts = df_display.get('Hợp Đồng - PLHĐ', pd.Series()).nunique()
 p_categories = df_display.get('Hạng Mục', pd.Series()).nunique()
@@ -422,10 +422,10 @@ if 'Trạng Thái' in df_display.columns:
 else:
     p_done = p_inprogress = p_notstarted = p_paused = 0
 
-# TÍNH TOÁN CỘT VƯỚNG MẮC: CHỈ ĐẾM CÁC HÀNG CÓ CHỮ TRONG CỘT (LOẠI BỎ RỖNG)
+# TÍNH TOÁN CỘT VƯỚNG MẮC: CỨ CÓ CHỮ TRONG Ô LÀ TÍNH 1
 if 'Vướng Mắc' in df_display.columns:
     _issues = df_display['Vướng Mắc'].astype(str).str.strip().str.lower()
-    p_issues = len(_issues[(_issues != '') & (_issues != 'nan') & (_issues != 'none')])
+    p_issues = sum((_issues != '') & (_issues != 'nan') & (_issues != 'none') & (_issues != 'null'))
 else:
     p_issues = 0
 
