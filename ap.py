@@ -208,13 +208,14 @@ st.markdown("""
     }
     .custom-download-link:hover { color: #198754 !important; text-decoration: underline !important; }
 
-    /* ================= KIẾN TRÚC MỚI CHO 10 Ô KPI - CẬP NHẬT KÍCH THƯỚC THEO YÊU CẦU ================= */
+    /* ================= KIẾN TRÚC MỚI CHO 10 Ô KPI - CĂN GIỮA VÀ GIẢM CHIỀU CAO ================= */
     .kpi-card {
-        width: 100%; padding: 18px 15px; 
+        width: 100%; padding: 12px 15px; /* Giảm padding trên dưới để cân đối */
         border-radius: 20px !important; 
         border: 1px solid rgba(255, 255, 255, 0.4) !important; 
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; 
-        display: flex; align-items: center; margin-bottom: 15px; min-height: 115px; /* Giữ nguyên kích thước ô */
+        display: flex; align-items: center; margin-bottom: 15px; 
+        min-height: 95px; /* Giảm chiều cao tối thiểu */
         background-color: rgba(255, 255, 255, 0.35) !important; 
         backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -223,19 +224,29 @@ st.markdown("""
     .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1) !important; }
     
     .kpi-icon-wrapper {
-        width: 70px; height: 70px; border-radius: 18px; /* TĂNG KHUNG CHỨA ICON LÊN 70x70 */
+        width: 70px; height: 70px; border-radius: 18px; 
         display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 15px;
     }
-    .kpi-icon-wrapper .material-symbols-rounded { font-size: 60px; } /* PHÓNG TO ICON LÊN 60PX */
+    .kpi-icon-wrapper .material-symbols-rounded { font-size: 60px; } 
     
-    .kpi-details { flex-grow: 1; overflow: hidden; }
-    
-    .kpi-title {
-        font-size: 1.2rem; font-weight: 800; opacity: 0.85; text-transform: uppercase; margin-bottom: 4px; /* GIẢM TIÊU ĐỀ XUỐNG 1.2REM */
-        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #0f172a;
+    .kpi-details { 
+        flex-grow: 1; overflow: hidden; 
+        display: flex; flex-direction: column; align-items: center; justify-content: center; /* Căn giữa toàn bộ văn bản */
     }
     
-    .kpi-value { font-size: 2.5rem; font-weight: 900; color: #0f172a; } /* GIỮ SỐ LIỆU 2.5REM & 900 */
+    .kpi-title {
+        font-size: 1.2rem; font-weight: 800; opacity: 0.85; text-transform: uppercase; margin-bottom: 2px; 
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #0f172a;
+        text-align: center; /* Chữ căn giữa */
+        width: 100%;
+    }
+    
+    .kpi-value { 
+        font-size: 2.5rem; font-weight: 900; color: #0f172a; 
+        text-align: center; /* Số liệu căn giữa */
+        line-height: 1.1; /* Thu gọn khoảng cách để cân đối trên dưới */
+        width: 100%;
+    }
     
     div[data-testid="stRadio"] { width: 100% !important; }
     div[data-testid="stRadio"] > div[role="radiogroup"] {
@@ -263,7 +274,7 @@ def load_data():
     
     df.columns = df.columns.str.strip()
     
-    # CHUẨN HÓA TÊN CỘT RÕ RÀNG (KHẮC PHỤC LỖI TRÙNG TÊN CỘT)
+    # CHUẨN HÓA TÊN CỘT RÕ RÀNG
     rename_dict = {}
     for col in df.columns:
         c_low = str(col).lower().strip()
@@ -286,7 +297,7 @@ def load_data():
             
     df.rename(columns=rename_dict, inplace=True)
     
-    # Ép bỏ các cột trùng tên (Nếu có 2 cột cùng tên, giữ cột đầu tiên - CHỐNG LỖI ATTRIBUTE ERROR)
+    # Ép bỏ các cột trùng tên
     df = df.loc[:, ~df.columns.duplicated()]
         
     cols_to_fill = ['Mã Dự Án', 'Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục']
@@ -387,7 +398,7 @@ if selected_hm and 'Hạng Mục' in df_display.columns: df_display = df_display
 if selected_ql and 'Cán Bộ Quản Lý' in df_display.columns: df_display = df_display[df_display['Cán Bộ Quản Lý'].isin(selected_ql)]
 if selected_cb and cb_col in df_display.columns: df_display = df_display[df_display[cb_col].isin(selected_cb)]
 
-# --- TÍNH TOÁN 10 CHỈ SỐ KPI ĐÃ ĐƯỢC CHỐNG LỖI ---
+# --- TÍNH TOÁN 10 CHỈ SỐ KPI ---
 p_projects = df_display.get('Dự Án', pd.Series()).nunique()
 p_contracts = df_display.get('Hợp Đồng - PLHĐ', pd.Series()).nunique()
 p_categories = df_display.get('Hạng Mục', pd.Series()).nunique()
