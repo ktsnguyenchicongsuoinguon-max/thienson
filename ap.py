@@ -295,7 +295,6 @@ with r2_c3: st.markdown(render_transparent_shadow_kpi("Chưa bắt đầu", p_no
 with r2_c4: st.markdown(render_transparent_shadow_kpi("Tạm dừng", p_paused, "pause_circle", "#fff3cd", "#ffc107"), unsafe_allow_html=True)
 with r2_c5: st.markdown(render_transparent_shadow_kpi("Vướng mắc", p_issues, "error", "#f8d7da", "#dc3545"), unsafe_allow_html=True)
 
-# ĐÃ THÊM "VƯỚNG MẮC" VÀO HÀNG LỰA CHỌN TRẠNG THÁI NGANG
 status_options = ["Tất cả", "Chưa bắt đầu", "Đang triển khai", "Đã hoàn thành", "Tạm dừng", "Vướng mắc"]
 actual_status = st.radio("Bộ lọc Trạng Thái", options=status_options, horizontal=True, label_visibility="collapsed")
 
@@ -305,7 +304,7 @@ if actual_status != "Tất cả":
             _iss = df_display['Vướng Mắc'].astype(str).str.strip().str.lower()
             df_display = df_display[(_iss != '') & (_iss != 'nan') & (_iss != 'none') & (_iss != 'null')]
         else:
-            df_display = df_display.iloc[0:0] # Trả về bảng trống nếu không tìm thấy cột
+            df_display = df_display.iloc[0:0]
     else:
         df_display = df_display[df_display.get('Trạng Thái', '') == actual_status]
 
@@ -332,22 +331,34 @@ def generate_excel_with_colors(df_data):
     green_fill = PatternFill(start_color="A5D6A7", end_color="A5D6A7", fill_type="solid")
     red_fill = PatternFill(start_color="EF9A9A", end_color="EF9A9A", fill_type="solid")
     gray_fill = PatternFill(start_color="F5F5F5", end_color="F5F5F5", fill_type="solid")
+    yellow_fill = PatternFill(start_color="FFF3CD", end_color="FFF3CD", fill_type="solid") # Màu vàng cam nhạt cho vướng mắc
 
     status_col_idx = None
+    vướng_col_idx = None
     for col_idx, col_name in enumerate(df_data.columns, 1):
-        if col_name == 'Trạng Thái':
-            status_col_idx = col_idx
-            break
-    if status_col_idx:
-        for row_idx in range(2, ws.max_row + 1):
+        if col_name == 'Trạng Thái': status_col_idx = col_idx
+        if col_name == 'Vướng Mắc': vướng_col_idx = col_idx
+
+    for row_idx in range(2, ws.max_row + 1):
+        fill_to_use = None
+        
+        # Kiểm tra nếu có vướng mắc thì ưu tiên tô màu vàng cam nhạt
+        if vướng_col_idx:
+            v_val = str(ws.cell(row=row_idx, column=vướng_col_idx).value).strip().lower()
+            if v_val and v_val not in ['nan', 'none', '']:
+                fill_to_use = yellow_fill
+
+        # Nếu không có vướng mắc thì tô màu theo Trạng Thái
+        if not fill_to_use and status_col_idx:
             status_val = str(ws.cell(row=row_idx, column=status_col_idx).value).strip()
-            fill_to_use = None
             if status_val == 'Đã hoàn thành': fill_to_use = green_fill
             elif status_val == 'Tạm dừng': fill_to_use = red_fill
             elif status_val == 'Chưa bắt đầu': fill_to_use = gray_fill
-            if fill_to_use:
-                for col in range(1, ws.max_column + 1):
-                    ws.cell(row=row_idx, column=col).fill = fill_to_use
+
+        if fill_to_use:
+            for col in range(1, ws.max_column + 1):
+                ws.cell(row=row_idx, column=col).fill = fill_to_use
+
     final_output = io.BytesIO()
     wb.save(final_output)
     return final_output.getvalue()
@@ -376,6 +387,11 @@ if 'Trạng Thái' in df_display.columns and 'Tiến Độ (%)' in df_display.co
     df_display = df_display.drop(columns=['Mức Ưu Tiên'])
 
 def color_rows(row):
+    # Kiểm tra cột Vướng Mắc, nếu có nội dung thì tô màu vàng cam nhạt
+    vm = str(row.get('Vướng Mắc', '')).strip().lower()
+    if vm and vm not in ['nan', 'none', '']:
+        return ['background-color: #fff3cd; color: #000;'] * len(row)
+        
     status = row.get('Trạng Thái', '')
     if status == 'Đã hoàn thành': return ['background-color: #a5d6a7; color: #000;'] * len(row)
     if status == 'Tạm dừng': return ['background-color: #ef9a9a; color: #000;'] * len(row)
