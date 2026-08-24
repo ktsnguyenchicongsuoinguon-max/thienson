@@ -208,30 +208,34 @@ st.markdown("""
     }
     .custom-download-link:hover { color: #198754 !important; text-decoration: underline !important; }
 
-    /* ================= KIẾN TRÚC MỚI CHO 10 Ô KPI - PHÓNG TO ================= */
+    /* ================= KIẾN TRÚC MỚI CHO 10 Ô KPI - PHÓNG TO VĂN BẢN & ICON ================= */
     .kpi-card {
-        width: 100%; padding: 18px 15px; /* Tăng padding để cân đối với icon to */
+        width: 100%; padding: 18px 15px; 
         border-radius: 20px !important; 
         border: 1px solid rgba(255, 255, 255, 0.4) !important; 
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; 
-        display: flex; align-items: center; margin-bottom: 15px; min-height: 115px; /* Tăng chiều cao tối thiểu */
+        display: flex; align-items: center; margin-bottom: 15px; min-height: 115px; /* Giữ nguyên kích thước ô */
         background-color: rgba(255, 255, 255, 0.35) !important; 
         backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
         overflow: visible !important;
     }
     .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1) !important; }
+    
     .kpi-icon-wrapper {
-        width: 60px; height: 60px; border-radius: 18px; /* Phóng to khung chứa Icon */
+        width: 60px; height: 60px; border-radius: 18px; /* Giữ nguyên khung Icon 60x60 */
         display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 15px;
     }
-    .kpi-icon-wrapper .material-symbols-rounded { font-size: 34px; } /* Phóng to Icon */
+    .kpi-icon-wrapper .material-symbols-rounded { font-size: 44px; } /* ĐÃ PHÓNG TO ICON LÊN 44PX */
+    
     .kpi-details { flex-grow: 1; overflow: hidden; }
+    
     .kpi-title {
-        font-size: 0.9rem; font-weight: 800; opacity: 0.85; text-transform: uppercase; margin-bottom: 4px; /* Phóng to Tiêu đề */
+        font-size: 1.5rem; font-weight: 800; opacity: 0.85; text-transform: uppercase; margin-bottom: 4px; /* ĐÃ PHÓNG TO TIÊU ĐỀ LÊN 1.5REM */
         white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #0f172a;
     }
-    .kpi-value { font-size: 1.9rem; font-weight: 900; color: #0f172a; } /* Phóng to Số liệu */
+    
+    .kpi-value { font-size: 2.5rem; font-weight: 900; color: #0f172a; } /* ĐÃ PHÓNG TO SỐ LIỆU LÊN 2.5REM */
     
     div[data-testid="stRadio"] { width: 100% !important; }
     div[data-testid="stRadio"] > div[role="radiogroup"] {
@@ -251,7 +255,7 @@ st.markdown("""
 # ================= 2. ĐỌC DỮ LIỆU TỪ GOOGLE SHEETS =================
 @st.cache_data(ttl=60)
 def load_data():
-    sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
+    sheet_url = "https://docs.google.com/spreadsheets/d/1dOiPWgLE8o7YUeA6l_g_eF825PnkskRn/export?format=csv&gid=418096547"
     df = pd.read_csv(sheet_url)
     
     df.columns = df.columns.str.strip()
@@ -360,7 +364,7 @@ if selected_cb: df_display = df_display[df_display[cb_col].isin(selected_cb)]
 
 # --- TÍNH TOÁN 10 CHỈ SỐ KPI ---
 p_projects = df_display.get('Dự Án', pd.Series()).nunique()
-p_contracts = df_display.get('Hợp Đồng - PLHĐ', pd.Series()).nunique() # Cột KPI Hợp đồng
+p_contracts = df_display.get('Hợp Đồng - PLHĐ', pd.Series()).nunique()
 p_categories = df_display.get('Hạng Mục', pd.Series()).nunique()
 p_total = len(df_display)
 p_prog = df_display['Tiến Độ (%)'].mean() if ('Tiến Độ (%)' in df_display.columns and p_total > 0) else 0
@@ -369,11 +373,11 @@ if 'Trạng Thái' in df_display.columns:
     p_done = len(df_display[df_display['Trạng Thái'].astype(str).str.strip() == 'Đã hoàn thành'])
     p_inprogress = len(df_display[df_display['Trạng Thái'].astype(str).str.strip() == 'Đang triển khai'])
     p_notstarted = len(df_display[df_display['Trạng Thái'].astype(str).str.strip() == 'Chưa bắt đầu'])
-    p_paused = len(df_display[df_display['Trạng Thái'].astype(str).str.strip() == 'Tạm dừng']) # KPI Tạm dừng
+    p_paused = len(df_display[df_display['Trạng Thái'].astype(str).str.strip() == 'Tạm dừng'])
 else:
     p_done = p_inprogress = p_notstarted = p_paused = 0
 
-p_issues = len(df_display[df_display.get('Vướng Mắc', pd.Series()).astype(str).str.strip() != '']) if 'Vướng Mắc' in df_display.columns else 0 # KPI Vướng mắc tách riêng đếm cột Ghi chú
+p_issues = len(df_display[df_display.get('Vướng Mắc', pd.Series()).astype(str).str.strip() != '']) if 'Vướng Mắc' in df_display.columns else 0
 
 def render_transparent_shadow_kpi(title, value, icon_name, bg_color, icon_color):
     return f"""
