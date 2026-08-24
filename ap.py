@@ -106,14 +106,14 @@ st.markdown("""
     .custom-download-link { display: block; float: right; text-align: right; color: #0A3622 !important; font-size: 13.5px !important; font-weight: 700 !important; text-decoration: none !important; margin-top: -30px !important; margin-right: 0px !important; margin-bottom: 5px !important; position: relative; z-index: 9999; cursor: pointer; }
     .custom-download-link:hover { color: #198754 !important; text-decoration: underline !important; }
 
-    /* 10 Ô KPI (ICON, TIÊU ĐỀ VÀ SỐ LIỆU ĐÃ ĐƯỢC CHUYỂN SANG MÀU ĐỎ) */
+    /* 10 Ô KPI (CHỮ MÀU ĐEN #0f172a, ICON MÀU XANH DƯƠNG ĐẬM #0d6efd) */
     .kpi-card { width: 100%; padding: 10px 12px; border-radius: 18px !important; border: 1px solid rgba(255, 255, 255, 0.4) !important; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 10px; min-height: 85px; background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden !important; }
     .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 5px 10px rgba(0, 0, 0, 0.1) !important; }
-    .kpi-icon-wrapper { position: absolute; left: 12px; width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; z-index: 0; opacity: 0.95; background-color: rgba(255, 255, 255, 0.5) !important; color: #d90429 !important; }
-    .kpi-icon-wrapper .material-symbols-rounded { font-size: 48px; color: #d90429 !important; } 
+    .kpi-icon-wrapper { position: absolute; left: 12px; width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; z-index: 0; opacity: 0.95; background-color: rgba(255, 255, 255, 0.5) !important; color: #0d6efd !important; }
+    .kpi-icon-wrapper .material-symbols-rounded { font-size: 48px; color: #0d6efd !important; } 
     .kpi-details { display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1; text-align: center; }
-    .kpi-title { font-size: 1.1rem; font-weight: 800; opacity: 0.9; text-transform: uppercase; margin-bottom: 2px; white-space: nowrap; color: #d90429 !important; text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8); }
-    .kpi-value { font-size: 2.2rem; font-weight: 900; color: #d90429 !important; line-height: 1.1; text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8); }
+    .kpi-title { font-size: 1.1rem; font-weight: 800; opacity: 0.85; text-transform: uppercase; margin-bottom: 2px; white-space: nowrap; color: #0f172a !important; text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8); }
+    .kpi-value { font-size: 2.2rem; font-weight: 900; color: #0f172a !important; line-height: 1.1; text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8); }
     
     div[data-testid="stRadio"] { width: 100% !important; }
     div[data-testid="stRadio"] > div[role="radiogroup"] { display: flex; flex-direction: row; justify-content: center; gap: 30px; margin-top: 5px; margin-bottom: 15px; flex-wrap: wrap; background-color: transparent !important; }
