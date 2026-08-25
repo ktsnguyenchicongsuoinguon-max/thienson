@@ -49,7 +49,9 @@ st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
     html, body { overflow: hidden !important; margin: 0 !important; padding: 0 !important; }
-    body > #root > .stApp > header { background: transparent !important; box-shadow: none !important; }
+    ::-webkit-scrollbar { display: none !important; }
+    * { scrollbar-width: none !important; -ms-overflow-style: none !important; box-sizing: border-box !important; }
+    header[data-testid="stHeader"] { background: transparent !important; box-shadow: none !important; }
     [data-testid="stHeaderActionElements"], .stAppDeployButton { display: none !important; }
     footer { display: none !important; }
 
@@ -86,101 +88,73 @@ st.markdown("""
     }
     div.row-widget.stSelectbox, div.row-widget.stMultiSelect { margin-bottom: -5px !important; }
 
-    /* KHOẢNG CÁCH ĐỀU CHO KHUNG CHÍNH */
+    /* KHOẢNG CÁCH ĐỀU 30PX (TRÁI/PHẢI/DƯỚI) CHO KHUNG CHÍNH */
     .block-container { 
         background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         width: calc(100% - 40px) !important; max-width: 100% !important; 
         margin: 20px 20px !important; 
-        padding: 25px 30px 25px 30px !important; 
+        padding: 25px 30px 30px 30px !important; 
         height: calc(100vh - 40px) !important; 
         display: flex !important; flex-direction: column !important; overflow: hidden !important; 
     }
     .block-container * { max-width: 100% !important; }
-    .block-container > div[data-testid="stVerticalBlock"] { flex-grow: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; height: 100% !important; }
+    .block-container > div[data-testid="stVerticalBlock"] { flex-grow: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; }
     .block-container > div[data-testid="stVerticalBlock"] > div { flex-shrink: 0 !important; width: 100% !important; }
     
-    /* BẢNG CHI TIẾT CÔNG VIỆC TÙY CHỈNH BẰNG HTML - BẬT CUỘN HOÀN TOÀN (CẢ DỌC VÀ NGANG) */
+    /* BẢNG CHI TIẾT CÔNG VIỆC TÙY CHỈNH BẰNG HTML (CHỐNG TRÀN VÀ CÁCH ĐỀU 30PX ĐÁY) */
     div.element-container:has(.custom-table-wrapper),
     .stMarkdown:has(.custom-table-wrapper),
     div[data-testid="stMarkdownContainer"]:has(.custom-table-wrapper) {
-        flex: 1 1 0% !important; 
-        display: flex !important; 
-        flex-direction: column !important; 
-        min-height: 0 !important; 
-        height: auto !important;
-        width: 100% !important; 
-        overflow: hidden !important;
+        flex-grow: 1 !important; flex-shrink: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; 
     }
     
     .custom-table-wrapper {
         width: 100% !important; 
-        flex: 1 1 0% !important;
-        height: 100% !important;
-        min-height: 150px !important;
-        overflow-y: scroll !important; 
+        max-height: calc(100vh - 355px) !important; 
+        overflow-y: auto !important; 
         overflow-x: auto !important; 
         border-radius: 12px; 
         border: 1px solid rgba(255,255,255,0.5);
         background-color: rgba(255, 255, 255, 0.45);
         box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         margin-bottom: 0px !important; 
-        scrollbar-width: thin !important;
-        scrollbar-color: rgba(15, 23, 42, 0.3) transparent !important;
-        -webkit-overflow-scrolling: touch !important;
     }
     .custom-table-wrapper::-webkit-scrollbar { width: 8px !important; height: 8px !important; display: block !important; }
     .custom-table-wrapper::-webkit-scrollbar-track { background: transparent !important; }
     .custom-table-wrapper::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.3) !important; border-radius: 10px !important; }
     .custom-table-wrapper::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.5) !important; }
     
-    /* GỠ BỎ MỌI GIỚI HẠN GÂY MẤT CỘT KHI ZOOM */
-    .custom-table-wrapper * {
-        max-width: none !important; 
-    }
-    
     .custom-table { 
-        width: max-content !important; 
-        min-width: 100% !important; 
+        width: 100% !important; 
         border-collapse: separate !important; 
         border-spacing: 0; 
         font-family: inherit; 
         margin: 0 !important;
     }
     .custom-table thead th {
-        background-color: #e9d8fd !important;
-        color: #000000 !important;
+        background-color: #e9d8fd !important; /* MÀU TÍM NHẠT CHO TIÊU ĐỀ */
+        color: #000000 !important; /* CHỮ MÀU ĐEN */
         font-weight: 800 !important; 
-        font-size: 13.5px !important; 
-        text-transform: uppercase !important; 
+        font-size: 15.5px !important; /* TĂNG KÍCH THƯỚC CHỮ LÊN 1 CHÚT */
+        text-transform: uppercase !important; /* CHỮ VIẾT HOA */
         position: sticky !important; 
         top: 0 !important; 
         z-index: 10 !important; 
-        padding: 8px 10px !important; 
-        text-align: center !important; 
+        padding: 12px 10px !important; 
+        text-align: left !important;
         border-bottom: 2px solid #d6bcfa !important; 
         border-right: 1px solid rgba(0,0,0,0.05) !important; 
-        
-        /* TỐI ĐA 2 DÒNG CHO TIÊU ĐỀ VÀ CĂN GIỮA */
-        white-space: normal !important; 
-        word-wrap: break-word !important; 
-        line-height: 1.25 !important;
-        vertical-align: middle !important;
-        
-        /* KÉO THẢ CHIỀU NGANG */
-        resize: horizontal !important; 
-        overflow: hidden !important; 
-        min-width: 130px !important;
+        white-space: nowrap !important; 
     }
     .custom-table tbody td {
-        padding: 8px 10px !important; 
-        font-size: 13px !important; 
+        padding: 10px 10px !important; 
+        font-size: 13.5px !important; 
         border-bottom: 1px solid rgba(0,0,0,0.05) !important;
         border-right: 1px solid rgba(0,0,0,0.05); 
         white-space: normal !important; 
         word-wrap: break-word !important; 
         vertical-align: middle !important; 
-        min-width: 130px !important;
     }
     
     /* CĂN GIỮA TUYỆT ĐỐI KHUNG TIÊU ĐỀ */
@@ -198,24 +172,24 @@ st.markdown("""
         align-items: center; 
         justify-content: center; 
         padding: 6px 25px; 
-        margin-top: 10px; 
-        margin-bottom: 10px;
+        margin-top: 15px; 
+        margin-bottom: 15px;
     }
 
-    .custom-download-link { display: block; float: right; text-align: right; color: #0A3622 !important; font-size: 13.5px !important; font-weight: 700 !important; text-decoration: none !important; margin-top: -28px !important; margin-right: 0px !important; margin-bottom: 5px !important; position: relative; z-index: 9999; cursor: pointer; }
+    .custom-download-link { display: block; float: right; text-align: right; color: #0A3622 !important; font-size: 13.5px !important; font-weight: 700 !important; text-decoration: none !important; margin-top: -30px !important; margin-right: 0px !important; margin-bottom: 5px !important; position: relative; z-index: 9999; cursor: pointer; }
     .custom-download-link:hover { color: #198754 !important; text-decoration: underline !important; }
 
     /* 10 Ô KPI */
-    .kpi-card { width: 100%; padding: 8px 10px; border-radius: 18px !important; border: 1px solid rgba(255, 255, 255, 0.4) !important; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 8px; min-height: 75px; background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden !important; }
+    .kpi-card { width: 100%; padding: 10px 12px; border-radius: 18px !important; border: 1px solid rgba(255, 255, 255, 0.4) !important; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 10px; min-height: 85px; background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden !important; }
     .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 5px 10px rgba(0, 0, 0, 0.1) !important; }
-    .kpi-icon-wrapper { position: absolute; left: 10px; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; z-index: 0; opacity: 0.95; background-color: #cfe2ff !important; color: #0d6efd !important; }
-    .kpi-icon-wrapper .material-symbols-rounded { font-size: 40px; color: #0d6efd !important; } 
+    .kpi-icon-wrapper { position: absolute; left: 12px; width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; z-index: 0; opacity: 0.95; background-color: #cfe2ff !important; color: #0d6efd !important; }
+    .kpi-icon-wrapper .material-symbols-rounded { font-size: 48px; color: #0d6efd !important; } 
     .kpi-details { display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1; text-align: center; }
-    .kpi-title { font-size: 0.95rem; font-weight: 800; opacity: 0.85; text-transform: uppercase; margin-bottom: 2px; white-space: nowrap; color: #0f172a !important; text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8); }
-    .kpi-value { font-size: 1.8rem; font-weight: 900; color: #0f172a !important; line-height: 1.1; text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8); }
+    .kpi-title { font-size: 1.1rem; font-weight: 800; opacity: 0.85; text-transform: uppercase; margin-bottom: 2px; white-space: nowrap; color: #0f172a !important; text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8); }
+    .kpi-value { font-size: 2.2rem; font-weight: 900; color: #0f172a !important; line-height: 1.1; text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8); }
     
     div[data-testid="stRadio"] { width: 100% !important; }
-    div[data-testid="stRadio"] > div[role="radiogroup"] { display: flex; flex-direction: row; justify-content: center; gap: 25px; margin-top: 2px; margin-bottom: 8px; flex-wrap: wrap; background-color: transparent !important; }
+    div[data-testid="stRadio"] > div[role="radiogroup"] { display: flex; flex-direction: row; justify-content: center; gap: 30px; margin-top: 5px; margin-bottom: 15px; flex-wrap: wrap; background-color: transparent !important; }
     div[data-testid="stRadio"] > div[role="radiogroup"] > label { cursor: pointer; background: transparent !important; border: none !important; box-shadow: none !important; padding: 2px !important; }
     div[data-testid="stRadio"] > div[role="radiogroup"] > label p { font-weight: 600 !important; color: #0f172a !important; margin: 0 !important; font-size: 0.95rem !important; }
 </style>
@@ -227,6 +201,7 @@ def load_data():
     sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
     try:
         df = pd.read_csv(sheet_url)
+        # LOẠI BỎ CÁC CỘT RỖNG VÀ LỖI UNNAMED ĐỂ ĐẢM BẢO KHÔNG BỊ RÁC BẢNG
         df = df.dropna(how='all', axis=1)
         df = df.loc[:, ~df.columns.str.contains('^unnamed', case=False, na=False)]
     except Exception:
@@ -234,6 +209,7 @@ def load_data():
     
     df.columns = df.columns.str.strip()
     
+    # THUẬT TOÁN NHẬN DIỆN CỘT THÔNG MINH - CHỐNG GHI ĐÈ 1-1 (HIỂN THỊ ĐỦ 100% CỘT)
     rename_dict = {}
     seen_targets = set()
     
@@ -269,6 +245,7 @@ def load_data():
             if not any(kw in c_low for kw in ['%', 'tiến độ', 'trạng thái', 'tình trạng']):
                 target = 'Ngày Hoàn Thành'
                 
+        # Chỉ cập nhật nếu tên mục tiêu chưa được gắn cho cột nào trước đó (Chống gộp cột/mất cột)
         if target and target not in seen_targets:
             rename_dict[col] = target
             seen_targets.add(target)
@@ -276,6 +253,7 @@ def load_data():
     df.rename(columns=rename_dict, inplace=True)
     df = df.loc[:, ~df.columns.duplicated()]
     
+    # LÀM SẠCH VÀ ĐỒNG NHẤT DỮ LIỆU TÌNH TRẠNG TRIỂN KHAI
     if 'Tình trạng triển khai' in df.columns:
         def clean_status(x):
             val = str(x).strip().lower()
@@ -287,6 +265,7 @@ def load_data():
         
         df['Tình trạng triển khai'] = df['Tình trạng triển khai'].apply(clean_status)
 
+    # FORWARD FILL ĐỂ XỬ LÝ CÁC Ô GỘP (MERGE CELLS) TRONG GOOGLE SHEETS
     cols_to_fill = ['Mã Dự Án', 'Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục', 'Chủ nhiệm dự án', 'Chuyên viên thực hiện']
     for col in cols_to_fill:
         if col in df.columns: 
@@ -301,7 +280,7 @@ def load_data():
         
     return df
 
-# LƯU TRỮ VÀ CẬP NHẬT DỮ LIỆU
+# LƯU TRỮ VÀ CẬP NHẬT DỮ LIỆU (TỰ LÀM MỚI KHI F5 DO KHÔNG DÙNG ST.CACHE)
 if 'raw_data' not in st.session_state:
     with st.spinner("⏳ Đang tải dữ liệu mới nhất từ Google Sheets..."):
         st.session_state.raw_data = load_data()
@@ -371,8 +350,8 @@ with st.sidebar:
 # ================= 4. KHỐI CHÍNH (BÊN PHẢI) =================
 
 st.markdown("""
-<div class="title-card-center" style="padding: 6px 25px; margin-top: 0px; margin-bottom: 10px;">
-    <div style="font-size: 24px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2; text-align: center;">BÁO CÁO CÔNG VIỆC - PHÒNG THIẾT KẾ</div>
+<div class="title-card-center" style="padding: 8px 25px; margin-top: 0px; margin-bottom: 15px;">
+    <div style="font-size: 26px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2; text-align: center;">BÁO CÁO CÔNG VIỆC - PHÒNG THIẾT KẾ</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -390,7 +369,7 @@ if selected_hm and 'Hạng Mục' in df_display.columns: df_display = df_display
 if selected_ql and 'Chủ nhiệm dự án' in df_display.columns: df_display = df_display[df_display['Chủ nhiệm dự án'].astype(str).isin(selected_ql)]
 if selected_cb and 'Chuyên viên thực hiện' in df_display.columns: df_display = df_display[df_display['Chuyên viên thực hiện'].astype(str).isin(selected_cb)]
 
-# --- TÍNH TOÁN 10 CHỈ SỐ KPI ---
+# --- TÍNH TOÁN 10 CHỈ SỐ KPI ĐẢM BẢO KHÔNG TRÙNG LẶP ---
 p_projects = 0
 if 'Dự Án' in df_display.columns:
     _prjs = df_display['Dự Án'].astype(str).str.strip().str.upper()
@@ -481,7 +460,7 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
 # TIÊU ĐỀ BẢNG CHI TIẾT
 st.markdown("""
 <div class="title-card-center">
-    <div style="font-size: 17px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2; text-align: center;">BẢNG CHI TIẾT CÔNG VIỆC</div>
+    <div style="font-size: 18px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2; text-align: center;">BẢNG CHI TIẾT CÔNG VIÊC</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -565,18 +544,10 @@ def color_rows(row):
 # ÁP DỤNG MÀU SẮC LÊN BẢNG VÀ CSS CHO TIÊU ĐỀ
 styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
     'selector': 'th',
-    'props': [
-        ('background-color', '#e9d8fd'),
-        ('color', '#000000'),
-        ('font-weight', '800'),
-        ('font-size', '13.5px'),
-        ('text-transform', 'uppercase'),
-        ('text-align', 'center'),
-        ('vertical-align', 'middle')
-    ]
+    'props': [('background-color', '#e9d8fd'), ('color', '#000000'), ('font-weight', '800'), ('font-size', '15.5px'), ('text-transform', 'uppercase')]
 }])
 
-# ẨN CỘT INDEX CỦA PANDAS
+# ẨN CỘT INDEX CỦA PANDAS ĐỂ BẢNG TRÔNG GỌN HƠN
 try:
     styled_df = styled_df.hide(axis='index')
 except Exception:
