@@ -102,20 +102,16 @@ st.markdown("""
     .block-container > div[data-testid="stVerticalBlock"] { flex-grow: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; }
     .block-container > div[data-testid="stVerticalBlock"] > div { flex-shrink: 0 !important; width: 100% !important; }
     
-    /* BẢNG CHI TIẾT CÔNG VIỆC TÙY CHỈNH BẰNG HTML (HỖ TRỢ XUỐNG DÒNG) */
-    div.element-container:has(.custom-table-wrapper),
-    .stMarkdown:has(.custom-table-wrapper),
-    div[data-testid="stMarkdownContainer"]:has(.custom-table-wrapper) {
-        flex-grow: 1 !important; flex-shrink: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; 
-    }
-    
+    /* BẢNG CHI TIẾT CÔNG VIỆC TÙY CHỈNH BẰNG HTML - ĐÃ FIX LỖI SCROLL */
     .custom-table-wrapper {
-        flex-grow: 1 !important; 
         width: 100% !important; 
-        overflow: auto !important; 
+        max-height: 52vh !important; /* GIỚI HẠN CHIỀU CAO ĐỂ HIỆN THANH CUỘN DỌC */
+        overflow-y: auto !important; 
+        overflow-x: auto !important; 
         border-radius: 12px; 
         border: 1px solid rgba(255,255,255,0.5);
         background-color: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     }
     .custom-table-wrapper::-webkit-scrollbar { width: 8px !important; height: 8px !important; display: block !important; }
     .custom-table-wrapper::-webkit-scrollbar-track { background: transparent !important; }
@@ -127,20 +123,21 @@ st.markdown("""
         border-collapse: separate !important; 
         border-spacing: 0; 
         font-family: inherit; 
+        margin: 0 !important;
     }
     .custom-table thead th {
-        background-color: rgba(226, 232, 240, 0.98) !important; 
+        background-color: rgba(226, 232, 240, 1) !important; /* Dùng màu đặc để không bị xuyên thấu khi cuộn */
         color: #0F172A !important; 
         font-weight: 800 !important; 
         font-size: 14px !important;
         position: sticky !important; 
-        top: 0 !important; 
+        top: 0 !important; /* GIỮ CỐ ĐỊNH TIÊU ĐỀ KHI CUỘN */
         z-index: 10 !important; 
         padding: 12px 10px !important; 
         text-align: left !important;
         border-bottom: 2px solid #cbd5e1 !important; 
         border-right: 1px solid rgba(0,0,0,0.05); 
-        white-space: nowrap !important; /* Tiêu đề không cần xuống dòng */
+        white-space: nowrap !important; /* Tiêu đề không xuống dòng */
     }
     .custom-table tbody td {
         padding: 10px 10px !important; 
@@ -374,7 +371,7 @@ if selected_hm and 'Hạng Mục' in df_display.columns: df_display = df_display
 if selected_ql and 'Chủ nhiệm dự án' in df_display.columns: df_display = df_display[df_display['Chủ nhiệm dự án'].astype(str).isin(selected_ql)]
 if selected_cb and 'Chuyên viên thực hiện' in df_display.columns: df_display = df_display[df_display['Chuyên viên thực hiện'].astype(str).isin(selected_cb)]
 
-# --- TÍNH TOÁN 10 CHỈ SỐ KPI ---
+# --- TÍNH TOÁN 10 CHỈ SỐ KPI ĐẢM BẢO KHÔNG TRÙNG LẶP ---
 p_projects = 0
 if 'Dự Án' in df_display.columns:
     _prjs = df_display['Dự Án'].astype(str).str.strip().str.upper()
@@ -558,7 +555,7 @@ except Exception:
     except:
         pass
 
-# ================= RENDER BẢNG BẰNG TÙY CHỈNH HTML (HỖ TRỢ XUỐNG DÒNG) =================
+# ================= RENDER BẢNG BẰNG TÙY CHỈNH HTML =================
 html_table = styled_df.to_html()
 html_table = html_table.replace('<table', '<table class="custom-table"')
 st.markdown(f'<div class="custom-table-wrapper">{html_table}</div>', unsafe_allow_html=True)
