@@ -134,22 +134,6 @@ st.markdown("""
 
     .custom-download-link { display: block; float: right; text-align: right; color: #0A3622 !important; font-size: 13.5px !important; font-weight: 700 !important; text-decoration: none !important; margin-top: -30px !important; margin-right: 0px !important; margin-bottom: 5px !important; position: relative; z-index: 9999; cursor: pointer; }
     .custom-download-link:hover { color: #198754 !important; text-decoration: underline !important; }
-    
-    /* NÚT TẢI EXCEL VÀ LÀM MỚI DỮ LIỆU */
-    div[data-testid="stButton"] button {
-        background-color: rgba(25, 135, 84, 0.85) !important;
-        color: white !important;
-        border-radius: 10px !important;
-        font-weight: bold !important;
-        font-size: 13px !important;
-        border: 1px solid rgba(255,255,255,0.5) !important;
-        padding: 4px 12px !important;
-        min-height: 32px !important;
-    }
-    div[data-testid="stButton"] button:hover {
-        background-color: rgba(25, 135, 84, 1) !important;
-        box-shadow: 0 4px 10px rgba(25, 135, 84, 0.3) !important;
-    }
 
     /* 10 Ô KPI */
     .kpi-card { width: 100%; padding: 10px 12px; border-radius: 18px !important; border: 1px solid rgba(255, 255, 255, 0.4) !important; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 10px; min-height: 85px; background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden !important; }
@@ -169,7 +153,6 @@ st.markdown("""
 
 
 # ================= 2. ĐỌC DỮ LIỆU TỪ GOOGLE SHEETS =================
-# LƯU Ý: Đã gỡ bỏ @st.cache_data để file luôn cập nhật mới nhất khi tải lại
 def load_data():
     sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
     try:
@@ -191,7 +174,7 @@ def load_data():
             rename_dict[col] = 'Tiến Độ (%)'
         elif any(kw in c_low for kw in ['đầu việc', 'công việc', 'task']):
             if not any(kw in c_low for kw in ['trạng thái', 'tình trạng', 'tiến độ', 'mức']):
-                rename_dict[col] = 'Đầu Việc'
+                rename_dict[col] = 'Công việc triển khai' # CẬP NHẬT TÊN MỚI THEO YÊU CẦU
         elif any(kw in c_low for kw in ['hạng mục', 'gói thầu']): 
             rename_dict[col] = 'Hạng Mục'
         elif any(kw in c_low for kw in ['vướng mắc', 'ghi chú', 'ý kiến', 'note', 'lý do']): 
@@ -205,7 +188,7 @@ def load_data():
         elif any(kw in c_low for kw in ['hợp đồng', 'hđ', 'plhđ']): 
             rename_dict[col] = 'Hợp Đồng - PLHĐ'
         elif any(kw in c_low for kw in ['chuyên viên', 'triển khai', 'thực hiện', 'cán bộ', 'nhân sự']): 
-            if not any(kw in c_low for kw in ['tình trạng', 'trình trạng', 'trạng thái']):
+            if not any(kw in c_low for kw in ['tình trạng', 'trình trạng', 'trạng thái', 'công việc']):
                 rename_dict[col] = 'Chuyên viên thực hiện'
         elif any(kw in c_low for kw in ['bắt đầu', 'start']):
             rename_dict[col] = 'Ngày Bắt Đầu'
@@ -400,6 +383,9 @@ with r2_c5: st.markdown(render_transparent_shadow_kpi("Vướng mắc", p_issues
 status_options = ["Tất cả", "Chưa bắt đầu", "Đang triển khai", "Đã hoàn thành", "Tạm dừng", "Vướng mắc"]
 actual_status = st.radio("Bộ lọc Trạng Thái", options=status_options, horizontal=True, label_visibility="collapsed")
 
+# -------------------------------------------------------------
+# SỬA LỖI: LỌC TRẠNG THÁI CHÍNH XÁC VỚI LOẠI BỎ KHOẢNG TRẮNG
+# -------------------------------------------------------------
 if actual_status != "Tất cả":
     if actual_status == "Vướng mắc":
         if 'Vướng Mắc' in df_display.columns:
@@ -408,7 +394,8 @@ if actual_status != "Tất cả":
         else:
             df_display = df_display.iloc[0:0]
     else:
-        df_display = df_display[df_display.get('Tình trạng triển khai', '') == actual_status]
+        if 'Tình trạng triển khai' in df_display.columns:
+            df_display = df_display[df_display['Tình trạng triển khai'].astype(str).str.strip() == actual_status]
 
 df_export = df_display.copy()
 for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
