@@ -94,7 +94,7 @@ st.markdown("""
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         width: calc(100% - 40px) !important; max-width: 100% !important; 
         margin: 20px 20px !important; 
-        padding: 25px 30px 30px 30px !important; 
+        padding: 25px 30px 30px 30px !important; /* Lớp đệm dưới 30px */
         height: calc(100vh - 40px) !important; 
         display: flex !important; flex-direction: column !important; overflow: hidden !important; 
     }
@@ -102,7 +102,7 @@ st.markdown("""
     .block-container > div[data-testid="stVerticalBlock"] { flex-grow: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; }
     .block-container > div[data-testid="stVerticalBlock"] > div { flex-shrink: 0 !important; width: 100% !important; }
     
-    /* BẢNG CHI TIẾT CÔNG VIỆC TÙY CHỈNH BẰNG HTML */
+    /* BẢNG CHI TIẾT CÔNG VIỆC TÙY CHỈNH BẰNG HTML (CHỐNG TRÀN VÀ CÁCH ĐỀU 30PX ĐÁY) */
     div.element-container:has(.custom-table-wrapper),
     .stMarkdown:has(.custom-table-wrapper),
     div[data-testid="stMarkdownContainer"]:has(.custom-table-wrapper) {
@@ -111,7 +111,7 @@ st.markdown("""
     
     .custom-table-wrapper {
         width: 100% !important; 
-        max-height: calc(100vh - 355px) !important; 
+        max-height: calc(100vh - 355px) !important; /* Tự động giới hạn chiều cao để nhường chỗ cho lề 30px ở đáy */
         overflow-y: auto !important; 
         overflow-x: auto !important; 
         border-radius: 12px; 
@@ -133,17 +133,17 @@ st.markdown("""
         margin: 0 !important;
     }
     .custom-table thead th {
-        background-color: #0d6efd !important; /* MÀU XANH DƯƠNG GIỐNG ICON KPI */
-        color: #ffffff !important; /* CHỮ MÀU TRẮNG NỔI BẬT */
-        font-weight: 900 !important; 
-        font-size: 14.5px !important;
+        background-color: #e2e8f0 !important; /* MÀU GHI NHẠT CHO TIÊU ĐỀ */
+        color: #000000 !important; /* CHỮ MÀU ĐEN */
+        font-weight: 800 !important; 
+        font-size: 15.5px !important; /* TĂNG KÍCH THƯỚC CHỮ LÊN 1 CHÚT */
         position: sticky !important; 
         top: 0 !important; 
         z-index: 10 !important; 
         padding: 12px 10px !important; 
         text-align: left !important;
-        border-bottom: 2px solid #0a58ca !important; 
-        border-right: 1px solid rgba(255,255,255,0.2) !important; 
+        border-bottom: 2px solid #cbd5e1 !important; 
+        border-right: 1px solid rgba(0,0,0,0.05) !important; 
         white-space: nowrap !important; 
     }
     .custom-table tbody td {
@@ -200,6 +200,7 @@ def load_data():
     sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
     try:
         df = pd.read_csv(sheet_url)
+        # LOẠI BỎ CÁC CỘT RỖNG VÀ LỖI UNNAMED ĐỂ ĐẢM BẢO KHÔNG BỊ RÁC BẢNG
         df = df.dropna(how='all', axis=1)
         df = df.loc[:, ~df.columns.str.contains('^unnamed', case=False, na=False)]
     except Exception:
@@ -207,7 +208,7 @@ def load_data():
     
     df.columns = df.columns.str.strip()
     
-    # THUẬT TOÁN NHẬN DIỆN CỘT THÔNG MINH - CHỐNG GHI ĐÈ 1-1
+    # THUẬT TOÁN NHẬN DIỆN CỘT THÔNG MINH - CHỐNG GHI ĐÈ 1-1 (HIỂN THỊ ĐỦ 100% CỘT)
     rename_dict = {}
     seen_targets = set()
     
@@ -243,6 +244,7 @@ def load_data():
             if not any(kw in c_low for kw in ['%', 'tiến độ', 'trạng thái', 'tình trạng']):
                 target = 'Ngày Hoàn Thành'
                 
+        # Chỉ cập nhật nếu tên mục tiêu chưa được gắn cho cột nào trước đó (Chống gộp cột/mất cột)
         if target and target not in seen_targets:
             rename_dict[col] = target
             seen_targets.add(target)
@@ -262,7 +264,7 @@ def load_data():
         
         df['Tình trạng triển khai'] = df['Tình trạng triển khai'].apply(clean_status)
 
-    # FORWARD FILL ĐỂ XỬ LÝ CÁC Ô GỘP (MERGE CELLS)
+    # FORWARD FILL ĐỂ XỬ LÝ CÁC Ô GỘP (MERGE CELLS) TRONG GOOGLE SHEETS
     cols_to_fill = ['Mã Dự Án', 'Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục', 'Chủ nhiệm dự án', 'Chuyên viên thực hiện']
     for col in cols_to_fill:
         if col in df.columns: 
@@ -538,10 +540,10 @@ def color_rows(row):
     if status == 'Chưa triển khai': return ['background-color: #adb5bd; color: #000;'] * len(row)
     return ['background-color: #ffffff; color: #000;'] * len(row)
 
-# ÁP DỤNG MÀU SẮC LÊN BẢNG (ĐẢM BẢO PYTHON RENDER THEO STYLE NÀY NẾU DÙNG TO_HTML)
+# ÁP DỤNG MÀU SẮC LÊN BẢNG 
 styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
     'selector': 'th',
-    'props': [('background-color', '#0d6efd'), ('color', '#ffffff'), ('font-weight', 'bold')]
+    'props': [('background-color', '#e2e8f0'), ('color', '#000000'), ('font-weight', '800'), ('font-size', '15.5px')]
 }])
 
 # ẨN CỘT INDEX CỦA PANDAS ĐỂ BẢNG TRÔNG GỌN HƠN
