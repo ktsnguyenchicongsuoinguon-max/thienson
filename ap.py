@@ -116,6 +116,37 @@ st.markdown("""
     .custom-download-link { display: block; float: right; text-align: right; color: #0A3622 !important; font-size: 13.5px !important; font-weight: 700 !important; text-decoration: none !important; margin-top: -30px !important; margin-right: 0px !important; margin-bottom: 5px !important; position: relative; z-index: 9999; cursor: pointer; }
     .custom-download-link:hover { color: #198754 !important; text-decoration: underline !important; }
 
+    /* NÚT TẢI EXCEL */
+    div[data-testid="stButton"] button {
+        background-color: rgba(25, 135, 84, 0.85) !important;
+        color: white !important;
+        border-radius: 10px !important;
+        font-weight: bold !important;
+        font-size: 12px !important;
+        border: 1px solid rgba(255,255,255,0.5) !important;
+        padding: 4px 12px !important;
+        min-height: 30px !important;
+    }
+    div[data-testid="stButton"] button:hover {
+        background-color: rgba(25, 135, 84, 1) !important;
+        box-shadow: 0 4px 10px rgba(25, 135, 84, 0.3) !important;
+    }
+
+    /* KHUNG CHỨA CÁC NÚT BẬT/TẮT CON MẮT CỘT */
+    .column-toggle-box {
+        background-color: rgba(255, 255, 255, 0.45);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: 14px;
+        padding: 8px 12px;
+        margin-bottom: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+    }
+
     /* 10 Ô KPI */
     .kpi-card { width: 100%; padding: 10px 12px; border-radius: 18px !important; border: 1px solid rgba(255, 255, 255, 0.4) !important; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 10px; min-height: 85px; background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden !important; }
     .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 5px 10px rgba(0, 0, 0, 0.1) !important; }
@@ -323,11 +354,14 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
     if col in df_display.columns: df_display = df_display.drop(columns=[col])
     if col in df_export.columns: df_export = df_export.drop(columns=[col])
 
-st.markdown("""
-<div class="title-card" style="padding: 6px 20px; margin-top: 15px; margin-bottom: 15px;">
-    <div style="font-size: 18px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2;">BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</div>
-</div>
-""", unsafe_allow_html=True)
+# THANH TIÊU ĐỀ VÀ NÚT TẢI EXCEL
+col_t1, col_t2 = st.columns([5, 1])
+with col_t1:
+    st.markdown("""
+    <div class="title-card" style="padding: 6px 20px; margin-top: 10px; margin-bottom: 10px; margin-left: 0;">
+        <div style="font-size: 18px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2;">BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</div>
+    </div>
+    """, unsafe_allow_html=True)
 
 def generate_excel_with_colors(df_data):
     output = io.BytesIO()
@@ -371,19 +405,46 @@ def generate_excel_with_colors(df_data):
     wb.save(final_output)
     return final_output.getvalue()
 
-try:
-    excel_bytes = generate_excel_with_colors(df_export)
-    b64 = base64.b64encode(excel_bytes).decode()
-    mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    filename = "Bao_cao_tien_do_Thien_Son.xlsx"
-except Exception:
-    csv_bytes = df_export.to_csv(index=False).encode('utf-8-sig')
-    b64 = base64.b64encode(csv_bytes).decode()
-    mime_type = "text/csv"
-    filename = "Bao_cao_tien_do_Thien_Son.csv"
+with col_t2:
+    st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
+    try:
+        excel_bytes = generate_excel_with_colors(df_export)
+        b64 = base64.b64encode(excel_bytes).decode()
+        mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        filename = "Bao_cao_tien_do_Thien_Son.xlsx"
+    except Exception:
+        csv_bytes = df_export.to_csv(index=False).encode('utf-8-sig')
+        b64 = base64.b64encode(csv_bytes).decode()
+        mime_type = "text/csv"
+        filename = "Bao_cao_tien_do_Thien_Son.csv"
 
-download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}">Tải Excel</a>'
-st.markdown(download_html, unsafe_allow_html=True)
+    download_html = f'<a class="custom-download-link" style="float:none; display:block; text-align:right; margin-top: 4px;" href="data:{mime_type};base64,{b64}" download="{filename}">📥 Tải Excel</a>'
+    st.markdown(download_html, unsafe_allow_html=True)
+
+# ================= 5. TÙY CHỌN ẨN/HIỆN CỘT BẰNG CON MẮT =================
+# Lấy danh sách tất cả các cột gốc
+all_original_cols = [c for c in df_display.columns if c not in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']]
+
+# Khởi tạo trạng thái ẩn/hiện cho từng cột trong session_state
+if 'column_visibility' not in st.session_state:
+    st.session_state.column_visibility = {col: True for col in all_original_cols}
+
+# Hiển thị thanh công cụ ẩn/hiện cột với biểu tượng con mắt
+cols_toggle_ui = st.columns(len(all_original_cols) + 1)
+with cols_toggle_ui[0]:
+    st.markdown("<span style='font-size: 13px; font-weight: 700; color: #0A3622; line-height: 2.2;'>Ẩn/Hiện cột:</span>", unsafe_allow_html=True)
+
+for idx, col_name in enumerate(all_original_cols):
+    with cols_toggle_ui[idx + 1]:
+        is_visible = st.session_state.column_visibility.get(col_name, True)
+        eye_icon = "👁️" if is_visible else "👁️‍🗨️"
+        # Nút bấm gọn gàng với tên cột và biểu tượng con mắt
+        if st.button(f"{eye_icon} {col_name}", key=f"eye_btn_{col_name}", use_container_width=True):
+            st.session_state.column_visibility[col_name] = not is_visible
+            st.rerun()
+
+# Lọc các cột được chọn hiển thị
+active_cols = [col for col in all_original_cols if st.session_state.column_visibility.get(col, True)]
 
 priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
 
@@ -405,19 +466,12 @@ def color_rows(row):
     if status == 'Chưa bắt đầu': return ['background-color: #adb5bd; color: #000;'] * len(row)
     return ['background-color: #ffffff; color: #000;'] * len(row)
 
-styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
+# Chỉ hiển thị các cột đang được bật (active_cols)
+df_final_view = df_display[active_cols] if active_cols else df_display
+
+styled_df = df_final_view.style.apply(color_rows, axis=1).set_table_styles([{
     'selector': 'th',
     'props': [('background-color', 'rgba(226, 232, 240, 0.9)'), ('color', '#0F172A'), ('font-weight', 'bold')]
 }])
 
-# CỐ ĐỊNH KÍCH THƯỚC CÁC CỘT TRONG BẢNG ĐỂ KHÔNG BỊ KÉO ẨN HOẶC MẤT CỘT
-column_config = {}
-for col in df_display.columns:
-    if col in ['Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục', 'Cán Bộ Quản Lý', 'Cán Bộ Triển Khai - SĐT']:
-        column_config[col] = st.column_config.TextColumn(col, width="medium")
-    elif col in ['Vướng Mắc', 'Đầu Việc']:
-        column_config[col] = st.column_config.TextColumn(col, width="large")
-    else:
-        column_config[col] = st.column_config.TextColumn(col, width="small")
-
-st.dataframe(styled_df, use_container_width=True, hide_index=True, column_config=column_config)
+st.dataframe(styled_df, use_container_width=True, hide_index=True)
