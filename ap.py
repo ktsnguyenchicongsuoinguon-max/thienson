@@ -542,10 +542,21 @@ def color_rows(row):
 
 styled_df = df_display.style.apply(color_rows, axis=1)
 
-# ÉP THU NHỎ CHIỀU RỘNG RIÊNG CHO CỘT HỢP ĐỒNG VÀ HẠNG MỤC (Cùng chủ đầu tư và dự án nếu có)
-target_narrow_cols = [c for c in ['Hợp Đồng - PLHĐ', 'Hạng Mục', 'Dự Án', 'Chủ đầu tư'] if c in df_display.columns]
-if target_narrow_cols:
-    styled_df = styled_df.set_properties(subset=target_narrow_cols, **{
+# ÉP THU NHỎ RIÊNG CỘT HỢP ĐỒNG CHO SIÊU GỌN
+if 'Hợp Đồng - PLHĐ' in df_display.columns:
+    styled_df = styled_df.set_properties(subset=['Hợp Đồng - PLHĐ'], **{
+        'max-width': '75px', 
+        'min-width': '65px', 
+        'width': '70px',
+        'white-space': 'normal',
+        'word-wrap': 'break-word',
+        'text-align': 'center'
+    })
+
+# ÉP THU NHỎ CÁC CỘT PHỤ CÒN LẠI VỪA PHẢI
+other_narrow_cols = [c for c in ['Hạng Mục', 'Dự Án', 'Chủ đầu tư'] if c in df_display.columns]
+if other_narrow_cols:
+    styled_df = styled_df.set_properties(subset=other_narrow_cols, **{
         'max-width': '100px', 
         'min-width': '80px', 
         'width': '90px',
