@@ -125,8 +125,14 @@ st.markdown("""
     .custom-table-wrapper::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.3) !important; border-radius: 10px !important; }
     .custom-table-wrapper::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.5) !important; }
     
+    /* GỠ BỎ GIỚI HẠN MAX-WIDTH GÂY MẤT CỘT KHI ZOOM */
+    .custom-table-wrapper * {
+        max-width: none !important; 
+    }
+    
     .custom-table { 
-        width: 100% !important; 
+        width: max-content !important; 
+        min-width: 100% !important; 
         border-collapse: separate !important; 
         border-spacing: 0; 
         font-family: inherit; 
@@ -146,6 +152,11 @@ st.markdown("""
         border-bottom: 2px solid #d6bcfa !important; 
         border-right: 1px solid rgba(0,0,0,0.05) !important; 
         white-space: nowrap !important; 
+        
+        /* TÍNH NĂNG KÉO THẢ CHIỀU NGANG */
+        resize: horizontal !important; 
+        overflow: hidden !important; 
+        min-width: 150px !important;
     }
     .custom-table tbody td {
         padding: 10px 10px !important; 
@@ -155,6 +166,7 @@ st.markdown("""
         white-space: normal !important; 
         word-wrap: break-word !important; 
         vertical-align: middle !important; 
+        min-width: 150px !important;
     }
     
     /* CĂN GIỮA TUYỆT ĐỐI KHUNG TIÊU ĐỀ */
