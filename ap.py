@@ -102,18 +102,22 @@ st.markdown("""
     .block-container > div[data-testid="stVerticalBlock"] { flex-grow: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; }
     .block-container > div[data-testid="stVerticalBlock"] > div { flex-shrink: 0 !important; width: 100% !important; }
     
-    /* BẢNG CHI TIẾT CÔNG VIỆC TÙY CHỈNH BẰNG HTML (CHỐNG TRÀN VÀ CÁCH ĐỀU 30PX ĐÁY) */
+    /* ================= SỬA LỖI MẤT CỘT, THANH CUỘN VÀ XUỐNG DÒNG ================= */
     div.element-container:has(.custom-table-wrapper),
     .stMarkdown:has(.custom-table-wrapper),
     div[data-testid="stMarkdownContainer"]:has(.custom-table-wrapper) {
         flex-grow: 1 !important; flex-shrink: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; 
+        overflow: hidden !important; /* Ép khung bao ngoài cắt đi phần thừa để kích hoạt thanh cuộn của wrapper bên trong */
     }
     
     .custom-table-wrapper {
         width: 100% !important; 
+        max-width: 100% !important;
+        height: 100% !important;
         max-height: calc(100vh - 355px) !important; 
         overflow-y: auto !important; 
-        overflow-x: auto !important; 
+        overflow-x: auto !important; /* ĐẢM BẢO XUẤT HIỆN THANH CUỘN NGANG VÀ DỌC */
+        display: block !important;
         border-radius: 12px; 
         border: 1px solid rgba(255,255,255,0.5);
         background-color: rgba(255, 255, 255, 0.45);
@@ -126,7 +130,8 @@ st.markdown("""
     .custom-table-wrapper::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.5) !important; }
     
     .custom-table { 
-        width: 100% !important; 
+        width: max-content !important; /* FIX LỖI MẤT CỘT: Cho phép bảng tự do giãn ngang khi zoom */
+        min-width: 100% !important; 
         border-collapse: separate !important; 
         border-spacing: 0; 
         font-family: inherit; 
@@ -136,25 +141,33 @@ st.markdown("""
         background-color: #e9d8fd !important; /* MÀU TÍM NHẠT CHO TIÊU ĐỀ */
         color: #000000 !important; /* CHỮ MÀU ĐEN */
         font-weight: 800 !important; 
-        font-size: 15.5px !important; /* TĂNG KÍCH THƯỚC CHỮ LÊN 1 CHÚT */
+        font-size: 15.5px !important; 
         text-transform: uppercase !important; /* CHỮ VIẾT HOA */
         position: sticky !important; 
         top: 0 !important; 
         z-index: 10 !important; 
         padding: 12px 10px !important; 
-        text-align: left !important;
+        text-align: center !important; /* CĂN GIỮA TIÊU ĐỀ */
+        vertical-align: middle !important; 
         border-bottom: 2px solid #d6bcfa !important; 
         border-right: 1px solid rgba(0,0,0,0.05) !important; 
-        white-space: nowrap !important; 
+        white-space: normal !important; /* CHO PHÉP XUỐNG DÒNG */
+        word-wrap: break-word !important; 
+        min-width: 130px !important; /* Khóa độ rộng tối thiểu chống co ép mất cột */
+        max-width: 250px !important; /* Chặn độ rộng tối đa để ép chữ dài rớt xuống dòng */
+        line-height: 1.3 !important;
     }
     .custom-table tbody td {
         padding: 10px 10px !important; 
         font-size: 13.5px !important; 
         border-bottom: 1px solid rgba(0,0,0,0.05) !important;
         border-right: 1px solid rgba(0,0,0,0.05); 
-        white-space: normal !important; 
+        white-space: normal !important; /* ÉP XUỐNG DÒNG NỘI DUNG */
         word-wrap: break-word !important; 
+        overflow-wrap: break-word !important;
         vertical-align: middle !important; 
+        min-width: 130px !important; /* Khóa độ rộng tối thiểu */
+        max-width: 350px !important; /* Chặn độ rộng tối đa */
     }
     
     /* CĂN GIỮA TUYỆT ĐỐI KHUNG TIÊU ĐỀ */
@@ -467,22 +480,31 @@ st.markdown("""
 def generate_excel_with_colors(df_data):
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df_data.columns = df_data.columns.str.upper() 
         df_data.to_excel(writer, index=False, sheet_name='TienDo')
     output.seek(0)
     import openpyxl
-    from openpyxl.styles import PatternFill
+    from openpyxl.styles import PatternFill, Font
     wb = openpyxl.load_workbook(output)
     ws = wb.active
+    
     green_fill = PatternFill(start_color="A5D6A7", end_color="A5D6A7", fill_type="solid")
     red_fill = PatternFill(start_color="EF9A9A", end_color="EF9A9A", fill_type="solid")
     gray_fill = PatternFill(start_color="ADB5BD", end_color="ADB5BD", fill_type="solid")
     yellow_fill = PatternFill(start_color="FFEeba", end_color="FFEeba", fill_type="solid")
+    header_fill = PatternFill(start_color="E9D8FD", end_color="E9D8FD", fill_type="solid")
+    header_font = Font(color="000000", bold=True)
 
     status_col_idx = None
     vướng_col_idx = None
+    
     for col_idx, col_name in enumerate(df_data.columns, 1):
-        if col_name == 'Tình trạng triển khai': status_col_idx = col_idx
-        if col_name == 'Vướng Mắc': vướng_col_idx = col_idx
+        cell = ws.cell(row=1, column=col_idx)
+        cell.fill = header_fill
+        cell.font = header_font
+        
+        if str(col_name).strip().upper() == 'TÌNH TRẠNG TRIỂN KHAI': status_col_idx = col_idx
+        if str(col_name).strip().upper() == 'VƯỚNG MẮC': vướng_col_idx = col_idx
 
     for row_idx in range(2, ws.max_row + 1):
         fill_to_use = None
@@ -517,7 +539,6 @@ except Exception:
     mime_type = "text/csv"
     filename = "Bao_cao_tien_do_Thien_Son.csv"
 
-# NÚT TẢI EXCEL
 download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}">Tải Excel</a>'
 st.markdown(download_html, unsafe_allow_html=True)
 
@@ -535,19 +556,18 @@ def color_rows(row):
     if vm and vm not in ['nan', 'none', '']:
         return ['background-color: #FFEeba; color: #000;'] * len(row)
         
-    status = row.get('Tình trạng triển khai', '')
+    status = str(row.get('Tình trạng triển khai', '')).strip()
     if status == 'Đã hoàn thành': return ['background-color: #a5d6a7; color: #000;'] * len(row)
     if status == 'Tạm dừng': return ['background-color: #ef9a9a; color: #000;'] * len(row)
     if status == 'Chưa triển khai': return ['background-color: #adb5bd; color: #000;'] * len(row)
     return ['background-color: #ffffff; color: #000;'] * len(row)
 
-# ÁP DỤNG MÀU SẮC LÊN BẢNG VÀ CSS CHO TIÊU ĐỀ
-styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
-    'selector': 'th',
-    'props': [('background-color', '#e9d8fd'), ('color', '#000000'), ('font-weight', '800'), ('font-size', '15.5px'), ('text-transform', 'uppercase')]
-}])
+# ÁP DỤNG MÀU SẮC LÊN BẢNG
+styled_df = df_display.style.apply(color_rows, axis=1)
 
-# ẨN CỘT INDEX CỦA PANDAS ĐỂ BẢNG TRÔNG GỌN HƠN
+# ÉP TÊN CỘT THÀNH IN HOA TRƯỚC KHI RENDER
+styled_df.columns = styled_df.columns.str.upper()
+
 try:
     styled_df = styled_df.hide(axis='index')
 except Exception:
@@ -556,7 +576,13 @@ except Exception:
     except:
         pass
 
-# ================= RENDER BẢNG BẰNG TÙY CHỈNH HTML =================
+# ================= RENDER BẢNG BẰNG TÙY CHỈNH HTML CAO CẤP =================
 html_table = styled_df.to_html()
 html_table = html_table.replace('<table', '<table class="custom-table"')
-st.markdown(f'<div class="custom-table-wrapper">{html_table}</div>', unsafe_allow_html=True)
+
+final_html = f"""
+<div class="table-responsive-wrapper">
+    {html_table}
+</div>
+"""
+st.markdown(final_html, unsafe_allow_html=True)
