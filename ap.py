@@ -130,7 +130,7 @@ st.markdown("""
         border-spacing: 0; 
         font-family: inherit; 
         margin: 0 !important;
-        table-layout: fixed !important; /* ÉP CỨNG KÍCH THƯỚC CỘT THEO CÀI ĐẶT */
+        table-layout: fixed !important; 
     }
     .custom-table thead th {
         background-color: #e9d8fd !important;
@@ -146,9 +146,10 @@ st.markdown("""
         vertical-align: middle !important;
         border-bottom: 2px solid #d6bcfa !important; 
         border-right: 1px solid rgba(0,0,0,0.05) !important; 
-        white-space: nowrap !important; /* ĐẢM BẢO TIÊU ĐỀ NẰM TRÊN 1 DÒNG */
+        white-space: normal !important; /* CHO PHÉP TIÊU ĐỀ XUỐNG DÒNG KHI BỊ KÍCH */
+        word-wrap: break-word !important;
         overflow: hidden !important;
-        text-overflow: ellipsis !important;
+        line-height: 1.25 !important;
     }
     .custom-table tbody td {
         padding: 8px 8px !important; 
@@ -545,27 +546,44 @@ def color_rows(row):
 
 styled_df = df_display.style.apply(color_rows, axis=1)
 
-# ÉP CỨNG THU NHỎ TỐI ĐA CỘT HỢP ĐỒNG (BẰNG table-layout: fixed TRONG CSS)
-if 'Hợp Đồng - PLHĐ' in df_display.columns:
-    styled_df = styled_df.set_properties(subset=['Hợp Đồng - PLHĐ'], **{
+# ÉP THU NHỎ CỘT HỢP ĐỒNG VÀ CHỦ ĐẦU TƯ
+small_cols = [c for c in ['Hợp Đồng - PLHĐ', 'Chủ đầu tư'] if c in df_display.columns]
+if small_cols:
+    styled_df = styled_df.set_properties(subset=small_cols, **{
         'width': '50px',
-        'max-width': '50px',
+        'max-width': '60px',
         'min-width': '45px',
         'text-align': 'left'
     })
 
 # CÁC CỘT KHÁC THU NHỎ VỪA PHẢI
-other_narrow_cols = [c for c in ['Hạng Mục', 'Dự Án', 'Chủ đầu tư'] if c in df_display.columns]
+other_narrow_cols = [c for c in ['Hạng Mục', 'Dự Án'] if c in df_display.columns]
 if other_narrow_cols:
     styled_df = styled_df.set_properties(subset=other_narrow_cols, **{
         'width': '90px',
-        'max-width': '100px',
+        'max-width': '105px',
         'min-width': '75px',
         'text-align': 'left'
     })
 
-# GIỮ TOÀN BỘ TIÊU ĐỀ NẰM TRÊN 1 DÒNG (KHÔNG XUỐNG DÒNG)
-styled_df = styled_df.format_index(lambda col: str(col), axis=1)
+# ĐỊNH NGHĨA TIÊU ĐỀ XUỐNG DÒNG (TỐI ĐA 2 DÒNG KHI BỊ HẸP)
+break_line_cols = {
+    'Mã Dự Án': 'MÃ<br>DỰ&nbsp;ÁN',
+    'Dự Án': 'DỰ&nbsp;ÁN',
+    'Chủ đầu tư': 'CHỦ<br>ĐẦU&nbsp;TƯ',
+    'Hợp Đồng - PLHĐ': 'HỢP&nbsp;ĐỒNG<br>PLHĐ',
+    'Hạng Mục': 'HẠNG&nbsp;MỤC',
+    'Chủ nhiệm dự án': 'CHỦ&nbsp;NHIỆM<br>DỰ&nbsp;ÁN',
+    'Chuyên viên thực hiện': 'CHUYÊN&nbsp;VIÊN',
+    'Công việc triển khai': 'CÔNG&nbsp;VIỆC<br>TRIỂN&nbsp;KHAI',
+    'Ngày Bắt Đầu': 'NGÀY<br>BẮT&nbsp;ĐẦU',
+    'Ngày Hoàn Thành': 'NGÀY<br>HOÀN&nbsp;THÀNH',
+    'Tiến Độ (%)': 'TIẾN&nbsp;ĐỘ<br>(%)',
+    'Tình trạng triển khai': 'TÌNH&nbsp;TRẠNG',
+    'Vướng Mắc': 'VƯỚNG&nbsp;MẮC'
+}
+
+styled_df = styled_df.format_index(lambda col: break_line_cols.get(col, str(col).replace(' ', '&nbsp;')), axis=1)
 
 # ẨN CỘT INDEX
 try:
