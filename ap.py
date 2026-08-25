@@ -163,35 +163,43 @@ def load_data():
     df.columns = df.columns.str.strip()
     
     # -------------------------------------------------------------
-    # SỬA LỖI: SỬ DỤNG NHẬN DIỆN TỪ KHÓA THÔNG MINH CHO CÁC CỘT
+    # THUẬT TOÁN NHẬN DIỆN CỘT THÔNG MINH (DỰA TRÊN TỪ KHÓA)
     # -------------------------------------------------------------
     rename_dict = {}
     for col in df.columns:
         c_low = str(col).lower().strip()
         if any(kw in c_low for kw in ['trạng thái', 'tình trạng', 'trình trạng']): 
             rename_dict[col] = 'Tình trạng triển khai'
-        elif 'tiến độ' in c_low: 
+        elif any(kw in c_low for kw in ['tiến độ', '%']): 
             rename_dict[col] = 'Tiến Độ (%)'
-        elif 'hạng mục' in c_low or 'đầu việc' in c_low: 
+        elif any(kw in c_low for kw in ['hạng mục', 'gói thầu']): 
             rename_dict[col] = 'Hạng Mục'
-        elif any(kw in c_low for kw in ['vướng mắc', 'ghi chú', 'ý kiến', 'note']): 
+        elif any(kw in c_low for kw in ['vướng mắc', 'ghi chú', 'ý kiến', 'note', 'lý do']): 
             rename_dict[col] = 'Vướng Mắc'
-        elif 'dự án' in c_low and 'chủ nhiệm' not in c_low: 
+        elif 'dự án' in c_low and not any(kw in c_low for kw in ['chủ nhiệm', 'cnda', 'quản lý', 'mã']): 
             rename_dict[col] = 'Dự Án'
-        elif any(kw in c_low for kw in ['chủ nhiệm', 'quản lý', 'trưởng nhóm']): 
+        elif any(kw in c_low for kw in ['mã dự án', 'mã da']):
+            rename_dict[col] = 'Mã Dự Án'
+        elif any(kw in c_low for kw in ['chủ nhiệm', 'quản lý', 'trưởng nhóm', 'cnda']): 
             rename_dict[col] = 'Chủ nhiệm dự án'
         elif any(kw in c_low for kw in ['hợp đồng', 'hđ', 'plhđ']): 
             rename_dict[col] = 'Hợp Đồng - PLHĐ'
-        elif any(kw in c_low for kw in ['chuyên viên', 'triển khai', 'thực hiện', 'người thực hiện']): 
+        elif any(kw in c_low for kw in ['chuyên viên', 'triển khai', 'thực hiện', 'cán bộ', 'nhân sự']): 
             if not any(kw in c_low for kw in ['tình trạng', 'trình trạng', 'trạng thái']):
                 rename_dict[col] = 'Chuyên viên thực hiện'
+        elif any(kw in c_low for kw in ['bắt đầu', 'start']):
+            rename_dict[col] = 'Ngày Bắt Đầu'
+        elif any(kw in c_low for kw in ['hoàn thành', 'kết thúc', 'deadline', 'mục tiêu', 'hạn chót']):
+            if not any(kw in c_low for kw in ['%', 'tiến độ', 'trạng thái', 'tình trạng']):
+                rename_dict[col] = 'Ngày Hoàn Thành'
+        elif any(kw in c_low for kw in ['đầu việc', 'nội dung', 'công việc', 'task']):
+            if not any(kw in c_low for kw in ['trạng thái', 'tình trạng', 'tiến độ', 'mức']):
+                rename_dict[col] = 'Đầu Việc'
             
     df.rename(columns=rename_dict, inplace=True)
     df = df.loc[:, ~df.columns.duplicated()]
         
-    # -------------------------------------------------------------
-    # SỬA LỖI: FORWARD-FILL (ĐIỀN TỰ ĐỘNG) CHO CÁC Ô BỊ GỘP (MERGE)
-    # -------------------------------------------------------------
+    # FORWARD FILL ĐỂ XỬ LÝ CÁC Ô GỘP (MERGE CELLS) TRONG GOOGLE SHEETS
     cols_to_fill = ['Mã Dự Án', 'Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục', 'Chủ nhiệm dự án', 'Chuyên viên thực hiện']
     for col in cols_to_fill:
         if col in df.columns: 
@@ -199,9 +207,11 @@ def load_data():
             
     df = df.fillna('') 
     
-    if 'Ngày Bắt Đầu' in df.columns: df['Ngày_Bat_Dau_Obj'] = pd.to_datetime(df['Ngày Bắt Đầu'].astype(str).str.strip(), format='%d/%m/%Y', errors='coerce')
-    col_ht = 'Ngày hoàn thành' if 'Ngày hoàn thành' in df.columns else ('Ngày Hoàn Thành' if 'Ngày Hoàn Thành' in df.columns else None)
-    if col_ht: df['Ngày_Hoan_Thanh_Obj'] = pd.to_datetime(df[col_ht].astype(str).str.strip(), format='%d/%m/%Y', errors='coerce')
+    # XỬ LÝ ĐỊNH DẠNG NGÀY THÁNG LINH HOẠT HƠN
+    if 'Ngày Bắt Đầu' in df.columns: 
+        df['Ngày_Bat_Dau_Obj'] = pd.to_datetime(df['Ngày Bắt Đầu'].astype(str).str.strip(), dayfirst=True, errors='coerce')
+    if 'Ngày Hoàn Thành' in df.columns: 
+        df['Ngày_Hoan_Thanh_Obj'] = pd.to_datetime(df['Ngày Hoàn Thành'].astype(str).str.strip(), dayfirst=True, errors='coerce')
         
     return df
 
@@ -294,7 +304,7 @@ if selected_hm and 'Hạng Mục' in df_display.columns: df_display = df_display
 if selected_ql and 'Chủ nhiệm dự án' in df_display.columns: df_display = df_display[df_display['Chủ nhiệm dự án'].astype(str).isin(selected_ql)]
 if selected_cb and 'Chuyên viên thực hiện' in df_display.columns: df_display = df_display[df_display['Chuyên viên thực hiện'].astype(str).isin(selected_cb)]
 
-# --- TÍNH TOÁN 10 CHỈ SỐ KPI ---
+# --- TÍNH TOÁN 10 CHỈ SỐ KPI ĐẢM BẢO KHÔNG TRÙNG LẶP ---
 p_projects = 0
 if 'Dự Án' in df_display.columns:
     _prjs = df_display['Dự Án'].astype(str).str.strip().str.upper()
