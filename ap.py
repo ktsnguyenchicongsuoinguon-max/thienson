@@ -102,10 +102,10 @@ st.markdown("""
     .block-container > div[data-testid="stVerticalBlock"] { flex-grow: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; }
     .block-container > div[data-testid="stVerticalBlock"] > div { flex-shrink: 0 !important; width: 100% !important; }
     
-    /* BẢNG CHI TIẾT CÔNG VIỆC TÙY CHỈNH BẰNG HTML - ĐÃ FIX LỖI SCROLL */
+    /* BẢNG CHI TIẾT CÔNG VIỆC TÙY CHỈNH BẰNG HTML - TĂNG CHIỀU CAO TỐI ĐA */
     .custom-table-wrapper {
         width: 100% !important; 
-        max-height: 52vh !important; /* GIỚI HẠN CHIỀU CAO ĐỂ HIỆN THANH CUỘN DỌC */
+        max-height: 75vh !important; /* ĐÃ TĂNG TỪ 52vh LÊN 75vh ĐỂ BẢNG DÀI HƠN */
         overflow-y: auto !important; 
         overflow-x: auto !important; 
         border-radius: 12px; 
@@ -126,25 +126,25 @@ st.markdown("""
         margin: 0 !important;
     }
     .custom-table thead th {
-        background-color: rgba(226, 232, 240, 1) !important; /* Dùng màu đặc để không bị xuyên thấu khi cuộn */
+        background-color: rgba(226, 232, 240, 1) !important; 
         color: #0F172A !important; 
         font-weight: 800 !important; 
         font-size: 14px !important;
         position: sticky !important; 
-        top: 0 !important; /* GIỮ CỐ ĐỊNH TIÊU ĐỀ KHI CUỘN */
+        top: 0 !important; 
         z-index: 10 !important; 
         padding: 12px 10px !important; 
         text-align: left !important;
         border-bottom: 2px solid #cbd5e1 !important; 
         border-right: 1px solid rgba(0,0,0,0.05); 
-        white-space: nowrap !important; /* Tiêu đề không xuống dòng */
+        white-space: nowrap !important; 
     }
     .custom-table tbody td {
         padding: 10px 10px !important; 
         font-size: 13.5px !important; 
         border-bottom: 1px solid rgba(0,0,0,0.05) !important;
         border-right: 1px solid rgba(0,0,0,0.05); 
-        white-space: normal !important; /* CỐT LÕI: CHO PHÉP XUỐNG DÒNG */
+        white-space: normal !important; 
         word-wrap: break-word !important; 
         vertical-align: middle !important; 
     }
@@ -214,7 +214,6 @@ def load_data():
     
     df.columns = df.columns.str.strip()
     
-    # THUẬT TOÁN NHẬN DIỆN CỘT THÔNG MINH
     rename_dict = {}
     for col in df.columns:
         c_low = str(col).lower().strip()
@@ -249,7 +248,6 @@ def load_data():
     df.rename(columns=rename_dict, inplace=True)
     df = df.loc[:, ~df.columns.duplicated()]
     
-    # LÀM SẠCH VÀ ĐỒNG NHẤT DỮ LIỆU TÌNH TRẠNG TRIỂN KHAI
     if 'Tình trạng triển khai' in df.columns:
         def clean_status(x):
             val = str(x).strip().lower()
@@ -261,7 +259,6 @@ def load_data():
         
         df['Tình trạng triển khai'] = df['Tình trạng triển khai'].apply(clean_status)
 
-    # FORWARD FILL ĐỂ XỬ LÝ CÁC Ô GỘP (MERGE CELLS)
     cols_to_fill = ['Mã Dự Án', 'Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục', 'Chủ nhiệm dự án', 'Chuyên viên thực hiện']
     for col in cols_to_fill:
         if col in df.columns: 
