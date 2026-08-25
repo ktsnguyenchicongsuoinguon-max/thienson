@@ -48,14 +48,19 @@ else:
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    html, body { overflow: hidden !important; margin: 0 !important; padding: 0 !important; }
-    ::-webkit-scrollbar { display: none !important; }
-    * { scrollbar-width: none !important; -ms-overflow-style: none !important; box-sizing: border-box !important; }
+    /* KHẮC PHỤC LỖI MẤT CỘT KHI ZOOM: Gỡ bỏ overflow hidden ép cứng màn hình */
+    html, body { overflow: auto !important; margin: 0 !important; padding: 0 !important; }
+    
+    ::-webkit-scrollbar { width: 8px !important; height: 8px !important; display: block !important; }
+    ::-webkit-scrollbar-track { background: transparent !important; }
+    ::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.25) !important; border-radius: 10px !important; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.45) !important; }
+
     header[data-testid="stHeader"] { background: transparent !important; box-shadow: none !important; }
     [data-testid="stHeaderActionElements"], .stAppDeployButton { display: none !important; }
     footer { display: none !important; }
 
-    /* KHOẢNG CÁCH TRÊN DƯỚI CHO KHUNG BỘ LỌC (SIDEBAR) */
+    /* BỘ LỌC SIDEBAR */
     [data-testid="stSidebar"] { background-color: transparent !important; border: none !important; }
     [data-testid="stSidebarResizer"] { display: none !important; }
     [data-testid="stSidebar"] > div:first-child {
@@ -68,16 +73,13 @@ st.markdown("""
         height: calc(100vh - 40px) !important; 
         overflow: hidden !important; 
     }
-    [data-testid="stSidebarUserContent"] { padding: 5px 20px 20px 20px !important; overflow: hidden !important; }
+    [data-testid="stSidebarUserContent"] { padding: 5px 20px 20px 20px !important; overflow-y: auto !important; }
     
-    /* HIỆU ỨNG BÓNG ĐỔ CHO LOGO TRONG SIDEBAR */
     [data-testid="stSidebar"] img {
         filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.25)) drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.15)) !important;
         transition: transform 0.3s ease !important;
     }
-    [data-testid="stSidebar"] img:hover {
-        transform: scale(1.03);
-    }
+    [data-testid="stSidebar"] img:hover { transform: scale(1.03); }
 
     .sidebar-title { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #0f172a; margin-top: 10px; margin-bottom: 2px; text-transform: uppercase; }
     .sidebar-title .material-symbols-rounded { font-size: 18px; color: #198754; }
@@ -88,60 +90,57 @@ st.markdown("""
     }
     div.row-widget.stSelectbox, div.row-widget.stMultiSelect { margin-bottom: -5px !important; }
 
-    /* KHOẢNG CÁCH ĐỀU 30PX (TRÁI/PHẢI/DƯỚI) CHO KHUNG CHÍNH */
+    /* KHUNG CHÍNH (ĐÃ CHO PHÉP SCROLL CHỐNG CẮT NỘI DUNG KHI ZOOM) */
     .block-container { 
         background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         width: calc(100% - 40px) !important; max-width: 100% !important; 
         margin: 20px 20px !important; 
         padding: 25px 30px 30px 30px !important; 
-        height: calc(100vh - 40px) !important; 
-        display: flex !important; flex-direction: column !important; overflow: hidden !important; 
+        min-height: calc(100vh - 40px) !important; 
+        display: flex !important; flex-direction: column !important; 
+        overflow-y: auto !important; overflow-x: hidden !important; /* Mở khóa để chống tràn */
     }
-    .block-container * { max-width: 100% !important; }
     .block-container > div[data-testid="stVerticalBlock"] { flex-grow: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; }
     .block-container > div[data-testid="stVerticalBlock"] > div { flex-shrink: 0 !important; width: 100% !important; }
     
-    /* ================= BẢNG CHI TIẾT CÔNG VIỆC TÙY CHỈNH BẰNG HTML ================= */
+    /* ================= BẢNG CHI TIẾT TÙY CHỈNH THÔNG MINH ================= */
     
-    div.element-container:has(.custom-table-wrapper),
-    .stMarkdown:has(.custom-table-wrapper),
-    div[data-testid="stMarkdownContainer"]:has(.custom-table-wrapper) {
+    div.element-container:has(.table-responsive-wrapper),
+    .stMarkdown:has(.table-responsive-wrapper),
+    div[data-testid="stMarkdownContainer"]:has(.table-responsive-wrapper) {
         flex-grow: 1 !important; flex-shrink: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; 
-        overflow: hidden !important; /* Ép viền để nội dung bên trong cuộn */
     }
     
-    .custom-table-wrapper {
+    .table-responsive-wrapper {
         width: 100% !important; 
         max-width: 100% !important;
         max-height: calc(100vh - 355px) !important; 
         overflow-y: auto !important; 
-        overflow-x: auto !important; 
-        display: block !important; /* CỐT LÕI: Biến thành dạng khối để hiện thanh cuộn ngang */
+        overflow-x: auto !important; /* THANH CUỘN NGANG HOẠT ĐỘNG KHI ZOOM */
+        display: block !important;
         border-radius: 12px; 
         border: 1px solid rgba(255,255,255,0.5);
         background-color: rgba(255, 255, 255, 0.45);
         box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         margin-bottom: 0px !important; 
     }
-    .custom-table-wrapper::-webkit-scrollbar { width: 8px !important; height: 8px !important; display: block !important; }
-    .custom-table-wrapper::-webkit-scrollbar-track { background: transparent !important; }
-    .custom-table-wrapper::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.3) !important; border-radius: 10px !important; }
-    .custom-table-wrapper::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.5) !important; }
     
     .custom-table { 
         width: 100% !important; 
+        min-width: 800px !important; /* Khi zoom quá to, ép hiện thanh cuộn chứ không bóp nát chữ */
         border-collapse: separate !important; 
         border-spacing: 0; 
         font-family: inherit; 
         margin: 0 !important;
     }
+    
     .custom-table thead th {
-        background-color: #e9d8fd !important; 
-        color: #000000 !important; 
+        background-color: #e9d8fd !important; /* MÀU TÍM NHẠT */
+        color: #000000 !important; /* CHỮ ĐEN */
         font-weight: 800 !important; 
-        font-size: 14.5px !important; 
-        text-transform: uppercase !important; 
+        font-size: 15px !important; /* CHỮ TO */
+        text-transform: uppercase !important; /* VIẾT HOA TOÀN BỘ */
         position: sticky !important; 
         top: 0 !important; 
         z-index: 10 !important; 
@@ -149,21 +148,19 @@ st.markdown("""
         text-align: left !important;
         border-bottom: 2px solid #d6bcfa !important; 
         border-right: 1px solid rgba(0,0,0,0.05) !important; 
-        white-space: normal !important; /* Chống tràn chữ ở tiêu đề */
-        min-width: 140px !important; /* KHÓA CHIỀU RỘNG TỐI THIỂU: ĐẢM BẢO KHÔNG MẤT CỘT KHI ZOOM */
-        max-width: 250px !important;
+        white-space: normal !important; /* CỐT LÕI: CHO TIÊU ĐỀ XUỐNG DÒNG */
+        word-wrap: break-word !important; 
     }
+    
     .custom-table tbody td {
         padding: 10px 10px !important; 
         font-size: 13.5px !important; 
         border-bottom: 1px solid rgba(0,0,0,0.05) !important;
         border-right: 1px solid rgba(0,0,0,0.05); 
-        white-space: normal !important; /* CỐT LÕI: ÉP XUỐNG DÒNG */
+        white-space: normal !important; /* CỐT LÕI: ÉP CHỮ TRONG BẢNG XUỐNG DÒNG */
         word-wrap: break-word !important; 
         overflow-wrap: break-word !important; 
         vertical-align: middle !important; 
-        min-width: 140px !important; /* KHÓA CHIỀU RỘNG TỐI THIỂU CHỐNG CHÈN ÉP CỘT */
-        max-width: 350px !important; /* KHÓA CHIỀU RỘNG TỐI ĐA ĐỂ KÍCH HOẠT XUỐNG DÒNG MƯỢT MÀ */
     }
     
     /* CĂN GIỮA TUYỆT ĐỐI KHUNG TIÊU ĐỀ */
@@ -474,22 +471,33 @@ st.markdown("""
 def generate_excel_with_colors(df_data):
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df_data.columns = df_data.columns.str.upper() # In hoa tiêu đề cho Excel
         df_data.to_excel(writer, index=False, sheet_name='TienDo')
     output.seek(0)
     import openpyxl
-    from openpyxl.styles import PatternFill
+    from openpyxl.styles import PatternFill, Font
     wb = openpyxl.load_workbook(output)
     ws = wb.active
+    
+    # Định dạng màu cho Excel
     green_fill = PatternFill(start_color="A5D6A7", end_color="A5D6A7", fill_type="solid")
     red_fill = PatternFill(start_color="EF9A9A", end_color="EF9A9A", fill_type="solid")
     gray_fill = PatternFill(start_color="ADB5BD", end_color="ADB5BD", fill_type="solid")
     yellow_fill = PatternFill(start_color="FFEeba", end_color="FFEeba", fill_type="solid")
+    header_fill = PatternFill(start_color="E9D8FD", end_color="E9D8FD", fill_type="solid")
+    header_font = Font(color="000000", bold=True)
 
     status_col_idx = None
     vướng_col_idx = None
+    
     for col_idx, col_name in enumerate(df_data.columns, 1):
-        if str(col_name).strip().upper() == 'TÌNH TRẠNG TRIỂN KHAI': status_col_idx = col_idx
-        if str(col_name).strip().upper() == 'VƯỚNG MẮC': vướng_col_idx = col_idx
+        # Tô màu tím nhạt và in đậm cho tiêu đề Excel
+        cell = ws.cell(row=1, column=col_idx)
+        cell.fill = header_fill
+        cell.font = header_font
+        
+        if str(col_name).strip() == 'TÌNH TRẠNG TRIỂN KHAI': status_col_idx = col_idx
+        if str(col_name).strip() == 'VƯỚNG MẮC': vướng_col_idx = col_idx
 
     for row_idx in range(2, ws.max_row + 1):
         fill_to_use = None
@@ -548,12 +556,11 @@ def color_rows(row):
     if status == 'Chưa triển khai': return ['background-color: #adb5bd; color: #000;'] * len(row)
     return ['background-color: #ffffff; color: #000;'] * len(row)
 
-# ================= RENDER BẢNG BẰNG TÙY CHỈNH HTML =================
-# ÁP DỤNG MÀU SẮC LÊN BẢNG VÀ CSS CHO TIÊU ĐỀ
-styled_df = df_display.style.apply(color_rows, axis=1)
+# ĐẨY TOÀN BỘ TIÊU ĐỀ THÀNH CHỮ IN HOA TRƯỚC KHI RENDER HTML (Để chắc chắn)
+df_display.columns = df_display.columns.str.upper()
 
-# ĐẨY TOÀN BỘ TIÊU ĐỀ THÀNH CHỮ IN HOA TRƯỚC KHI RENDER HTML
-styled_df.columns = styled_df.columns.str.upper()
+# ÁP DỤNG MÀU SẮC LÊN BẢNG
+styled_df = df_display.style.apply(color_rows, axis=1)
 
 try:
     styled_df = styled_df.hide(axis='index')
@@ -563,6 +570,15 @@ except Exception:
     except:
         pass
 
+# ================= RENDER BẢNG BẰNG TÙY CHỈNH HTML CAO CẤP =================
+# Thay thế mã HTML để bọc bảng vào trong div table-responsive-wrapper chống cắt xén
 html_table = styled_df.to_html()
 html_table = html_table.replace('<table', '<table class="custom-table"')
-st.markdown(f'<div class="custom-table-wrapper">{html_table}</div>', unsafe_allow_html=True)
+
+# Gắn toàn bộ khung HTML
+final_html = f"""
+<div class="table-responsive-wrapper">
+    {html_table}
+</div>
+"""
+st.markdown(final_html, unsafe_allow_html=True)
