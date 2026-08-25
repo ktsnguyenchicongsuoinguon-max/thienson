@@ -102,16 +102,23 @@ st.markdown("""
     .block-container > div[data-testid="stVerticalBlock"] { flex-grow: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; }
     .block-container > div[data-testid="stVerticalBlock"] > div { flex-shrink: 0 !important; width: 100% !important; }
     
-    /* BẢNG CHI TIẾT CÔNG VIỆC TÙY CHỈNH BẰNG HTML - TĂNG CHIỀU CAO TỐI ĐA */
+    /* BẢNG CHI TIẾT CÔNG VIỆC TÙY CHỈNH BẰNG HTML */
+    div.element-container:has(.custom-table-wrapper),
+    .stMarkdown:has(.custom-table-wrapper),
+    div[data-testid="stMarkdownContainer"]:has(.custom-table-wrapper) {
+        flex-grow: 1 !important; flex-shrink: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; 
+    }
+    
     .custom-table-wrapper {
         width: 100% !important; 
-        max-height: 75vh !important; /* ĐÃ TĂNG TỪ 52vh LÊN 75vh ĐỂ BẢNG DÀI HƠN */
+        max-height: 68vh !important; /* ĐÃ CHỈNH LẠI ĐỂ BẢNG KHÔNG BỊ TRÀN CHẠM ĐÁY */
         overflow-y: auto !important; 
         overflow-x: auto !important; 
         border-radius: 12px; 
         border: 1px solid rgba(255,255,255,0.5);
         background-color: rgba(255, 255, 255, 0.2);
         box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        margin-bottom: 25px !important; /* CÁCH ĐỀU KHỐI CHÍNH Ở PHÍA DƯỚI */
     }
     .custom-table-wrapper::-webkit-scrollbar { width: 8px !important; height: 8px !important; display: block !important; }
     .custom-table-wrapper::-webkit-scrollbar-track { background: transparent !important; }
