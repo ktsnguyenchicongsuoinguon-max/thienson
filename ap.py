@@ -55,7 +55,7 @@ st.markdown("""
     [data-testid="stHeaderActionElements"], .stAppDeployButton { display: none !important; }
     footer { display: none !important; }
 
-    /* KHOẢNG CÁCH TRÊN DƯỚI CHO KHUNG BỘ LỌC (SIDEBAR) */
+    /* KHOẢNG CÁCH TRÊN DƯỚI 20PX CHO KHUNG BỘ LỌC (SIDEBAR) */
     [data-testid="stSidebar"] { background-color: transparent !important; border: none !important; }
     [data-testid="stSidebarResizer"] { display: none !important; }
     [data-testid="stSidebar"] > div:first-child {
@@ -94,7 +94,7 @@ st.markdown("""
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         width: calc(100% - 40px) !important; max-width: 100% !important; 
         margin: 20px 20px !important; 
-        padding: 25px 30px 30px 30px !important; /* Chỉnh lớp đệm dưới 30px để cách đều bảng */
+        padding: 25px 30px 30px 30px !important; /* Lớp đệm dưới 30px */
         height: calc(100vh - 40px) !important; 
         display: flex !important; flex-direction: column !important; overflow: hidden !important; 
     }
@@ -111,14 +111,14 @@ st.markdown("""
     
     .custom-table-wrapper {
         width: 100% !important; 
-        max-height: calc(100vh - 355px) !important; /* Tự động giới hạn chiều cao để nhường chỗ cho lề 30px ở đáy */
+        max-height: 62vh !important; /* Giới hạn lại để bảng không đụng đáy */
         overflow-y: auto !important; 
         overflow-x: auto !important; 
         border-radius: 12px; 
         border: 1px solid rgba(255,255,255,0.5);
         background-color: rgba(255, 255, 255, 0.45);
         box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        margin-bottom: 0px !important; 
+        margin-bottom: 30px !important; /* Khoảng cách cách đáy khung chính 30px */
     }
     .custom-table-wrapper::-webkit-scrollbar { width: 8px !important; height: 8px !important; display: block !important; }
     .custom-table-wrapper::-webkit-scrollbar-track { background: transparent !important; }
@@ -133,16 +133,16 @@ st.markdown("""
         margin: 0 !important;
     }
     .custom-table thead th {
-        background-color: rgba(226, 232, 240, 1) !important; 
+        background-color: #A0AEC0 !important; /* MÀU ĐẬM HƠN CHO TIÊU ĐỀ */
         color: #0F172A !important; 
-        font-weight: 800 !important; 
-        font-size: 14px !important;
+        font-weight: 900 !important; /* CHỮ ĐẬM HƠN */
+        font-size: 14.5px !important;
         position: sticky !important; 
         top: 0 !important; 
         z-index: 10 !important; 
         padding: 12px 10px !important; 
         text-align: left !important;
-        border-bottom: 2px solid #cbd5e1 !important; 
+        border-bottom: 2px solid #718096 !important; 
         border-right: 1px solid rgba(0,0,0,0.05); 
         white-space: nowrap !important; 
     }
@@ -177,22 +177,6 @@ st.markdown("""
 
     .custom-download-link { display: block; float: right; text-align: right; color: #0A3622 !important; font-size: 13.5px !important; font-weight: 700 !important; text-decoration: none !important; margin-top: -30px !important; margin-right: 0px !important; margin-bottom: 5px !important; position: relative; z-index: 9999; cursor: pointer; }
     .custom-download-link:hover { color: #198754 !important; text-decoration: underline !important; }
-    
-    /* NÚT TẢI EXCEL VÀ LÀM MỚI DỮ LIỆU */
-    div[data-testid="stButton"] button {
-        background-color: rgba(25, 135, 84, 0.85) !important;
-        color: white !important;
-        border-radius: 10px !important;
-        font-weight: bold !important;
-        font-size: 13px !important;
-        border: 1px solid rgba(255,255,255,0.5) !important;
-        padding: 4px 12px !important;
-        min-height: 32px !important;
-    }
-    div[data-testid="stButton"] button:hover {
-        background-color: rgba(25, 135, 84, 1) !important;
-        box-shadow: 0 4px 10px rgba(25, 135, 84, 0.3) !important;
-    }
 
     /* 10 Ô KPI */
     .kpi-card { width: 100%; padding: 10px 12px; border-radius: 18px !important; border: 1px solid rgba(255, 255, 255, 0.4) !important; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 10px; min-height: 85px; background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden !important; }
@@ -216,7 +200,6 @@ def load_data():
     sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
     try:
         df = pd.read_csv(sheet_url)
-        # LOẠI BỎ CÁC CỘT RỖNG VÀ LỖI UNNAMED ĐỂ ĐẢM BẢO KHÔNG BỊ RÁC BẢNG
         df = df.dropna(how='all', axis=1)
         df = df.loc[:, ~df.columns.str.contains('^unnamed', case=False, na=False)]
     except Exception:
@@ -224,7 +207,7 @@ def load_data():
     
     df.columns = df.columns.str.strip()
     
-    # THUẬT TOÁN NHẬN DIỆN CỘT THÔNG MINH - CHỐNG GHI ĐÈ 1-1 (HIỂN THỊ ĐỦ 100% CỘT)
+    # THUẬT TOÁN NHẬN DIỆN CỘT THÔNG MINH - CHỐNG GHI ĐÈ 1-1
     rename_dict = {}
     seen_targets = set()
     
@@ -260,7 +243,6 @@ def load_data():
             if not any(kw in c_low for kw in ['%', 'tiến độ', 'trạng thái', 'tình trạng']):
                 target = 'Ngày Hoàn Thành'
                 
-        # Chỉ cập nhật nếu tên mục tiêu chưa được gắn cho cột nào trước đó (Chống gộp cột/mất cột)
         if target and target not in seen_targets:
             rename_dict[col] = target
             seen_targets.add(target)
@@ -295,7 +277,7 @@ def load_data():
         
     return df
 
-# LƯU TRỮ VÀ CẬP NHẬT DỮ LIỆU
+# LƯU TRỮ VÀ CẬP NHẬT DỮ LIỆU (TỰ LÀM MỚI KHI F5 DO KHÔNG DÙNG ST.CACHE)
 if 'raw_data' not in st.session_state:
     with st.spinner("⏳ Đang tải dữ liệu mới nhất từ Google Sheets..."):
         st.session_state.raw_data = load_data()
@@ -307,12 +289,6 @@ with st.sidebar:
     col_logo1, col_logo2, col_logo3 = st.columns([0.1, 2.8, 0.1])
     with col_logo2:
         st.image("logothienson.png", use_container_width=True) 
-        
-    st.markdown("<div style='margin-top: 15px;'></div>", unsafe_allow_html=True)
-    
-    if st.button("🔄 LÀM MỚI DỮ LIỆU", use_container_width=True):
-        st.session_state.pop('raw_data', None)
-        st.rerun()
         
     st.markdown("<h3 style='text-align: left; margin-top: 15px; margin-bottom: 5px; color: #0f172a; font-size: 15px;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
     
