@@ -158,7 +158,6 @@ st.markdown("""
         word-wrap: break-word !important; 
         vertical-align: middle !important; 
         color: #000000 !important;
-        max-width: 250px; /* Ép bảng bẻ dòng nếu nội dung bên trong quá dài */
     }
     
     .title-card-center { 
@@ -266,7 +265,6 @@ def load_data():
         
         df['Tình trạng triển khai'] = df['Tình trạng triển khai'].apply(clean_status)
 
-    # Đã thêm 'Chủ đầu tư' vào danh sách fill nan
     cols_to_fill = ['Mã Dự Án', 'Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục', 'Chủ nhiệm dự án', 'Chuyên viên thực hiện', 'Chủ đầu tư']
     for col in cols_to_fill:
         if col in df.columns: 
@@ -544,25 +542,25 @@ def color_rows(row):
 
 styled_df = df_display.style.apply(color_rows, axis=1)
 
-# ÉP KÍCH THƯỚC THU NHỎ CHO CÁC CỘT CỤ THỂ
-narrow_cols = [c for c in ['Dự Án', 'Hợp Đồng - PLHĐ', 'Chủ đầu tư'] if c in df_display.columns]
-if narrow_cols:
-    styled_df = styled_df.set_properties(subset=narrow_cols, **{
-        'max-width': '120px', 
-        'min-width': '90px', 
-        'width': '100px',
+# ÉP THU NHỎ CHIỀU RỘNG RIÊNG CHO CỘT HỢP ĐỒNG VÀ HẠNG MỤC (Cùng chủ đầu tư và dự án nếu có)
+target_narrow_cols = [c for c in ['Hợp Đồng - PLHĐ', 'Hạng Mục', 'Dự Án', 'Chủ đầu tư'] if c in df_display.columns]
+if target_narrow_cols:
+    styled_df = styled_df.set_properties(subset=target_narrow_cols, **{
+        'max-width': '100px', 
+        'min-width': '80px', 
+        'width': '90px',
         'white-space': 'normal',
         'word-wrap': 'break-word',
         'text-align': 'center'
     })
 
-# KHÓA CHẶT CHỮ, ÉP TIÊU ĐỀ XUỐNG TỐI ĐA 2 DÒNG BẰNG KÝ TỰ &nbsp; (Thay vì dấu cách thường)
+# KHÓA CHẶT CHỮ, ÉP TIÊU ĐỀ XUỐNG TỐI ĐA 2 DÒNG
 break_line_cols = {
     'Mã Dự Án': 'MÃ<br>DỰ&nbsp;ÁN',
     'Dự Án': 'DỰ&nbsp;ÁN',
     'Chủ đầu tư': 'CHỦ<br>ĐẦU&nbsp;TƯ',
     'Hợp Đồng - PLHĐ': 'HỢP&nbsp;ĐỒNG<br>PLHĐ',
-    'Hạng Mục': 'HẠNG&nbsp;MỤC',
+    'Hạng Mục': 'HẠNG<br>MỤC',
     'Chủ nhiệm dự án': 'CHỦ&nbsp;NHIỆM<br>DỰ&nbsp;ÁN',
     'Chuyên viên thực hiện': 'CHUYÊN&nbsp;VIÊN<br>THỰC&nbsp;HIỆN',
     'Công việc triển khai': 'CÔNG&nbsp;VIỆC<br>TRIỂN&nbsp;KHAI',
@@ -573,7 +571,6 @@ break_line_cols = {
     'Vướng Mắc': 'VƯỚNG&nbsp;MẮC'
 }
 
-# Các cột không định nghĩa sẵn trong từ điển cũng sẽ bị thay dấu cách bằng &nbsp; để chống rớt dòng bậy bạ
 styled_df = styled_df.format_index(lambda col: break_line_cols.get(col, str(col).replace(' ', '&nbsp;')), axis=1)
 
 # ẨN CỘT INDEX
