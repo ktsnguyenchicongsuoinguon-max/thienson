@@ -546,7 +546,7 @@ def color_rows(row):
 
 styled_df = df_display.style.apply(color_rows, axis=1)
 
-# ÉP THU NHỎ CỘT HỢP ĐỒNG
+# ÉP CỨNG THU NHỎ CỘT HỢP ĐỒNG VÀ CHỦ ĐẦU TƯ BẰNG CẢ ĐỘ RỘNG TH HEADER VÀ CELL
 if 'Hợp Đồng - PLHĐ' in df_display.columns:
     styled_df = styled_df.set_properties(subset=['Hợp Đồng - PLHĐ'], **{
         'width': '50px',
@@ -555,12 +555,11 @@ if 'Hợp Đồng - PLHĐ' in df_display.columns:
         'text-align': 'left'
     })
 
-# THU NHỎ RIÊNG CỘT CHỦ ĐẦU TƯ XUỐNG MỘT NỬA (~25PX)
 if 'Chủ đầu tư' in df_display.columns:
     styled_df = styled_df.set_properties(subset=['Chủ đầu tư'], **{
-        'width': '25px',
-        'max-width': '30px',
-        'min-width': '20px',
+        'width': '30px',
+        'max-width': '40px',
+        'min-width': '25px',
         'text-align': 'left'
     })
 
@@ -574,24 +573,24 @@ if other_narrow_cols:
         'text-align': 'left'
     })
 
-# ĐỊNH NGHĨA TIÊU ĐỀ XUỐNG DÒNG (TỐI ĐA 2 DÒNG KHI BỊ HẸP)
+# KHÓA KÍCH THƯỚC TIÊU ĐỀ TRONG THẺ DIV ĐỂ TRÌNH DUYỆT BẮT BUỘC CO LẠI
 break_line_cols = {
-    'Mã Dự Án': 'MÃ<br>DỰ&nbsp;ÁN',
-    'Dự Án': 'DỰ&nbsp;ÁN',
-    'Chủ đầu tư': 'CHỦ<br>ĐẦU&nbsp;TƯ',
-    'Hợp Đồng - PLHĐ': 'HỢP&nbsp;ĐỒNG<br>PLHĐ',
-    'Hạng Mục': 'HẠNG&nbsp;MỤC',
-    'Chủ nhiệm dự án': 'CHỦ&nbsp;NHIỆM<br>DỰ&nbsp;ÁN',
-    'Chuyên viên thực hiện': 'CHUYÊN&nbsp;VIÊN',
-    'Công việc triển khai': 'CÔNG&nbsp;VIỆC<br>TRIỂN&nbsp;KHAI',
-    'Ngày Bắt Đầu': 'NGÀY<br>BẮT&nbsp;ĐẦU',
-    'Ngày Hoàn Thành': 'NGÀY<br>HOÀN&nbsp;THÀNH',
-    'Tiến Độ (%)': 'TIẾN&nbsp;ĐỘ<br>(%)',
-    'Tình trạng triển khai': 'TÌNH&nbsp;TRẠNG',
-    'Vướng Mắc': 'VƯỚNG&nbsp;MẮC'
+    'Mã Dự Án': '<div style="width: 50px; overflow: hidden;">MÃ<br>DỰ&nbsp;ÁN</div>',
+    'Dự Án': '<div style="width: 90px; overflow: hidden;">DỰ&nbsp;ÁN</div>',
+    'Chủ đầu tư': '<div style="width: 30px; overflow: hidden;">CHỦ<br>ĐẦU&nbsp;TƯ</div>',
+    'Hợp Đồng - PLHĐ': '<div style="width: 50px; overflow: hidden;">HỢP&nbsp;ĐỒNG<br>PLHĐ</div>',
+    'Hạng Mục': '<div style="width: 90px; overflow: hidden;">HẠNG&nbsp;MỤC</div>',
+    'Chủ nhiệm dự án': '<div style="width: 90px; overflow: hidden;">CHỦ&nbsp;NHIỆM<br>DỰ&nbsp;ÁN</div>',
+    'Chuyên viên thực hiện': '<div style="width: 90px; overflow: hidden;">CHUYÊN<br>VIÊN</div>',
+    'Công việc triển khai': '<div style="overflow: hidden;">CÔNG&nbsp;VIỆC<br>TRIỂN&nbsp;KHAI</div>',
+    'Ngày Bắt Đầu': '<div style="overflow: hidden;">NGÀY<br>BẮT&nbsp;ĐẦU</div>',
+    'Ngày Hoàn Thành': '<div style="overflow: hidden;">NGÀY<br>HOÀN&nbsp;THÀNH</div>',
+    'Tiến Độ (%)': '<div style="overflow: hidden;">TIẾN&nbsp;ĐỘ<br>(%)</div>',
+    'Tình trạng triển khai': '<div style="overflow: hidden;">TÌNH<br>TRẠNG</div>',
+    'Vướng Mắc': '<div style="overflow: hidden;">VƯỚNG&nbsp;MẮC</div>'
 }
 
-styled_df = styled_df.format_index(lambda col: break_line_cols.get(col, str(col).replace(' ', '&nbsp;')), axis=1)
+styled_df = styled_df.format_index(lambda col: break_line_cols.get(col, f'<div style="overflow: hidden;">{str(col).replace(" ", "&nbsp;")}</div>'), axis=1)
 
 # ẨN CỘT INDEX
 try:
