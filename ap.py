@@ -55,7 +55,7 @@ st.markdown("""
     [data-testid="stHeaderActionElements"], .stAppDeployButton { display: none !important; }
     footer { display: none !important; }
 
-    /* KHOẢNG CÁCH TRÊN DƯỚI CHO KHUNG BỘ LỌC (SIDEBAR) */
+    /* KHOẢNG CÁCH CHO KHUNG BỘ LỌC (SIDEBAR) */
     [data-testid="stSidebar"] { background-color: transparent !important; border: none !important; }
     [data-testid="stSidebarResizer"] { display: none !important; }
     [data-testid="stSidebar"] > div:first-child {
@@ -70,7 +70,6 @@ st.markdown("""
     }
     [data-testid="stSidebarUserContent"] { padding: 5px 20px 20px 20px !important; overflow: hidden !important; }
     
-    /* HIỆU ỨNG BÓNG ĐỔ CHO LOGO TRONG SIDEBAR */
     [data-testid="stSidebar"] img {
         filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.25)) drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.15)) !important;
         transition: transform 0.3s ease !important;
@@ -88,7 +87,7 @@ st.markdown("""
     }
     div.row-widget.stSelectbox, div.row-widget.stMultiSelect { margin-bottom: -5px !important; }
 
-    /* KHOẢNG CÁCH ĐỀU 30PX CHO KHUNG CHÍNH */
+    /* KHUNG CHÍNH */
     .block-container { 
         background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
@@ -102,7 +101,7 @@ st.markdown("""
     .block-container > div[data-testid="stVerticalBlock"] { flex-grow: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; }
     .block-container > div[data-testid="stVerticalBlock"] > div { flex-shrink: 0 !important; width: 100% !important; }
     
-    /* BẢNG CHI TIẾT CÔNG VIỆC TÙY CHỈNH */
+    /* BẢNG CHI TIẾT CÔNG VIỆC */
     div.element-container:has(.custom-table-wrapper),
     .stMarkdown:has(.custom-table-wrapper),
     div[data-testid="stMarkdownContainer"]:has(.custom-table-wrapper) {
@@ -136,19 +135,19 @@ st.markdown("""
         background-color: #e9d8fd !important;
         color: #000000 !important;
         font-weight: 800 !important; 
-        font-size: 14px !important;
+        font-size: 13.5px !important;
         text-transform: uppercase !important;
         position: sticky !important; 
         top: 0 !important; 
         z-index: 10 !important; 
-        padding: 8px 6px !important; 
+        padding: 6px 4px !important; 
         text-align: center !important;
         vertical-align: middle !important;
         border-bottom: 2px solid #d6bcfa !important; 
         border-right: 1px solid rgba(0,0,0,0.05) !important; 
         white-space: normal !important; 
         word-wrap: break-word !important; 
-        line-height: 1.25 !important;
+        line-height: 1.2 !important;
     }
     .custom-table tbody td {
         padding: 10px 10px !important; 
@@ -161,7 +160,6 @@ st.markdown("""
         color: #000000 !important;
     }
     
-    /* CĂN GIỮA TUYỆT ĐỐI KHUNG TIÊU ĐỀ */
     .title-card-center { 
         border-radius: 16px; 
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.05); 
@@ -528,7 +526,7 @@ if 'Tình trạng triển khai' in df_display.columns and 'Tiến Độ (%)' in 
     df_display = df_display.sort_values(by=sort_cols, ascending=[True] * len(sort_cols))
     df_display = df_display.drop(columns=['Mức Ưu Tiên'])
 
-# ÁP DỤNG MÀU TRỰC TIẾP TRÊN DF GỐC TRƯỚC KHI ĐỔI TÊN CỘT ĐỂ KHÔNG BỊ LỖI MẤT MÀU
+# ÁP DỤNG MÀU SẮC LÊN BẢNG
 def color_rows(row):
     vm = str(row.get('Vướng Mắc', '')).strip().lower()
     if vm and vm not in ['nan', 'none', '']:
@@ -542,25 +540,25 @@ def color_rows(row):
 
 styled_df = df_display.style.apply(color_rows, axis=1)
 
-# ĐỔI TÊN TIÊU ĐỀ 2 HÀNG BẰNG FORMAT INDEX/COLUMNS CỦA STYLER (GIỮ NGUYÊN MÀU DÒNG)
+# NGẮT DÒNG TIÊU ĐỀ TỐI ĐA 3 DÒNG
 break_line_cols = {
     'Mã Dự Án': 'MÃ<br>DỰ ÁN',
     'Dự Án': 'DỰ ÁN',
-    'Hợp Đồng - PLHĐ': 'HỢP ĐỒNG<br>PLHĐ',
+    'Hợp Đồng - PLHĐ': 'HỢP ĐỒNG<br>-<br>PLHĐ',
     'Hạng Mục': 'HẠNG MỤC',
-    'Chủ nhiệm dự án': 'CHỦ NHIỆM<br>DỰ ÁN',
+    'Chủ nhiệm dự án': 'CHỦ NHIỆM<br>DỰ ÁN<br>(CNDA)',
     'Chuyên viên thực hiện': 'CHUYÊN VIÊN<br>THỰC HIỆN',
     'Công việc triển khai': 'CÔNG VIỆC<br>TRIỂN KHAI',
     'Ngày Bắt Đầu': 'NGÀY<br>BẮT ĐẦU',
     'Ngày Hoàn Thành': 'NGÀY<br>HOÀN THÀNH',
     'Tiến Độ (%)': 'TIẾN ĐỘ<br>(%)',
     'Tình trạng triển khai': 'TÌNH TRẠNG<br>TRIỂN KHAI',
-    'Vướng Mắc': 'VƯỚNG MẮC'
+    'Vướng Mắc': 'VƯỚNG MẮC<br>/ GHI CHÚ'
 }
 
 styled_df = styled_df.format_index(lambda col: break_line_cols.get(col, col), axis=1)
 
-# ẨN CỘT INDEX CỦA PANDAS
+# ẨN CỘT INDEX
 try:
     styled_df = styled_df.hide(axis='index')
 except Exception:
