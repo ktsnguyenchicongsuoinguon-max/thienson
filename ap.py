@@ -48,7 +48,9 @@ else:
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    html, body { overflow: auto !important; margin: 0 !important; padding: 0 !important; }
+    /* KHÓA CUỘN TOÀN TRANG: ÉP TRANG WEB CỐ ĐỊNH, KHÔNG HIỆN THANH CUỘN BÊN NGOÀI */
+    html, body { overflow: hidden !important; margin: 0 !important; padding: 0 !important; height: 100vh !important; width: 100vw !important; }
+    [data-testid="stAppViewContainer"], [data-testid="stMain"] { overflow: hidden !important; height: 100vh !important; width: 100vw !important; }
     
     ::-webkit-scrollbar { width: 8px !important; height: 8px !important; display: block !important; }
     ::-webkit-scrollbar-track { background: transparent !important; }
@@ -72,8 +74,9 @@ st.markdown("""
         height: calc(100vh - 40px) !important; 
         overflow: hidden !important; 
     }
-    [data-testid="stSidebarUserContent"] { padding: 5px 20px 20px 20px !important; overflow-y: auto !important; }
+    [data-testid="stSidebarUserContent"] { padding: 5px 20px 20px 20px !important; overflow-y: auto !important; height: 100% !important; }
     
+    /* HIỆU ỨNG BÓNG ĐỔ CHO LOGO TRONG SIDEBAR */
     [data-testid="stSidebar"] img {
         filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.25)) drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.15)) !important;
         transition: transform 0.3s ease !important;
@@ -89,34 +92,42 @@ st.markdown("""
     }
     div.row-widget.stSelectbox, div.row-widget.stMultiSelect { margin-bottom: -5px !important; }
 
-    /* KHUNG CHÍNH */
+    /* ================= KHUNG CHÍNH (CỐ ĐỊNH HOÀN TOÀN) ================= */
     .block-container { 
         background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         width: calc(100% - 40px) !important; max-width: 100% !important; 
         margin: 20px 20px !important; 
         padding: 25px 30px 30px 30px !important; 
-        min-height: calc(100vh - 40px) !important; 
+        height: calc(100vh - 40px) !important; /* GIỚI HẠN CHIỀU CAO CHÍNH XÁC */
+        max-height: calc(100vh - 40px) !important;
         display: flex !important; flex-direction: column !important; 
-        overflow-y: auto !important; overflow-x: hidden !important; 
+        overflow: hidden !important; /* KHÓA CUỘN KHỐI CHÍNH */
     }
-    .block-container > div[data-testid="stVerticalBlock"] { flex-grow: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; }
-    .block-container > div[data-testid="stVerticalBlock"] > div { flex-shrink: 0 !important; width: 100% !important; }
+    .block-container > div[data-testid="stVerticalBlock"] { 
+        flex-grow: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; height: 100% !important; 
+    }
+    .block-container > div[data-testid="stVerticalBlock"] > div { flex-shrink: 0 !important; }
     
     /* ================= BẢNG CHI TIẾT TÙY CHỈNH THÔNG MINH ================= */
     
+    /* XÓA BỎ LỆNH ÉP KÍCH THƯỚC TRÀN ĐỂ CHỐNG MẤT CỘT KHI ZOOM TO */
+    .custom-table, .custom-table * { max-width: none !important; }
+
     div.element-container:has(.table-responsive-wrapper),
     .stMarkdown:has(.table-responsive-wrapper),
     div[data-testid="stMarkdownContainer"]:has(.table-responsive-wrapper) {
-        flex-grow: 1 !important; flex-shrink: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; 
+        flex-grow: 1 !important; flex-shrink: 1 !important; display: flex !important; flex-direction: column !important; 
+        min-height: 0 !important; width: 100% !important; height: 100% !important; /* ĐẨY BẢNG TRÀN HẾT KHOẢNG TRỐNG CÒN LẠI */
     }
     
     .table-responsive-wrapper {
         width: 100% !important; 
         max-width: 100% !important;
-        max-height: calc(100vh - 355px) !important; 
+        height: 100% !important; /* TỰ ĐỘNG ĐIỀN ĐẦY VÙNG TRỐNG */
+        max-height: none !important; /* Bỏ max-height cứng do đã dùng Flexbox */
         overflow-y: auto !important; 
-        overflow-x: auto !important; 
+        overflow-x: auto !important; /* THANH CUỘN HIỆN Ở ĐÂY KHI ZOOM/DÀI */
         display: block !important;
         border-radius: 12px; 
         border: 1px solid rgba(255,255,255,0.5);
@@ -126,8 +137,8 @@ st.markdown("""
     }
     
     .custom-table { 
-        width: 100% !important; 
-        min-width: 800px !important; 
+        width: max-content !important; 
+        min-width: 100% !important; 
         border-collapse: separate !important; 
         border-spacing: 0; 
         font-family: inherit; 
@@ -135,8 +146,8 @@ st.markdown("""
     }
     
     .custom-table thead th {
-        background-color: #e9d8fd !important; 
-        color: #000000 !important; 
+        background-color: #e9d8fd !important; /* MÀU TÍM NHẠT */
+        color: #000000 !important; /* CHỮ ĐEN */
         font-weight: 800 !important; 
         font-size: 15px !important; 
         text-transform: uppercase !important; 
@@ -144,13 +155,13 @@ st.markdown("""
         top: 0 !important; 
         z-index: 10 !important; 
         padding: 12px 10px !important; 
-        text-align: center !important; /* CĂN GIỮA CHIỀU NGANG */
-        vertical-align: middle !important; /* CĂN GIỮA CHIỀU DỌC */
+        text-align: center !important; 
+        vertical-align: middle !important; 
         border-bottom: 2px solid #d6bcfa !important; 
         border-right: 1px solid rgba(0,0,0,0.05) !important; 
         white-space: normal !important; 
         word-wrap: break-word !important; 
-        min-width: 160px !important; /* ĐỘ RỘNG TỐI THIỂU: ÉP CHỮ CHỈ RỚT XUỐNG TỐI ĐA 2 DÒNG */
+        min-width: 160px !important; 
         max-width: 250px !important;
         line-height: 1.3 !important;
     }
@@ -164,6 +175,8 @@ st.markdown("""
         word-wrap: break-word !important; 
         overflow-wrap: break-word !important; 
         vertical-align: middle !important; 
+        min-width: 160px !important; 
+        max-width: 350px !important;
     }
     
     /* CĂN GIỮA TUYỆT ĐỐI KHUNG TIÊU ĐỀ */
@@ -493,8 +506,8 @@ def generate_excel_with_colors(df_data):
         cell.fill = header_fill
         cell.font = header_font
         
-        if str(col_name).strip() == 'TÌNH TRẠNG TRIỂN KHAI': status_col_idx = col_idx
-        if str(col_name).strip() == 'VƯỚNG MẮC': vướng_col_idx = col_idx
+        if str(col_name).strip().upper() == 'TÌNH TRẠNG TRIỂN KHAI': status_col_idx = col_idx
+        if str(col_name).strip().upper() == 'VƯỚNG MẮC': vướng_col_idx = col_idx
 
     for row_idx in range(2, ws.max_row + 1):
         fill_to_use = None
@@ -541,11 +554,8 @@ if 'Tình trạng triển khai' in df_display.columns and 'Tiến Độ (%)' in 
     df_display = df_display.sort_values(by=sort_cols, ascending=[True] * len(sort_cols))
     df_display = df_display.drop(columns=['Mức Ưu Tiên'])
 
-# Ép toàn bộ tên cột thành in hoa 
-df_display.columns = df_display.columns.str.upper()
-
-# KHẮC PHỤC LỖI TÔ MÀU (Dùng key in hoa)
 def color_rows(row):
+    # Dùng hoa vì lát nữa ta sẽ ép hoa tên cột
     vm = str(row.get('VƯỚNG MẮC', '')).strip().lower()
     if vm and vm not in ['nan', 'none', '']:
         return ['background-color: #FFEeba; color: #000;'] * len(row)
@@ -555,6 +565,9 @@ def color_rows(row):
     if status == 'Tạm dừng': return ['background-color: #ef9a9a; color: #000;'] * len(row)
     if status == 'Chưa triển khai': return ['background-color: #adb5bd; color: #000;'] * len(row)
     return ['background-color: #ffffff; color: #000;'] * len(row)
+
+# ÉP TÊN CỘT THÀNH IN HOA NGAY TRƯỚC KHI TÔ MÀU ĐỂ MAP ĐÚNG TÊN
+df_display.columns = df_display.columns.str.upper()
 
 styled_df = df_display.style.apply(color_rows, axis=1)
 
