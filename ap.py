@@ -102,16 +102,55 @@ st.markdown("""
     .block-container > div[data-testid="stVerticalBlock"] { flex-grow: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; }
     .block-container > div[data-testid="stVerticalBlock"] > div { flex-shrink: 0 !important; width: 100% !important; }
     
-    /* BẢNG CHI TIẾT CÔNG VIỆC */
-    div.element-container:has([data-testid="stDataFrame"]) { flex-grow: 1 !important; flex-shrink: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; }
-    [data-testid="stDataFrame"] { flex-grow: 1 !important; width: 100% !important; min-height: 0 !important; overflow-x: auto !important; }
-    [data-testid="stDataFrame"] > div { height: 100% !important; width: 100% !important; overflow: auto !important; }
-    [data-testid="stDataFrame"] div::-webkit-scrollbar { width: 8px !important; height: 8px !important; display: block !important; }
-    [data-testid="stDataFrame"] div::-webkit-scrollbar-track { background: transparent !important; }
-    [data-testid="stDataFrame"] div::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.3) !important; border-radius: 10px !important; }
-    [data-testid="stDataFrame"] div::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.5) !important; }
-
-    div[data-testid="stDataFrame"] th { background-color: rgba(226, 232, 240, 0.9) !important; color: #0F172A !important; font-weight: 800 !important; font-size: 14px !important; }
+    /* BẢNG CHI TIẾT CÔNG VIỆC TÙY CHỈNH BẰNG HTML (HỖ TRỢ XUỐNG DÒNG) */
+    div.element-container:has(.custom-table-wrapper),
+    .stMarkdown:has(.custom-table-wrapper),
+    div[data-testid="stMarkdownContainer"]:has(.custom-table-wrapper) {
+        flex-grow: 1 !important; flex-shrink: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; 
+    }
+    
+    .custom-table-wrapper {
+        flex-grow: 1 !important; 
+        width: 100% !important; 
+        overflow: auto !important; 
+        border-radius: 12px; 
+        border: 1px solid rgba(255,255,255,0.5);
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+    .custom-table-wrapper::-webkit-scrollbar { width: 8px !important; height: 8px !important; display: block !important; }
+    .custom-table-wrapper::-webkit-scrollbar-track { background: transparent !important; }
+    .custom-table-wrapper::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.3) !important; border-radius: 10px !important; }
+    .custom-table-wrapper::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.5) !important; }
+    
+    .custom-table { 
+        width: 100% !important; 
+        border-collapse: separate !important; 
+        border-spacing: 0; 
+        font-family: inherit; 
+    }
+    .custom-table thead th {
+        background-color: rgba(226, 232, 240, 0.98) !important; 
+        color: #0F172A !important; 
+        font-weight: 800 !important; 
+        font-size: 14px !important;
+        position: sticky !important; 
+        top: 0 !important; 
+        z-index: 10 !important; 
+        padding: 12px 10px !important; 
+        text-align: left !important;
+        border-bottom: 2px solid #cbd5e1 !important; 
+        border-right: 1px solid rgba(0,0,0,0.05); 
+        white-space: nowrap !important; /* Tiêu đề không cần xuống dòng */
+    }
+    .custom-table tbody td {
+        padding: 10px 10px !important; 
+        font-size: 13.5px !important; 
+        border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+        border-right: 1px solid rgba(0,0,0,0.05); 
+        white-space: normal !important; /* CỐT LÕI: CHO PHÉP XUỐNG DÒNG */
+        word-wrap: break-word !important; 
+        vertical-align: middle !important; 
+    }
     
     /* CĂN GIỮA TUYỆT ĐỐI KHUNG TIÊU ĐỀ */
     .title-card-center { 
@@ -213,9 +252,7 @@ def load_data():
     df.rename(columns=rename_dict, inplace=True)
     df = df.loc[:, ~df.columns.duplicated()]
     
-    # -------------------------------------------------------------
-    # SỬA LỖI: LÀM SẠCH VÀ ĐỒNG NHẤT DỮ LIỆU TÌNH TRẠNG TRIỂN KHAI
-    # -------------------------------------------------------------
+    # LÀM SẠCH VÀ ĐỒNG NHẤT DỮ LIỆU TÌNH TRẠNG TRIỂN KHAI
     if 'Tình trạng triển khai' in df.columns:
         def clean_status(x):
             val = str(x).strip().lower()
@@ -223,7 +260,7 @@ def load_data():
             if val in ['chưa bắt đầu', 'chưa triển khai', 'not started']: return 'Chưa triển khai'
             if val in ['đang triển khai', 'đang thực hiện', 'in progress']: return 'Đang triển khai'
             if val in ['tạm dừng', 'pending', 'pause']: return 'Tạm dừng'
-            return str(x).strip() # Giữ nguyên nếu không thuộc các trường hợp trên
+            return str(x).strip()
         
         df['Tình trạng triển khai'] = df['Tình trạng triển khai'].apply(clean_status)
 
@@ -509,9 +546,19 @@ def color_rows(row):
     if status == 'Chưa triển khai': return ['background-color: #adb5bd; color: #000;'] * len(row)
     return ['background-color: #ffffff; color: #000;'] * len(row)
 
-styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
-    'selector': 'th',
-    'props': [('background-color', 'rgba(226, 232, 240, 0.9)'), ('color', '#0F172A'), ('font-weight', 'bold')]
-}])
+# ÁP DỤNG MÀU SẮC LÊN BẢNG
+styled_df = df_display.style.apply(color_rows, axis=1)
 
-st.dataframe(styled_df, use_container_width=True, hide_index=True)
+# ẨN CỘT INDEX CỦA PANDAS ĐỂ BẢNG TRÔNG GỌN HƠN
+try:
+    styled_df = styled_df.hide(axis='index')
+except Exception:
+    try:
+        styled_df = styled_df.hide_index()
+    except:
+        pass
+
+# ================= RENDER BẢNG BẰNG TÙY CHỈNH HTML (HỖ TRỢ XUỐNG DÒNG) =================
+html_table = styled_df.to_html()
+html_table = html_table.replace('<table', '<table class="custom-table"')
+st.markdown(f'<div class="custom-table-wrapper">{html_table}</div>', unsafe_allow_html=True)
