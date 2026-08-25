@@ -102,7 +102,13 @@ st.markdown("""
     .block-container > div[data-testid="stVerticalBlock"] { flex-grow: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; }
     .block-container > div[data-testid="stVerticalBlock"] > div { flex-shrink: 0 !important; width: 100% !important; }
     
-    /* BẢNG CHI TIẾT CÔNG VIỆC TÙY CHỈNH BẰNG HTML (CHỐNG TRÀN VÀ CÁCH ĐỀU 30PX ĐÁY) */
+    /* ================= BẢNG CHI TIẾT CÔNG VIỆC TÙY CHỈNH BẰNG HTML ================= */
+    
+    /* Gỡ bỏ giới hạn max-width cho riêng bảng để chống mất cột khi Zoom */
+    .custom-table, .custom-table * {
+        max-width: none !important;
+    }
+
     div.element-container:has(.custom-table-wrapper),
     .stMarkdown:has(.custom-table-wrapper),
     div[data-testid="stMarkdownContainer"]:has(.custom-table-wrapper) {
@@ -136,8 +142,8 @@ st.markdown("""
         background-color: #e9d8fd !important; /* MÀU TÍM NHẠT CHO TIÊU ĐỀ */
         color: #000000 !important; /* CHỮ MÀU ĐEN */
         font-weight: 800 !important; 
-        font-size: 15.5px !important; /* TĂNG KÍCH THƯỚC CHỮ LÊN 1 CHÚT */
-        text-transform: uppercase !important; /* CHỮ VIẾT HOA */
+        font-size: 15.5px !important; 
+        text-transform: uppercase !important; 
         position: sticky !important; 
         top: 0 !important; 
         z-index: 10 !important; 
@@ -145,7 +151,7 @@ st.markdown("""
         text-align: left !important;
         border-bottom: 2px solid #d6bcfa !important; 
         border-right: 1px solid rgba(0,0,0,0.05) !important; 
-        white-space: nowrap !important; 
+        white-space: nowrap !important; /* Không xuống dòng ở tiêu đề */
     }
     .custom-table tbody td {
         padding: 10px 10px !important; 
@@ -209,7 +215,7 @@ def load_data():
     
     df.columns = df.columns.str.strip()
     
-    # THUẬT TOÁN NHẬN DIỆN CỘT THÔNG MINH - CHỐNG GHI ĐÈ 1-1 (HIỂN THỊ ĐỦ 100% CỘT)
+    # THUẬT TOÁN NHẬN DIỆN CỘT THÔNG MINH - CHỐNG GHI ĐÈ 1-1
     rename_dict = {}
     seen_targets = set()
     
@@ -245,7 +251,6 @@ def load_data():
             if not any(kw in c_low for kw in ['%', 'tiến độ', 'trạng thái', 'tình trạng']):
                 target = 'Ngày Hoàn Thành'
                 
-        # Chỉ cập nhật nếu tên mục tiêu chưa được gắn cho cột nào trước đó (Chống gộp cột/mất cột)
         if target and target not in seen_targets:
             rename_dict[col] = target
             seen_targets.add(target)
@@ -280,7 +285,7 @@ def load_data():
         
     return df
 
-# LƯU TRỮ VÀ CẬP NHẬT DỮ LIỆU (TỰ LÀM MỚI KHI F5 DO KHÔNG DÙNG ST.CACHE)
+# LƯU TRỮ VÀ CẬP NHẬT DỮ LIỆU (TỰ LÀM MỚI KHI F5)
 if 'raw_data' not in st.session_state:
     with st.spinner("⏳ Đang tải dữ liệu mới nhất từ Google Sheets..."):
         st.session_state.raw_data = load_data()
