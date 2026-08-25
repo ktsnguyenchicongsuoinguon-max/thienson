@@ -204,24 +204,28 @@ with st.sidebar:
         
     st.markdown("<h3 style='text-align: left; margin-top: 5px; margin-bottom: 5px; color: #0f172a; font-size: 15px;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
     
-    unique_projects = [p for p in df.get('Dự Án', pd.Series()).unique() if p != '']
+    # SỬA LỖI TẠI ĐÂY: Loại bỏ việc sử dụng pd.Series() trong hàm .get()
+    unique_projects = [p for p in df['Dự Án'].unique() if p != ''] if 'Dự Án' in df.columns else []
     st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">domain</span> DỰ ÁN</div>', unsafe_allow_html=True)
     selected_projects = st.multiselect("DỰ ÁN", options=unique_projects, placeholder="Chọn Tất cả", label_visibility="collapsed")
 
     df_temp = df.copy()
-    if selected_projects: df_temp = df_temp[df_temp['Dự Án'].isin(selected_projects)]
+    if selected_projects and 'Dự Án' in df_temp.columns: 
+        df_temp = df_temp[df_temp['Dự Án'].isin(selected_projects)]
 
-    hd_opts = [x for x in df_temp.get('Hợp Đồng - PLHĐ', pd.Series()).unique() if x != '']
+    hd_opts = [x for x in df_temp['Hợp Đồng - PLHĐ'].unique() if x != ''] if 'Hợp Đồng - PLHĐ' in df_temp.columns else []
     st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">description</span> SỐ HỢP ĐỒNG</div>', unsafe_allow_html=True)
     selected_hd = st.multiselect("SỐ HỢP ĐỒNG", options=hd_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
-    if selected_hd: df_temp = df_temp[df_temp['Hợp Đồng - PLHĐ'].isin(selected_hd)]
+    if selected_hd and 'Hợp Đồng - PLHĐ' in df_temp.columns: 
+        df_temp = df_temp[df_temp['Hợp Đồng - PLHĐ'].isin(selected_hd)]
 
-    hm_opts = [x for x in df_temp.get('Hạng Mục', pd.Series()).unique() if x != '']
+    hm_opts = [x for x in df_temp['Hạng Mục'].unique() if x != ''] if 'Hạng Mục' in df_temp.columns else []
     st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">folder_open</span> HẠNG MỤC</div>', unsafe_allow_html=True)
     selected_hm = st.multiselect("HẠNG MỤC", options=hm_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
-    if selected_hm: df_temp = df_temp[df_temp['Hạng Mục'].isin(selected_hm)]
+    if selected_hm and 'Hạng Mục' in df_temp.columns: 
+        df_temp = df_temp[df_temp['Hạng Mục'].isin(selected_hm)]
 
-    ql_opts = [x for x in df_temp.get('Trưởng nhóm -CNDA', pd.Series()).unique() if x != ''] if 'Trưởng nhóm -CNDA' in df_temp.columns else []
+    ql_opts = [x for x in df_temp['Trưởng nhóm -CNDA'].unique() if x != ''] if 'Trưởng nhóm -CNDA' in df_temp.columns else []
     st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">manage_accounts</span> TRƯỞNG NHÓM -CNDA</div>', unsafe_allow_html=True)
     selected_ql = st.multiselect("TRƯỞNG NHÓM -CNDA", options=ql_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
 
@@ -262,6 +266,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+df_display = df.copy()
 if start_date and end_date and 'Ngày_Bat_Dau_Obj' in df_display.columns and 'Ngày_Hoan_Thanh_Obj' in df_display.columns:
     start_ts = pd.to_datetime(start_date)
     end_ts = pd.to_datetime(end_date)
@@ -273,12 +278,13 @@ if selected_projects and 'Dự Án' in df_display.columns: df_display = df_displ
 if selected_hd and 'Hợp Đồng - PLHĐ' in df_display.columns: df_display = df_display[df_display['Hợp Đồng - PLHĐ'].isin(selected_hd)]
 if selected_hm and 'Hạng Mục' in df_display.columns: df_display = df_display[df_display['Hạng Mục'].isin(selected_hm)]
 if selected_ql and 'Trưởng nhóm -CNDA' in df_display.columns: df_display = df_display[df_display['Trưởng nhóm -CNDA'].isin(selected_ql)]
-if selected_cb and cb_col in df_display.columns: df_display = df_display[df_display[cb_col].isin(selected_cb)]
+if selected_cb and cb_col and cb_col in df_display.columns: df_display = df_display[df_display[cb_col].isin(selected_cb)]
 
 # --- TÍNH TOÁN 10 CHỈ SỐ KPI ---
-p_projects = df_display.get('Dự Án', pd.Series()).nunique()
-p_contracts = df_display.get('Hợp Đồng - PLHĐ', pd.Series()).nunique()
-p_categories = df_display.get('Hạng Mục', pd.Series()).nunique()
+# SỬA LỖI TẠI ĐÂY: Loại bỏ việc sử dụng pd.Series()
+p_projects = df_display['Dự Án'].nunique() if 'Dự Án' in df_display.columns else 0
+p_contracts = df_display['Hợp Đồng - PLHĐ'].nunique() if 'Hợp Đồng - PLHĐ' in df_display.columns else 0
+p_categories = df_display['Hạng Mục'].nunique() if 'Hạng Mục' in df_display.columns else 0
 p_total = len(df_display)
 p_prog = df_display['Tiến Độ (%)'].mean() if ('Tiến Độ (%)' in df_display.columns and p_total > 0) else 0
 
