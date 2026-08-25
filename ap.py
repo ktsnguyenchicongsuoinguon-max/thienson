@@ -550,9 +550,9 @@ styled_df = df_display.style.apply(color_rows, axis=1)
 small_cols = [c for c in ['Hợp Đồng - PLHĐ', 'Chủ đầu tư'] if c in df_display.columns]
 if small_cols:
     styled_df = styled_df.set_properties(subset=small_cols, **{
-        'width': '40px',
-        'max-width': '40px',
-        'min-width': '30px',
+        'width': '10px',
+        'max-width': '10px',
+        'min-width': '10px',
         'text-align': 'left'
     })
 
