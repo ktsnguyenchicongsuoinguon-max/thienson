@@ -162,25 +162,40 @@ def load_data():
     
     df.columns = df.columns.str.strip()
     
+    # -------------------------------------------------------------
+    # SỬA LỖI: SỬ DỤNG NHẬN DIỆN TỪ KHÓA THÔNG MINH CHO CÁC CỘT
+    # -------------------------------------------------------------
     rename_dict = {}
     for col in df.columns:
         c_low = str(col).lower().strip()
-        if c_low in ['trạng thái', 'tình trạng', 'tình trạng triển khai', 'trình trạng triển khai', 'trình trạng']: rename_dict[col] = 'Tình trạng triển khai'
-        elif c_low == 'tiến độ (%)': rename_dict[col] = 'Tiến Độ (%)'
-        elif c_low in ['đầu việc', 'đầu việc shopdrawing', 'hạng mục']: rename_dict[col] = 'Hạng Mục'
-        elif c_low in ['ghi chú', 'vướng mắc', 'ý kiến', 'vuong mac', 'ghi chu', 'note', 'ghi chú/vướng mắc']: rename_dict[col] = 'Vướng Mắc'
-        elif c_low == 'dự án': rename_dict[col] = 'Dự Án'
-        # CẬP NHẬT TÊN CỘT THÀNH "CHỦ NHIỆM DỰ ÁN" ĐỂ ĐỒNG BỘ VỚI BỘ LỌC TRƯỞNG NHÓM
-        elif c_low in ['chủ nhiệm dự án', 'cán bộ quản lý', 'người quản lý', 'trưởng nhóm -cnda', 'trưởng nhóm - cnda', 'trưởng nhóm']: rename_dict[col] = 'Chủ nhiệm dự án'
-        elif c_low in ['hợp đồng - plhđ', 'hợp đồng', 'số hợp đồng', 'hợp đồng plhđ', 'số hđ/plhđ', 'hđ/plhđ', 'số hđ / plhđ', 'hđ / plhđ']: rename_dict[col] = 'Hợp Đồng - PLHĐ'
-        elif c_low in ['cán bộ triển khai - sđt', 'người triển khai', 'cán bộ triển khai', 'chuyên viên thực hiện']: rename_dict[col] = 'Chuyên viên thực hiện'
+        if any(kw in c_low for kw in ['trạng thái', 'tình trạng', 'trình trạng']): 
+            rename_dict[col] = 'Tình trạng triển khai'
+        elif 'tiến độ' in c_low: 
+            rename_dict[col] = 'Tiến Độ (%)'
+        elif 'hạng mục' in c_low or 'đầu việc' in c_low: 
+            rename_dict[col] = 'Hạng Mục'
+        elif any(kw in c_low for kw in ['vướng mắc', 'ghi chú', 'ý kiến', 'note']): 
+            rename_dict[col] = 'Vướng Mắc'
+        elif 'dự án' in c_low and 'chủ nhiệm' not in c_low: 
+            rename_dict[col] = 'Dự Án'
+        elif any(kw in c_low for kw in ['chủ nhiệm', 'quản lý', 'trưởng nhóm']): 
+            rename_dict[col] = 'Chủ nhiệm dự án'
+        elif any(kw in c_low for kw in ['hợp đồng', 'hđ', 'plhđ']): 
+            rename_dict[col] = 'Hợp Đồng - PLHĐ'
+        elif any(kw in c_low for kw in ['chuyên viên', 'triển khai', 'thực hiện', 'người thực hiện']): 
+            if not any(kw in c_low for kw in ['tình trạng', 'trình trạng', 'trạng thái']):
+                rename_dict[col] = 'Chuyên viên thực hiện'
             
     df.rename(columns=rename_dict, inplace=True)
     df = df.loc[:, ~df.columns.duplicated()]
         
-    cols_to_fill = ['Mã Dự Án', 'Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục']
+    # -------------------------------------------------------------
+    # SỬA LỖI: FORWARD-FILL (ĐIỀN TỰ ĐỘNG) CHO CÁC Ô BỊ GỘP (MERGE)
+    # -------------------------------------------------------------
+    cols_to_fill = ['Mã Dự Án', 'Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục', 'Chủ nhiệm dự án', 'Chuyên viên thực hiện']
     for col in cols_to_fill:
-        if col in df.columns: df[col] = df[col].replace('', pd.NA).ffill()
+        if col in df.columns: 
+            df[col] = df[col].replace('', pd.NA).ffill()
             
     df = df.fillna('') 
     
@@ -205,33 +220,31 @@ with st.sidebar:
         
     st.markdown("<h3 style='text-align: left; margin-top: 5px; margin-bottom: 5px; color: #0f172a; font-size: 15px;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
     
-    unique_projects = [p for p in df['Dự Án'].unique() if p != ''] if 'Dự Án' in df.columns else []
+    unique_projects = [str(p) for p in df['Dự Án'].unique() if pd.notna(p) and str(p).strip() != '' and str(p).lower() != 'nan'] if 'Dự Án' in df.columns else []
     st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">domain</span> DỰ ÁN</div>', unsafe_allow_html=True)
     selected_projects = st.multiselect("DỰ ÁN", options=unique_projects, placeholder="Chọn Tất cả", label_visibility="collapsed")
 
     df_temp = df.copy()
     if selected_projects and 'Dự Án' in df_temp.columns: 
-        df_temp = df_temp[df_temp['Dự Án'].isin(selected_projects)]
+        df_temp = df_temp[df_temp['Dự Án'].astype(str).isin(selected_projects)]
 
-    hd_opts = [x for x in df_temp['Hợp Đồng - PLHĐ'].unique() if x != ''] if 'Hợp Đồng - PLHĐ' in df_temp.columns else []
+    hd_opts = [str(x) for x in df_temp['Hợp Đồng - PLHĐ'].unique() if pd.notna(x) and str(x).strip() != '' and str(x).lower() != 'nan'] if 'Hợp Đồng - PLHĐ' in df_temp.columns else []
     st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">description</span> SỐ HỢP ĐỒNG</div>', unsafe_allow_html=True)
     selected_hd = st.multiselect("SỐ HỢP ĐỒNG", options=hd_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
     if selected_hd and 'Hợp Đồng - PLHĐ' in df_temp.columns: 
-        df_temp = df_temp[df_temp['Hợp Đồng - PLHĐ'].isin(selected_hd)]
+        df_temp = df_temp[df_temp['Hợp Đồng - PLHĐ'].astype(str).isin(selected_hd)]
 
-    hm_opts = [x for x in df_temp['Hạng Mục'].unique() if x != ''] if 'Hạng Mục' in df_temp.columns else []
+    hm_opts = [str(x) for x in df_temp['Hạng Mục'].unique() if pd.notna(x) and str(x).strip() != '' and str(x).lower() != 'nan'] if 'Hạng Mục' in df_temp.columns else []
     st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">folder_open</span> HẠNG MỤC</div>', unsafe_allow_html=True)
     selected_hm = st.multiselect("HẠNG MỤC", options=hm_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
     if selected_hm and 'Hạng Mục' in df_temp.columns: 
-        df_temp = df_temp[df_temp['Hạng Mục'].isin(selected_hm)]
+        df_temp = df_temp[df_temp['Hạng Mục'].astype(str).isin(selected_hm)]
 
-    # CẬP NHẬT CỘT "CHỦ NHIỆM DỰ ÁN" VÀO BỘ LỌC "TRƯỞNG NHÓM - CNDA"
-    ql_opts = [x for x in df_temp['Chủ nhiệm dự án'].unique() if x != ''] if 'Chủ nhiệm dự án' in df_temp.columns else []
+    ql_opts = [str(x) for x in df_temp['Chủ nhiệm dự án'].unique() if pd.notna(x) and str(x).strip() != '' and str(x).lower() != 'nan'] if 'Chủ nhiệm dự án' in df_temp.columns else []
     st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">manage_accounts</span> TRƯỞNG NHÓM - CNDA</div>', unsafe_allow_html=True)
     selected_ql = st.multiselect("TRƯỞNG NHÓM - CNDA", options=ql_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
 
-    # CẬP NHẬT CỘT "CHUYÊN VIÊN THỰC HIỆN" VÀO BỘ LỌC "CHUYÊN VIÊN THỰC HIỆN"
-    cb_opts = [x for x in df_temp['Chuyên viên thực hiện'].unique() if x != ''] if 'Chuyên viên thực hiện' in df_temp.columns else []
+    cb_opts = [str(x) for x in df_temp['Chuyên viên thực hiện'].unique() if pd.notna(x) and str(x).strip() != '' and str(x).lower() != 'nan'] if 'Chuyên viên thực hiện' in df_temp.columns else []
     st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">engineering</span> CHUYÊN VIÊN THỰC HIỆN</div>', unsafe_allow_html=True)
     selected_cb = st.multiselect("CHUYÊN VIÊN THỰC HIỆN", options=cb_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
 
@@ -275,14 +288,13 @@ if start_date and end_date and 'Ngày_Bat_Dau_Obj' in df_display.columns and 'Ng
     cond_end = df_display['Ngày_Hoan_Thanh_Obj'].between(start_ts, end_ts)
     df_display = df_display[cond_start | cond_end]
 
-if selected_projects and 'Dự Án' in df_display.columns: df_display = df_display[df_display['Dự Án'].isin(selected_projects)]
-if selected_hd and 'Hợp Đồng - PLHĐ' in df_display.columns: df_display = df_display[df_display['Hợp Đồng - PLHĐ'].isin(selected_hd)]
-if selected_hm and 'Hạng Mục' in df_display.columns: df_display = df_display[df_display['Hạng Mục'].isin(selected_hm)]
-# LỌC DỮ LIỆU THEO TÊN CỘT MỚI 
-if selected_ql and 'Chủ nhiệm dự án' in df_display.columns: df_display = df_display[df_display['Chủ nhiệm dự án'].isin(selected_ql)]
-if selected_cb and 'Chuyên viên thực hiện' in df_display.columns: df_display = df_display[df_display['Chuyên viên thực hiện'].isin(selected_cb)]
+if selected_projects and 'Dự Án' in df_display.columns: df_display = df_display[df_display['Dự Án'].astype(str).isin(selected_projects)]
+if selected_hd and 'Hợp Đồng - PLHĐ' in df_display.columns: df_display = df_display[df_display['Hợp Đồng - PLHĐ'].astype(str).isin(selected_hd)]
+if selected_hm and 'Hạng Mục' in df_display.columns: df_display = df_display[df_display['Hạng Mục'].astype(str).isin(selected_hm)]
+if selected_ql and 'Chủ nhiệm dự án' in df_display.columns: df_display = df_display[df_display['Chủ nhiệm dự án'].astype(str).isin(selected_ql)]
+if selected_cb and 'Chuyên viên thực hiện' in df_display.columns: df_display = df_display[df_display['Chuyên viên thực hiện'].astype(str).isin(selected_cb)]
 
-# --- TÍNH TOÁN 10 CHỈ SỐ KPI ĐẢM BẢO KHÔNG TRÙNG LẶP ---
+# --- TÍNH TOÁN 10 CHỈ SỐ KPI ---
 p_projects = 0
 if 'Dự Án' in df_display.columns:
     _prjs = df_display['Dự Án'].astype(str).str.strip().str.upper()
