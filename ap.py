@@ -147,7 +147,7 @@ st.markdown("""
         border-right: 1px solid rgba(0,0,0,0.05) !important; 
         white-space: normal !important; 
         word-wrap: break-word !important; 
-        line-height: 1.2 !important;
+        line-height: 1.3 !important;
     }
     .custom-table tbody td {
         padding: 10px 10px !important; 
@@ -232,6 +232,8 @@ def load_data():
             target = 'Mã Dự Án'
         elif 'dự án' in c_low and not any(kw in c_low for kw in ['chủ nhiệm', 'cnda', 'quản lý', 'mã']): 
             target = 'Dự Án'
+        elif any(kw in c_low for kw in ['chủ đầu tư', 'cdt']): 
+            target = 'Chủ đầu tư'
         elif any(kw in c_low for kw in ['chủ nhiệm', 'quản lý', 'trưởng nhóm', 'cnda']): 
             target = 'Chủ nhiệm dự án'
         elif any(kw in c_low for kw in ['hợp đồng', 'hđ', 'plhđ']): 
@@ -263,7 +265,7 @@ def load_data():
         
         df['Tình trạng triển khai'] = df['Tình trạng triển khai'].apply(clean_status)
 
-    cols_to_fill = ['Mã Dự Án', 'Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục', 'Chủ nhiệm dự án', 'Chuyên viên thực hiện']
+    cols_to_fill = ['Mã Dự Án', 'Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục', 'Chủ nhiệm dự án', 'Chuyên viên thực hiện', 'Chủ đầu tư']
     for col in cols_to_fill:
         if col in df.columns: 
             df[col] = df[col].replace('', pd.NA).ffill()
@@ -540,20 +542,21 @@ def color_rows(row):
 
 styled_df = df_display.style.apply(color_rows, axis=1)
 
-# NGẮT DÒNG TIÊU ĐỀ TỐI ĐA 3 DÒNG
+# NGẮT DÒNG TỐI ĐA 2 DÒNG + THU NHỎ CHIỀU RỘNG BẰNG CSS INLINE
 break_line_cols = {
     'Mã Dự Án': 'MÃ<br>DỰ ÁN',
-    'Dự Án': 'DỰ ÁN',
-    'Hợp Đồng - PLHĐ': 'HỢP ĐỒNG<br>-<br>PLHĐ',
+    'Dự Án': '<div style="width: 140px; min-width: 100px; white-space: normal; margin: auto;">DỰ ÁN</div>',
+    'Chủ đầu tư': '<div style="width: 120px; min-width: 90px; white-space: normal; margin: auto;">CHỦ<br>ĐẦU TƯ</div>',
+    'Hợp Đồng - PLHĐ': '<div style="width: 120px; min-width: 90px; white-space: normal; margin: auto;">HỢP ĐỒNG<br>PLHĐ</div>',
     'Hạng Mục': 'HẠNG MỤC',
-    'Chủ nhiệm dự án': 'CHỦ NHIỆM<br>DỰ ÁN<br>(CNDA)',
+    'Chủ nhiệm dự án': '<div style="width: 120px; min-width: 90px; white-space: normal; margin: auto;">CHỦ NHIỆM<br>DỰ ÁN</div>',
     'Chuyên viên thực hiện': 'CHUYÊN VIÊN<br>THỰC HIỆN',
     'Công việc triển khai': 'CÔNG VIỆC<br>TRIỂN KHAI',
     'Ngày Bắt Đầu': 'NGÀY<br>BẮT ĐẦU',
     'Ngày Hoàn Thành': 'NGÀY<br>HOÀN THÀNH',
     'Tiến Độ (%)': 'TIẾN ĐỘ<br>(%)',
     'Tình trạng triển khai': 'TÌNH TRẠNG<br>TRIỂN KHAI',
-    'Vướng Mắc': 'VƯỚNG MẮC<br>/ GHI CHÚ'
+    'Vướng Mắc': 'VƯỚNG MẮC'
 }
 
 styled_df = styled_df.format_index(lambda col: break_line_cols.get(col, col), axis=1)
