@@ -146,7 +146,7 @@ st.markdown("""
         vertical-align: middle !important;
         border-bottom: 2px solid #d6bcfa !important; 
         border-right: 1px solid rgba(0,0,0,0.05) !important; 
-        white-space: normal !important; /* CHO PHÉP TIÊU ĐỀ XUỐNG DÒNG KHI BỊ KÍCH */
+        white-space: normal !important; 
         word-wrap: break-word !important;
         overflow: hidden !important;
         line-height: 1.25 !important;
@@ -160,7 +160,7 @@ st.markdown("""
         word-wrap: break-word !important; 
         vertical-align: middle !important; 
         color: #000000 !important;
-        text-align: left !important; /* CĂN LỀ TRÁI CHO TOÀN BỘ DỮ LIỆU */
+        text-align: left !important; 
         overflow: hidden !important;
     }
     
@@ -546,13 +546,21 @@ def color_rows(row):
 
 styled_df = df_display.style.apply(color_rows, axis=1)
 
-# ÉP THU NHỎ CỘT HỢP ĐỒNG VÀ CHỦ ĐẦU TƯ
-small_cols = [c for c in ['Hợp Đồng - PLHĐ', 'Chủ đầu tư'] if c in df_display.columns]
-if small_cols:
-    styled_df = styled_df.set_properties(subset=small_cols, **{
-        'width': '10px',
-        'max-width': '10px',
-        'min-width': '10px',
+# ÉP THU NHỎ CỘT HỢP ĐỒNG
+if 'Hợp Đồng - PLHĐ' in df_display.columns:
+    styled_df = styled_df.set_properties(subset=['Hợp Đồng - PLHĐ'], **{
+        'width': '50px',
+        'max-width': '60px',
+        'min-width': '45px',
+        'text-align': 'left'
+    })
+
+# THU NHỎ RIÊNG CỘT CHỦ ĐẦU TƯ XUỐNG MỘT NỬA (~25PX)
+if 'Chủ đầu tư' in df_display.columns:
+    styled_df = styled_df.set_properties(subset=['Chủ đầu tư'], **{
+        'width': '25px',
+        'max-width': '30px',
+        'min-width': '20px',
         'text-align': 'left'
     })
 
