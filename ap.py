@@ -165,7 +165,8 @@ def load_data():
     rename_dict = {}
     for col in df.columns:
         c_low = str(col).lower().strip()
-        if c_low == 'trạng thái': rename_dict[col] = 'Trạng Thái'
+        # NHẬN DIỆN CỘT TRẠNG THÁI (BAO GỒM TÌNH TRẠNG TRIỂN KHAI)
+        if c_low in ['trạng thái', 'tình trạng', 'tình trạng triển khai', 'trình trạng triển khai', 'trình trạng']: rename_dict[col] = 'Tình trạng triển khai'
         elif c_low == 'tiến độ (%)': rename_dict[col] = 'Tiến Độ (%)'
         elif c_low in ['đầu việc', 'đầu việc shopdrawing', 'hạng mục']: rename_dict[col] = 'Hạng Mục'
         elif c_low in ['ghi chú', 'vướng mắc', 'ý kiến', 'vuong mac', 'ghi chu', 'note', 'ghi chú/vướng mắc']: rename_dict[col] = 'Vướng Mắc'
@@ -279,21 +280,10 @@ if selected_hm and 'Hạng Mục' in df_display.columns: df_display = df_display
 if selected_ql and 'Trưởng nhóm -CNDA' in df_display.columns: df_display = df_display[df_display['Trưởng nhóm -CNDA'].isin(selected_ql)]
 if selected_cb and cb_col and cb_col in df_display.columns: df_display = df_display[df_display[cb_col].isin(selected_cb)]
 
-# --- TÍNH TOÁN 10 CHỈ SỐ KPI ĐẢM BẢO KHÔNG TRÙNG LẶP ---
-p_projects = 0
-if 'Dự Án' in df_display.columns:
-    _prjs = df_display['Dự Án'].astype(str).str.strip().str.upper()
-    p_projects = _prjs[(_prjs != '') & (_prjs != 'NAN')].nunique()
-
-p_contracts = 0
-if 'Hợp Đồng - PLHĐ' in df_display.columns:
-    _cts = df_display['Hợp Đồng - PLHĐ'].astype(str).str.strip().str.upper()
-    p_contracts = _cts[(_cts != '') & (_cts != 'NAN')].nunique()
-
-p_categories = 0
-if 'Hạng Mục' in df_display.columns:
-    _cats = df_display['Hạng Mục'].astype(str).str.strip().str.upper()
-    p_categories = _cats[(_cats != '') & (_cats != 'NAN')].nunique()
+# --- TÍNH TOÁN 10 CHỈ SỐ KPI ---
+p_projects = df_display[df_display['Dự Án'] != '']['Dự Án'].nunique() if 'Dự Án' in df_display.columns else 0
+p_contracts = df_display[df_display['Hợp Đồng - PLHĐ'] != '']['Hợp Đồng - PLHĐ'].nunique() if 'Hợp Đồng - PLHĐ' in df_display.columns else 0
+p_categories = df_display[df_display['Hạng Mục'] != '']['Hạng Mục'].nunique() if 'Hạng Mục' in df_display.columns else 0
 
 p_total = len(df_display)
 
@@ -305,11 +295,11 @@ if 'Tiến Độ (%)' in df_display.columns and p_total > 0:
 else:
     p_prog = 0
 
-if 'Trạng Thái' in df_display.columns:
-    p_done = len(df_display[df_display['Trạng Thái'].astype(str).str.strip() == 'Đã hoàn thành'])
-    p_inprogress = len(df_display[df_display['Trạng Thái'].astype(str).str.strip() == 'Đang triển khai'])
-    p_notstarted = len(df_display[df_display['Trạng Thái'].astype(str).str.strip() == 'Chưa bắt đầu'])
-    p_paused = len(df_display[df_display['Trạng Thái'].astype(str).str.strip() == 'Tạm dừng'])
+if 'Tình trạng triển khai' in df_display.columns:
+    p_done = len(df_display[df_display['Tình trạng triển khai'].astype(str).str.strip() == 'Đã hoàn thành'])
+    p_inprogress = len(df_display[df_display['Tình trạng triển khai'].astype(str).str.strip() == 'Đang triển khai'])
+    p_notstarted = len(df_display[df_display['Tình trạng triển khai'].astype(str).str.strip() == 'Chưa bắt đầu'])
+    p_paused = len(df_display[df_display['Tình trạng triển khai'].astype(str).str.strip() == 'Tạm dừng'])
 else:
     p_done = p_inprogress = p_notstarted = p_paused = 0
 
@@ -349,7 +339,7 @@ with r2_c4: st.markdown(render_transparent_shadow_kpi("Tạm dừng", p_paused, 
 with r2_c5: st.markdown(render_transparent_shadow_kpi("Vướng mắc", p_issues, "error"), unsafe_allow_html=True)
 
 status_options = ["Tất cả", "Chưa bắt đầu", "Đang triển khai", "Đã hoàn thành", "Tạm dừng", "Vướng mắc"]
-actual_status = st.radio("Bộ lọc Trạng Thái", options=status_options, horizontal=True, label_visibility="collapsed")
+actual_status = st.radio("Bộ lọc Tình trạng", options=status_options, horizontal=True, label_visibility="collapsed")
 
 if actual_status != "Tất cả":
     if actual_status == "Vướng mắc":
@@ -359,14 +349,14 @@ if actual_status != "Tất cả":
         else:
             df_display = df_display.iloc[0:0]
     else:
-        df_display = df_display[df_display.get('Trạng Thái', '') == actual_status]
+        df_display = df_display[df_display.get('Tình trạng triển khai', '') == actual_status]
 
 df_export = df_display.copy()
 for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
     if col in df_display.columns: df_display = df_display.drop(columns=[col])
     if col in df_export.columns: df_export = df_export.drop(columns=[col])
 
-# TIÊU ĐỀ BẢNG CHI TIẾT
+# TIÊU ĐỀ BẢNG CHI TIẾT ĐÃ ĐƯỢC CĂN GIỮA VÀ ĐỔI TÊN
 st.markdown("""
 <div class="title-card-center">
     <div style="font-size: 18px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2; text-align: center;">BẢNG CHI TIẾT CÔNG VIÊC</div>
@@ -390,7 +380,7 @@ def generate_excel_with_colors(df_data):
     status_col_idx = None
     vướng_col_idx = None
     for col_idx, col_name in enumerate(df_data.columns, 1):
-        if col_name == 'Trạng Thái': status_col_idx = col_idx
+        if col_name == 'Tình trạng triển khai': status_col_idx = col_idx
         if col_name == 'Vướng Mắc': vướng_col_idx = col_idx
 
     for row_idx in range(2, ws.max_row + 1):
@@ -432,8 +422,8 @@ st.markdown(download_html, unsafe_allow_html=True)
 
 priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
 
-if 'Trạng Thái' in df_display.columns and 'Tiến Độ (%)' in df_display.columns:
-    df_display['Mức Ưu Tiên'] = df_display['Trạng Thái'].map(priority_map).fillna(99)
+if 'Tình trạng triển khai' in df_display.columns and 'Tiến Độ (%)' in df_display.columns:
+    df_display['Mức Ưu Tiên'] = df_display['Tình trạng triển khai'].map(priority_map).fillna(99)
     sort_cols = ['Mức Ưu Tiên', 'Tiến Độ (%)']
     if 'Hạng Mục' in df_display.columns: sort_cols = ['Hạng Mục'] + sort_cols
     df_display = df_display.sort_values(by=sort_cols, ascending=[True] * len(sort_cols))
@@ -444,7 +434,7 @@ def color_rows(row):
     if vm and vm not in ['nan', 'none', '']:
         return ['background-color: #FFEeba; color: #000;'] * len(row)
         
-    status = row.get('Trạng Thái', '')
+    status = row.get('Tình trạng triển khai', '')
     if status == 'Đã hoàn thành': return ['background-color: #a5d6a7; color: #000;'] * len(row)
     if status == 'Tạm dừng': return ['background-color: #ef9a9a; color: #000;'] * len(row)
     if status == 'Chưa bắt đầu': return ['background-color: #adb5bd; color: #000;'] * len(row)
