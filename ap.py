@@ -113,7 +113,7 @@ st.markdown("""
 
     div[data-testid="stDataFrame"] th { background-color: rgba(226, 232, 240, 0.9) !important; color: #0F172A !important; font-weight: 800 !important; font-size: 14px !important; }
     
-    /* CĂN GIỮA TUYỆT ĐỐI KHUNG TIÊU ĐỀ BẢNG CHI TIẾT */
+    /* CĂN GIỮA TUYỆT ĐỐI KHUNG TIÊU ĐỀ */
     .title-card-center { 
         border-radius: 16px; 
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.05); 
@@ -131,6 +131,9 @@ st.markdown("""
         margin-top: 15px; 
         margin-bottom: 15px;
     }
+
+    .custom-download-link { display: block; float: right; text-align: right; color: #0A3622 !important; font-size: 13.5px !important; font-weight: 700 !important; text-decoration: none !important; margin-top: -30px !important; margin-right: 0px !important; margin-bottom: 5px !important; position: relative; z-index: 9999; cursor: pointer; }
+    .custom-download-link:hover { color: #198754 !important; text-decoration: underline !important; }
 
     /* 10 Ô KPI */
     .kpi-card { width: 100%; padding: 10px 12px; border-radius: 18px !important; border: 1px solid rgba(255, 255, 255, 0.4) !important; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 10px; min-height: 85px; background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden !important; }
@@ -252,8 +255,8 @@ with st.sidebar:
 # ================= 4. KHỐI CHÍNH (BÊN PHẢI) =================
 
 st.markdown("""
-<div class="title-card" style="padding: 8px 25px; margin-top: 0px; margin-bottom: 15px;">
-    <div style="font-size: 26px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO CÔNG VIỆC - PHÒNG THIẾT KẾ</div>
+<div class="title-card-center" style="padding: 8px 25px; margin-top: 0px; margin-bottom: 15px;">
+    <div style="font-size: 26px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2; text-align: center;">BÁO CÁO CÔNG VIỆC - PHÒNG THIẾT KẾ</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -342,7 +345,7 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
 # TIÊU ĐỀ BẢNG CHI TIẾT ĐÃ ĐƯỢC CĂN GIỮA VÀ ĐỔI TÊN
 st.markdown("""
 <div class="title-card-center">
-    <div style="font-size: 18px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2;">BẢNG CHI TIẾT CÔNG VIÊC</div>
+    <div style="font-size: 18px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2; text-align: center;">BẢNG CHI TIẾT CÔNG VIÊC</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -387,6 +390,21 @@ def generate_excel_with_colors(df_data):
     final_output = io.BytesIO()
     wb.save(final_output)
     return final_output.getvalue()
+
+try:
+    excel_bytes = generate_excel_with_colors(df_export)
+    b64 = base64.b64encode(excel_bytes).decode()
+    mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    filename = "Bao_cao_tien_do_Thien_Son.xlsx"
+except Exception:
+    csv_bytes = df_export.to_csv(index=False).encode('utf-8-sig')
+    b64 = base64.b64encode(csv_bytes).decode()
+    mime_type = "text/csv"
+    filename = "Bao_cao_tien_do_Thien_Son.csv"
+
+# TRẢ LẠI CHỮ TẢI EXCEL KẾ BÊN PHẢI TIÊU ĐỀ
+download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}">Tải Excel</a>'
+st.markdown(download_html, unsafe_allow_html=True)
 
 priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
 
