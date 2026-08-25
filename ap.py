@@ -130,12 +130,13 @@ st.markdown("""
         border-spacing: 0; 
         font-family: inherit; 
         margin: 0 !important;
+        table-layout: fixed !important; /* ÉP CỨNG KÍCH THƯỚC CỘT THEO CÀI ĐẶT */
     }
     .custom-table thead th {
         background-color: #e9d8fd !important;
         color: #000000 !important;
         font-weight: 800 !important; 
-        font-size: 13.5px !important;
+        font-size: 13px !important;
         text-transform: uppercase !important;
         position: sticky !important; 
         top: 0 !important; 
@@ -145,9 +146,9 @@ st.markdown("""
         vertical-align: middle !important;
         border-bottom: 2px solid #d6bcfa !important; 
         border-right: 1px solid rgba(0,0,0,0.05) !important; 
-        white-space: normal !important; 
-        word-wrap: break-word !important; 
-        line-height: 1.3 !important;
+        white-space: nowrap !important; /* ĐẢM BẢO TIÊU ĐỀ NẰM TRÊN 1 DÒNG */
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
     }
     .custom-table tbody td {
         padding: 8px 8px !important; 
@@ -158,7 +159,8 @@ st.markdown("""
         word-wrap: break-word !important; 
         vertical-align: middle !important; 
         color: #000000 !important;
-        text-align: left !important; /* CĂN LỀ TRÁI CHO TOÀN BỘ PHẦN NỘI DUNG BẢNG */
+        text-align: left !important; /* CĂN LỀ TRÁI CHO TOÀN BỘ DỮ LIỆU */
+        overflow: hidden !important;
     }
     
     .title-card-center { 
@@ -543,47 +545,27 @@ def color_rows(row):
 
 styled_df = df_display.style.apply(color_rows, axis=1)
 
-# THU NHỎ TỐI ĐA CỘT HỢP ĐỒNG (XUỐNG KHOẢNG 55PX)
+# ÉP CỨNG THU NHỎ TỐI ĐA CỘT HỢP ĐỒNG (BẰNG table-layout: fixed TRONG CSS)
 if 'Hợp Đồng - PLHĐ' in df_display.columns:
     styled_df = styled_df.set_properties(subset=['Hợp Đồng - PLHĐ'], **{
-        'max-width': '60px', 
-        'min-width': '50px', 
-        'width': '55px',
-        'white-space': 'normal',
-        'word-wrap': 'break-word',
+        'width': '50px',
+        'max-width': '50px',
+        'min-width': '45px',
         'text-align': 'left'
     })
 
-# THU NHỎ CÁC CỘT PHỤ CÒN LẠI VỪA PHẢI
+# CÁC CỘT KHÁC THU NHỎ VỪA PHẢI
 other_narrow_cols = [c for c in ['Hạng Mục', 'Dự Án', 'Chủ đầu tư'] if c in df_display.columns]
 if other_narrow_cols:
     styled_df = styled_df.set_properties(subset=other_narrow_cols, **{
-        'max-width': '100px', 
-        'min-width': '80px', 
         'width': '90px',
-        'white-space': 'normal',
-        'word-wrap': 'break-word',
+        'max-width': '100px',
+        'min-width': '75px',
         'text-align': 'left'
     })
 
-# KHÓA CHẶT CHỮ, ÉP TIÊU ĐỀ XUỐNG TỐI ĐA 2 DÒNG
-break_line_cols = {
-    'Mã Dự Án': 'MÃ<br>DỰ&nbsp;ÁN',
-    'Dự Án': 'DỰ&nbsp;ÁN',
-    'Chủ đầu tư': 'CHỦ<br>ĐẦU&nbsp;TƯ',
-    'Hợp Đồng - PLHĐ': 'HỢP&nbsp;ĐỒNG<br>PLHĐ',
-    'Hạng Mục': 'HẠNG<br>MỤC',
-    'Chủ nhiệm dự án': 'CHỦ&nbsp;NHIỆM<br>DỰ&nbsp;ÁN',
-    'Chuyên viên thực hiện': 'CHUYÊN&nbsp;VIÊN<br>THỰC&nbsp;HIỆN',
-    'Công việc triển khai': 'CÔNG&nbsp;VIỆC<br>TRIỂN&nbsp;KHAI',
-    'Ngày Bắt Đầu': 'NGÀY<br>BẮT&nbsp;ĐẦU',
-    'Ngày Hoàn Thành': 'NGÀY<br>HOÀN&nbsp;THÀNH',
-    'Tiến Độ (%)': 'TIẾN&nbsp;ĐỘ<br>(%)',
-    'Tình trạng triển khai': 'TÌNH&nbsp;TRẠNG<br>TRIỂN&nbsp;KHAI',
-    'Vướng Mắc': 'VƯỚNG&nbsp;MẮC'
-}
-
-styled_df = styled_df.format_index(lambda col: break_line_cols.get(col, str(col).replace(' ', '&nbsp;')), axis=1)
+# GIỮ TOÀN BỘ TIÊU ĐỀ NẰM TRÊN 1 DÒNG (KHÔNG XUỐNG DÒNG)
+styled_df = styled_df.format_index(lambda col: str(col), axis=1)
 
 # ẨN CỘT INDEX
 try:
