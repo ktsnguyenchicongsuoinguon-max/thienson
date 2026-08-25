@@ -48,7 +48,7 @@ else:
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* 1. KHÓA TRANG WEB: KHÔNG HIỆN THANH CUỘN THỪA BÊN NGOÀI */
+    /* 1. KHÓA CỨNG TRANG WEB: KHÔNG HIỆN THANH CUỘN THỪA BÊN NGOÀI */
     html, body { overflow: hidden !important; margin: 0 !important; padding: 0 !important; width: 100vw !important; height: 100vh !important; }
     [data-testid="stAppViewContainer"], [data-testid="stMain"] { overflow: hidden !important; height: 100vh !important; }
     
@@ -88,48 +88,66 @@ st.markdown("""
     }
     div.row-widget.stSelectbox, div.row-widget.stMultiSelect { margin-bottom: -5px !important; }
 
-    /* 3. KHỐI CHÍNH - CÁCH BỘ LỌC 10PX VÀ CÁCH CÁC VIỀN CÒN LẠI 30PX */
+    /* 3. KHỐI CHÍNH BẤT TỬ - LUÔN CÁCH BỘ LỌC 10PX VÀ CÁC VIỀN CÒN LẠI 30PX */
     .block-container { 
         background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         max-width: none !important; 
-        width: auto !important; /* Ép giãn đều bằng margin */
+        width: auto !important; 
         margin: 30px 30px 30px 10px !important; /* Lề: Trên 30, Phải 30, Dưới 30, Trái 10 */
         padding: 25px 30px !important; 
         height: calc(100vh - 60px) !important; 
         display: flex !important; flex-direction: column !important; 
-        overflow: hidden !important; /* Khóa cuộn khối chính, chỉ cho cuộn bảng */
+        overflow: hidden !important; /* ÉP CHẶT: Không bao giờ cho phép khối này bị cuộn hay tràn viền */
     }
-    .block-container > div[data-testid="stVerticalBlock"] { flex-grow: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; }
-    .block-container > div[data-testid="stVerticalBlock"] > div { flex-shrink: 0 !important; width: 100% !important; }
     
-    /* 4. ================= BẢNG CHI TIẾT TÙY CHỈNH THÔNG MINH ================= */
-    div.element-container:has(.table-responsive-wrapper),
-    .stMarkdown:has(.table-responsive-wrapper),
-    div[data-testid="stMarkdownContainer"]:has(.table-responsive-wrapper) {
-        width: 100% !important; 
+    /* ÉP FLEXBOX VÀO CẤU TRÚC LÕI CỦA STREAMLIT ĐỂ CO GIÃN THÔNG MINH */
+    .block-container > div[data-testid="stVerticalBlock"] { 
         flex-grow: 1 !important; 
         display: flex !important; 
         flex-direction: column !important; 
-        min-height: 250px !important; /* Bảo vệ bảng không bị đè nát */
+        min-height: 0 !important; /* Chìa khóa chống tràn khi Zoom */
+        width: 100% !important; 
+        height: 100% !important;
     }
     
-    /* ĐÂY LÀ CHÌA KHÓA: ÉP KHUNG CHỨA BẢNG TẠO THANH CUỘN KHI BẢNG BỊ ZOOM */
+    /* Giữ nguyên kích thước cho Title và KPI */
+    .block-container > div[data-testid="stVerticalBlock"] > div { 
+        flex-shrink: 0 !important; 
+        width: 100% !important; 
+    }
+    
+    /* 4. ================= BẢNG CHI TIẾT CO GIÃN THÔNG MINH ================= */
+    
+    /* Giao toàn bộ không gian còn trống cho Bảng */
+    div.element-container:has(.table-responsive-wrapper),
+    .stMarkdown:has(.table-responsive-wrapper),
+    div[data-testid="stMarkdownContainer"]:has(.table-responsive-wrapper) {
+        flex-grow: 1 !important; 
+        flex-shrink: 1 !important; 
+        display: flex !important; 
+        flex-direction: column !important; 
+        min-height: 0 !important; /* Khi zoom, bảng sẽ tự co lại nhường chỗ cho KPI, bảo vệ viền khối chính */
+        width: 100% !important; 
+        height: 100% !important;
+    }
+    
+    /* Vùng chứa tạo thanh cuộn */
     .table-responsive-wrapper {
+        flex-grow: 1 !important; 
         width: 100% !important; 
         height: 100% !important; 
-        max-height: calc(100vh - 380px) !important; /* Giới hạn an toàn để không tràn khối chính */
-        overflow: auto !important; /* LUÔN KÍCH HOẠT THANH CUỘN DỌC/NGANG KHI TRÀN */
+        overflow: auto !important; /* TỰ ĐỘNG HIỆN THANH CUỘN KHI NỘI DUNG VƯỢT QUÁ */
         display: block !important;
         border-radius: 12px; 
         border: 1px solid rgba(255,255,255,0.5);
         background-color: rgba(255, 255, 255, 0.65); 
         box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        margin-bottom: 0px !important; 
+        margin: 0 !important; 
     }
     
     .custom-table { 
-        width: max-content !important; /* CỐT LÕI: Cho bảng rộng thoải mái -> CHỐNG MẤT CỘT KHI ZOOM */
+        width: max-content !important; /* CHỐNG MẤT CỘT: Cho bảng rộng thoải mái */
         min-width: 100% !important; 
         border-collapse: separate !important; 
         border-spacing: 0; 
@@ -154,8 +172,8 @@ st.markdown("""
         border-right: 1px solid rgba(0,0,0,0.05) !important; 
         white-space: normal !important; 
         word-wrap: break-word !important; 
-        min-width: 130px !important; /* Khóa bề ngang không cho thu hẹp -> Ngăn mất cột */
-        max-width: 250px !important; /* Giới hạn bề rộng tối đa -> Ép rớt xuống 2 hàng */
+        min-width: 130px !important; /* Bảo vệ không bị mất cột */
+        max-width: 250px !important; /* Ép chữ rớt xuống 2 hàng */
         line-height: 1.3 !important;
     }
     
@@ -170,7 +188,7 @@ st.markdown("""
         overflow-wrap: break-word !important; 
         vertical-align: middle !important; 
         min-width: 130px !important; 
-        max-width: 350px !important; /* Ép văn bản rớt xuống dòng thay vì tràn ra ngoài */
+        max-width: 350px !important; /* Ép văn bản rớt xuống dòng */
     }
     
     /* CĂN GIỮA TUYỆT ĐỐI KHUNG TIÊU ĐỀ BÁO CÁO CÔNG VIỆC */
@@ -560,7 +578,7 @@ def color_rows(row):
     if status == 'Chưa triển khai': return ['background-color: #adb5bd; color: #000;'] * len(row)
     return ['background-color: #ffffff; color: #000;'] * len(row)
 
-# Ép tên cột thành in hoa
+# Ép toàn bộ tên cột thành in hoa
 df_display.columns = df_display.columns.str.upper()
 
 styled_df = df_display.style.apply(color_rows, axis=1)
@@ -577,7 +595,7 @@ except Exception:
 html_table = styled_df.to_html()
 html_table = html_table.replace('<table', '<table class="custom-table"')
 
-# GÓI BẢNG VÀO TRONG KHUNG HTML ĐỂ BẢO VỆ THANH CUỘN VÀ CHỐNG TRÀN
+# GÓI BẢNG VÀO TRONG KHUNG HTML
 final_html = f"""
 <div class="table-responsive-wrapper">
     {html_table}
