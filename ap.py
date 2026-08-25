@@ -133,8 +133,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# ================= 2. ĐỌC DỮ LIỆU TỪ GOOGLE SHEETS =================
-@st.cache_data(ttl=0, show_spinner=False)
+# ================= 2. ĐỌC DỮ LIỆU TỪ GOOGLE SHEETS (LƯU CACHE TỐC ĐỘ CAO) =================
+@st.cache_data(ttl=86400, show_spinner=False) # Lưu cache 24h, chỉ tải lại khi F5 trang
 def load_data():
     sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
     try:
@@ -171,7 +171,7 @@ def load_data():
         
     return df
 
-with st.spinner("⏳ Đang tải dữ liệu mới nhất từ Google Sheets..."):
+with st.spinner("⏳ Đang tải dữ liệu..."):
     df = load_data()
 
 
