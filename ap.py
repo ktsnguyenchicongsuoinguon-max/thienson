@@ -136,19 +136,19 @@ st.markdown("""
         background-color: #e9d8fd !important;
         color: #000000 !important;
         font-weight: 800 !important; 
-        font-size: 14.5px !important;
+        font-size: 14px !important;
         text-transform: uppercase !important;
         position: sticky !important; 
         top: 0 !important; 
         z-index: 10 !important; 
-        padding: 8px 8px !important; 
+        padding: 8px 6px !important; 
         text-align: center !important;
         vertical-align: middle !important;
         border-bottom: 2px solid #d6bcfa !important; 
         border-right: 1px solid rgba(0,0,0,0.05) !important; 
         white-space: normal !important; 
         word-wrap: break-word !important; 
-        line-height: 1.3 !important;
+        line-height: 1.25 !important;
     }
     .custom-table tbody td {
         padding: 10px 10px !important; 
@@ -158,6 +158,7 @@ st.markdown("""
         white-space: normal !important; 
         word-wrap: break-word !important; 
         vertical-align: middle !important; 
+        color: #000000 !important;
     }
     
     /* CĂN GIỮA TUYỆT ĐỐI KHUNG TIÊU ĐỀ */
@@ -527,18 +528,21 @@ if 'Tình trạng triển khai' in df_display.columns and 'Tiến Độ (%)' in 
     df_display = df_display.sort_values(by=sort_cols, ascending=[True] * len(sort_cols))
     df_display = df_display.drop(columns=['Mức Ưu Tiên'])
 
+# ÁP DỤNG MÀU TRỰC TIẾP TRÊN DF GỐC TRƯỚC KHI ĐỔI TÊN CỘT ĐỂ KHÔNG BỊ LỖI MẤT MÀU
 def color_rows(row):
     vm = str(row.get('Vướng Mắc', '')).strip().lower()
     if vm and vm not in ['nan', 'none', '']:
-        return ['background-color: #FFEeba; color: #000;'] * len(row)
+        return ['background-color: #FFEeba !important; color: #000000 !important;'] * len(row)
         
-    status = row.get('Tình trạng triển khai', '')
-    if status == 'Đã hoàn thành': return ['background-color: #a5d6a7; color: #000;'] * len(row)
-    if status == 'Tạm dừng': return ['background-color: #ef9a9a; color: #000;'] * len(row)
-    if status == 'Chưa triển khai': return ['background-color: #adb5bd; color: #000;'] * len(row)
-    return ['background-color: #ffffff; color: #000;'] * len(row)
+    status = str(row.get('Tình trạng triển khai', '')).strip()
+    if status == 'Đã hoàn thành': return ['background-color: #a5d6a7 !important; color: #000000 !important;'] * len(row)
+    if status == 'Tạm dừng': return ['background-color: #ef9a9a !important; color: #000000 !important;'] * len(row)
+    if status == 'Chưa triển khai': return ['background-color: #adb5bd !important; color: #000000 !important;'] * len(row)
+    return ['background-color: #ffffff !important; color: #000000 !important;'] * len(row)
 
-# NGẮT DÒNG CHỦ ĐỘNG CHO CÁC CỘT DÀI
+styled_df = df_display.style.apply(color_rows, axis=1)
+
+# ĐỔI TÊN TIÊU ĐỀ 2 HÀNG BẰNG FORMAT INDEX/COLUMNS CỦA STYLER (GIỮ NGUYÊN MÀU DÒNG)
 break_line_cols = {
     'Mã Dự Án': 'MÃ<br>DỰ ÁN',
     'Dự Án': 'DỰ ÁN',
@@ -554,10 +558,7 @@ break_line_cols = {
     'Vướng Mắc': 'VƯỚNG MẮC'
 }
 
-df_table_show = df_display.rename(columns=break_line_cols)
-
-# ÁP DỤNG MÀU SẮC LÊN BẢNG VÀ CSS CHO TIÊU ĐỀ
-styled_df = df_table_show.style.apply(color_rows, axis=1)
+styled_df = styled_df.format_index(lambda col: break_line_cols.get(col, col), axis=1)
 
 # ẨN CỘT INDEX CỦA PANDAS
 try:
@@ -569,7 +570,6 @@ except Exception:
         pass
 
 # ================= RENDER BẢNG BẰNG TÙY CHỈNH HTML =================
-# escape=False để nhận diện thẻ <br> xuống hàng trong tên cột
 html_table = styled_df.to_html(escape=False)
 html_table = html_table.replace('<table', '<table class="custom-table"')
 st.markdown(f'<div class="custom-table-wrapper">{html_table}</div>', unsafe_allow_html=True)
