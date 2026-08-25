@@ -55,7 +55,7 @@ st.markdown("""
     [data-testid="stHeaderActionElements"], .stAppDeployButton { display: none !important; }
     footer { display: none !important; }
 
-    /* KHOẢNG CÁCH TRÊN DƯỚI 20PX CHO KHUNG BỘ LỌC (SIDEBAR) */
+    /* KHOẢNG CÁCH TRÊN DƯỚI CHO KHUNG BỘ LỌC (SIDEBAR) */
     [data-testid="stSidebar"] { background-color: transparent !important; border: none !important; }
     [data-testid="stSidebarResizer"] { display: none !important; }
     [data-testid="stSidebar"] > div:first-child {
@@ -88,13 +88,13 @@ st.markdown("""
     }
     div.row-widget.stSelectbox, div.row-widget.stMultiSelect { margin-bottom: -5px !important; }
 
-    /* KHOẢNG CÁCH TRÊN DƯỚI 20PX CHO KHUNG CHÍNH */
+    /* KHOẢNG CÁCH ĐỀU 30PX (TRÁI/PHẢI/DƯỚI) CHO KHUNG CHÍNH */
     .block-container { 
         background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         width: calc(100% - 40px) !important; max-width: 100% !important; 
         margin: 20px 20px !important; 
-        padding: 25px 30px !important; 
+        padding: 25px 30px 30px 30px !important; /* Chỉnh lớp đệm dưới 30px để cách đều bảng */
         height: calc(100vh - 40px) !important; 
         display: flex !important; flex-direction: column !important; overflow: hidden !important; 
     }
@@ -102,7 +102,7 @@ st.markdown("""
     .block-container > div[data-testid="stVerticalBlock"] { flex-grow: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; }
     .block-container > div[data-testid="stVerticalBlock"] > div { flex-shrink: 0 !important; width: 100% !important; }
     
-    /* BẢNG CHI TIẾT CÔNG VIỆC TÙY CHỈNH BẰNG HTML */
+    /* BẢNG CHI TIẾT CÔNG VIỆC TÙY CHỈNH BẰNG HTML (CHỐNG TRÀN VÀ CÁCH ĐỀU 30PX ĐÁY) */
     div.element-container:has(.custom-table-wrapper),
     .stMarkdown:has(.custom-table-wrapper),
     div[data-testid="stMarkdownContainer"]:has(.custom-table-wrapper) {
@@ -111,14 +111,14 @@ st.markdown("""
     
     .custom-table-wrapper {
         width: 100% !important; 
-        max-height: 68vh !important; /* ĐÃ CHỈNH LẠI ĐỂ BẢNG KHÔNG BỊ TRÀN CHẠM ĐÁY */
+        max-height: calc(100vh - 355px) !important; /* Tự động giới hạn chiều cao để nhường chỗ cho lề 30px ở đáy */
         overflow-y: auto !important; 
         overflow-x: auto !important; 
         border-radius: 12px; 
         border: 1px solid rgba(255,255,255,0.5);
-        background-color: rgba(255, 255, 255, 0.2);
+        background-color: rgba(255, 255, 255, 0.45);
         box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        margin-bottom: 25px !important; /* CÁCH ĐỀU KHỐI CHÍNH Ở PHÍA DƯỚI */
+        margin-bottom: 0px !important; 
     }
     .custom-table-wrapper::-webkit-scrollbar { width: 8px !important; height: 8px !important; display: block !important; }
     .custom-table-wrapper::-webkit-scrollbar-track { background: transparent !important; }
@@ -216,45 +216,59 @@ def load_data():
     sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
     try:
         df = pd.read_csv(sheet_url)
+        # LOẠI BỎ CÁC CỘT RỖNG VÀ LỖI UNNAMED ĐỂ ĐẢM BẢO KHÔNG BỊ RÁC BẢNG
+        df = df.dropna(how='all', axis=1)
+        df = df.loc[:, ~df.columns.str.contains('^unnamed', case=False, na=False)]
     except Exception:
         return pd.DataFrame()
     
     df.columns = df.columns.str.strip()
     
+    # THUẬT TOÁN NHẬN DIỆN CỘT THÔNG MINH - CHỐNG GHI ĐÈ 1-1 (HIỂN THỊ ĐỦ 100% CỘT)
     rename_dict = {}
+    seen_targets = set()
+    
     for col in df.columns:
         c_low = str(col).lower().strip()
+        target = None
+        
         if any(kw in c_low for kw in ['trạng thái', 'tình trạng', 'trình trạng']): 
-            rename_dict[col] = 'Tình trạng triển khai'
+            target = 'Tình trạng triển khai'
         elif any(kw in c_low for kw in ['tiến độ', '%']): 
-            rename_dict[col] = 'Tiến Độ (%)'
+            target = 'Tiến Độ (%)'
         elif any(kw in c_low for kw in ['đầu việc', 'công việc', 'task']):
             if not any(kw in c_low for kw in ['trạng thái', 'tình trạng', 'tiến độ', 'mức']):
-                rename_dict[col] = 'Công việc triển khai' 
+                target = 'Công việc triển khai' 
         elif any(kw in c_low for kw in ['hạng mục', 'gói thầu']): 
-            rename_dict[col] = 'Hạng Mục'
+            target = 'Hạng Mục'
         elif any(kw in c_low for kw in ['vướng mắc', 'ghi chú', 'ý kiến', 'note', 'lý do']): 
-            rename_dict[col] = 'Vướng Mắc'
+            target = 'Vướng Mắc'
+        elif 'mã dự án' in c_low or 'mã da' in c_low:
+            target = 'Mã Dự Án'
         elif 'dự án' in c_low and not any(kw in c_low for kw in ['chủ nhiệm', 'cnda', 'quản lý', 'mã']): 
-            rename_dict[col] = 'Dự Án'
-        elif any(kw in c_low for kw in ['mã dự án', 'mã da']):
-            rename_dict[col] = 'Mã Dự Án'
+            target = 'Dự Án'
         elif any(kw in c_low for kw in ['chủ nhiệm', 'quản lý', 'trưởng nhóm', 'cnda']): 
-            rename_dict[col] = 'Chủ nhiệm dự án'
+            target = 'Chủ nhiệm dự án'
         elif any(kw in c_low for kw in ['hợp đồng', 'hđ', 'plhđ']): 
-            rename_dict[col] = 'Hợp Đồng - PLHĐ'
+            target = 'Hợp Đồng - PLHĐ'
         elif any(kw in c_low for kw in ['chuyên viên', 'triển khai', 'thực hiện', 'cán bộ', 'nhân sự']): 
-            if not any(kw in c_low for kw in ['tình trạng', 'trình trạng', 'trạng thái', 'công việc']):
-                rename_dict[col] = 'Chuyên viên thực hiện'
+            if not any(kw in c_low for kw in ['tình trạng', 'trình trạng', 'trạng thái', 'công việc', 'ngày']):
+                target = 'Chuyên viên thực hiện'
         elif any(kw in c_low for kw in ['bắt đầu', 'start']):
-            rename_dict[col] = 'Ngày Bắt Đầu'
+            target = 'Ngày Bắt Đầu'
         elif any(kw in c_low for kw in ['hoàn thành', 'kết thúc', 'deadline', 'mục tiêu', 'hạn chót']):
             if not any(kw in c_low for kw in ['%', 'tiến độ', 'trạng thái', 'tình trạng']):
-                rename_dict[col] = 'Ngày Hoàn Thành'
+                target = 'Ngày Hoàn Thành'
+                
+        # Chỉ cập nhật nếu tên mục tiêu chưa được gắn cho cột nào trước đó (Chống gộp cột/mất cột)
+        if target and target not in seen_targets:
+            rename_dict[col] = target
+            seen_targets.add(target)
             
     df.rename(columns=rename_dict, inplace=True)
     df = df.loc[:, ~df.columns.duplicated()]
     
+    # LÀM SẠCH VÀ ĐỒNG NHẤT DỮ LIỆU TÌNH TRẠNG TRIỂN KHAI
     if 'Tình trạng triển khai' in df.columns:
         def clean_status(x):
             val = str(x).strip().lower()
@@ -266,6 +280,7 @@ def load_data():
         
         df['Tình trạng triển khai'] = df['Tình trạng triển khai'].apply(clean_status)
 
+    # FORWARD FILL ĐỂ XỬ LÝ CÁC Ô GỘP (MERGE CELLS)
     cols_to_fill = ['Mã Dự Án', 'Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục', 'Chủ nhiệm dự án', 'Chuyên viên thực hiện']
     for col in cols_to_fill:
         if col in df.columns: 
