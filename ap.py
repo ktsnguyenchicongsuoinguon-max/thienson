@@ -55,7 +55,7 @@ st.markdown("""
     [data-testid="stHeaderActionElements"], .stAppDeployButton { display: none !important; }
     footer { display: none !important; }
 
-    /* KHOẢNG CÁCH TRÊN DƯỚI 20PX CHO KHUNG BỘ LỌC (SIDEBAR) */
+    /* KHOẢNG CÁCH TRÊN DƯỚI CHO KHUNG BỘ LỌC (SIDEBAR) */
     [data-testid="stSidebar"] { background-color: transparent !important; border: none !important; }
     [data-testid="stSidebarResizer"] { display: none !important; }
     [data-testid="stSidebar"] > div:first-child {
@@ -94,7 +94,7 @@ st.markdown("""
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         width: calc(100% - 40px) !important; max-width: 100% !important; 
         margin: 20px 20px !important; 
-        padding: 25px 30px 30px 30px !important; /* Lớp đệm dưới 30px */
+        padding: 25px 30px 30px 30px !important; 
         height: calc(100vh - 40px) !important; 
         display: flex !important; flex-direction: column !important; overflow: hidden !important; 
     }
@@ -102,7 +102,7 @@ st.markdown("""
     .block-container > div[data-testid="stVerticalBlock"] { flex-grow: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; }
     .block-container > div[data-testid="stVerticalBlock"] > div { flex-shrink: 0 !important; width: 100% !important; }
     
-    /* BẢNG CHI TIẾT CÔNG VIỆC TÙY CHỈNH BẰNG HTML (CHỐNG TRÀN VÀ CÁCH ĐỀU 30PX ĐÁY) */
+    /* BẢNG CHI TIẾT CÔNG VIỆC TÙY CHỈNH BẰNG HTML */
     div.element-container:has(.custom-table-wrapper),
     .stMarkdown:has(.custom-table-wrapper),
     div[data-testid="stMarkdownContainer"]:has(.custom-table-wrapper) {
@@ -111,14 +111,14 @@ st.markdown("""
     
     .custom-table-wrapper {
         width: 100% !important; 
-        max-height: 62vh !important; /* Giới hạn lại để bảng không đụng đáy */
+        max-height: calc(100vh - 355px) !important; 
         overflow-y: auto !important; 
         overflow-x: auto !important; 
         border-radius: 12px; 
         border: 1px solid rgba(255,255,255,0.5);
         background-color: rgba(255, 255, 255, 0.45);
         box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        margin-bottom: 30px !important; /* Khoảng cách cách đáy khung chính 30px */
+        margin-bottom: 0px !important; 
     }
     .custom-table-wrapper::-webkit-scrollbar { width: 8px !important; height: 8px !important; display: block !important; }
     .custom-table-wrapper::-webkit-scrollbar-track { background: transparent !important; }
@@ -133,17 +133,17 @@ st.markdown("""
         margin: 0 !important;
     }
     .custom-table thead th {
-        background-color: #A0AEC0 !important; /* MÀU ĐẬM HƠN CHO TIÊU ĐỀ */
-        color: #0F172A !important; 
-        font-weight: 900 !important; /* CHỮ ĐẬM HƠN */
+        background-color: #0d6efd !important; /* MÀU XANH DƯƠNG GIỐNG ICON KPI */
+        color: #ffffff !important; /* CHỮ MÀU TRẮNG NỔI BẬT */
+        font-weight: 900 !important; 
         font-size: 14.5px !important;
         position: sticky !important; 
         top: 0 !important; 
         z-index: 10 !important; 
         padding: 12px 10px !important; 
         text-align: left !important;
-        border-bottom: 2px solid #718096 !important; 
-        border-right: 1px solid rgba(0,0,0,0.05); 
+        border-bottom: 2px solid #0a58ca !important; 
+        border-right: 1px solid rgba(255,255,255,0.2) !important; 
         white-space: nowrap !important; 
     }
     .custom-table tbody td {
@@ -538,8 +538,11 @@ def color_rows(row):
     if status == 'Chưa triển khai': return ['background-color: #adb5bd; color: #000;'] * len(row)
     return ['background-color: #ffffff; color: #000;'] * len(row)
 
-# ÁP DỤNG MÀU SẮC LÊN BẢNG
-styled_df = df_display.style.apply(color_rows, axis=1)
+# ÁP DỤNG MÀU SẮC LÊN BẢNG (ĐẢM BẢO PYTHON RENDER THEO STYLE NÀY NẾU DÙNG TO_HTML)
+styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
+    'selector': 'th',
+    'props': [('background-color', '#0d6efd'), ('color', '#ffffff'), ('font-weight', 'bold')]
+}])
 
 # ẨN CỘT INDEX CỦA PANDAS ĐỂ BẢNG TRÔNG GỌN HƠN
 try:
