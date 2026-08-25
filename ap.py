@@ -55,7 +55,7 @@ st.markdown("""
     [data-testid="stHeaderActionElements"], .stAppDeployButton { display: none !important; }
     footer { display: none !important; }
 
-    /* KHOẢNG CÁCH CHO KHUNG BỘ LỌC (SIDEBAR) */
+    /* KHOẢNG CÁCH TRÊN DƯỚI CHO KHUNG BỘ LỌC (SIDEBAR) */
     [data-testid="stSidebar"] { background-color: transparent !important; border: none !important; }
     [data-testid="stSidebarResizer"] { display: none !important; }
     [data-testid="stSidebar"] > div:first-child {
@@ -70,6 +70,7 @@ st.markdown("""
     }
     [data-testid="stSidebarUserContent"] { padding: 5px 20px 20px 20px !important; overflow: hidden !important; }
     
+    /* HIỆU ỨNG BÓNG ĐỔ CHO LOGO TRONG SIDEBAR */
     [data-testid="stSidebar"] img {
         filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.25)) drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.15)) !important;
         transition: transform 0.3s ease !important;
@@ -87,7 +88,7 @@ st.markdown("""
     }
     div.row-widget.stSelectbox, div.row-widget.stMultiSelect { margin-bottom: -5px !important; }
 
-    /* KHUNG CHÍNH */
+    /* KHOẢNG CÁCH ĐỀU 30PX (TRÁI/PHẢI/DƯỚI) CHO KHUNG CHÍNH */
     .block-container { 
         background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
@@ -101,7 +102,7 @@ st.markdown("""
     .block-container > div[data-testid="stVerticalBlock"] { flex-grow: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; }
     .block-container > div[data-testid="stVerticalBlock"] > div { flex-shrink: 0 !important; width: 100% !important; }
     
-    /* BẢNG CHI TIẾT CÔNG VIỆC */
+    /* BẢNG CHI TIẾT CÔNG VIỆC TÙY CHỈNH BẰNG HTML (CHỐNG TRÀN VÀ CÁCH ĐỀU 30PX ĐÁY) */
     div.element-container:has(.custom-table-wrapper),
     .stMarkdown:has(.custom-table-wrapper),
     div[data-testid="stMarkdownContainer"]:has(.custom-table-wrapper) {
@@ -130,40 +131,33 @@ st.markdown("""
         border-spacing: 0; 
         font-family: inherit; 
         margin: 0 !important;
-        table-layout: fixed !important; 
     }
     .custom-table thead th {
-        background-color: #e9d8fd !important;
-        color: #000000 !important;
+        background-color: #e9d8fd !important; /* MÀU TÍM NHẠT CHO TIÊU ĐỀ */
+        color: #000000 !important; /* CHỮ MÀU ĐEN */
         font-weight: 800 !important; 
-        font-size: 13px !important;
-        text-transform: uppercase !important;
+        font-size: 15.5px !important; /* TĂNG KÍCH THƯỚC CHỮ LÊN 1 CHÚT */
+        text-transform: uppercase !important; /* CHỮ VIẾT HOA */
         position: sticky !important; 
         top: 0 !important; 
         z-index: 10 !important; 
-        padding: 6px 4px !important; 
-        text-align: center !important;
-        vertical-align: middle !important;
+        padding: 12px 10px !important; 
+        text-align: left !important;
         border-bottom: 2px solid #d6bcfa !important; 
         border-right: 1px solid rgba(0,0,0,0.05) !important; 
-        white-space: normal !important; 
-        word-wrap: break-word !important;
-        overflow: hidden !important;
-        line-height: 1.25 !important;
+        white-space: nowrap !important; 
     }
     .custom-table tbody td {
-        padding: 8px 8px !important; 
+        padding: 10px 10px !important; 
         font-size: 13.5px !important; 
         border-bottom: 1px solid rgba(0,0,0,0.05) !important;
         border-right: 1px solid rgba(0,0,0,0.05); 
         white-space: normal !important; 
         word-wrap: break-word !important; 
         vertical-align: middle !important; 
-        color: #000000 !important;
-        text-align: left !important; 
-        overflow: hidden !important;
     }
     
+    /* CĂN GIỮA TUYỆT ĐỐI KHUNG TIÊU ĐỀ */
     .title-card-center { 
         border-radius: 16px; 
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.05); 
@@ -207,6 +201,7 @@ def load_data():
     sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
     try:
         df = pd.read_csv(sheet_url)
+        # LOẠI BỎ CÁC CỘT RỖNG VÀ LỖI UNNAMED ĐỂ ĐẢM BẢO KHÔNG BỊ RÁC BẢNG
         df = df.dropna(how='all', axis=1)
         df = df.loc[:, ~df.columns.str.contains('^unnamed', case=False, na=False)]
     except Exception:
@@ -214,6 +209,7 @@ def load_data():
     
     df.columns = df.columns.str.strip()
     
+    # THUẬT TOÁN NHẬN DIỆN CỘT THÔNG MINH - CHỐNG GHI ĐÈ 1-1 (HIỂN THỊ ĐỦ 100% CỘT)
     rename_dict = {}
     seen_targets = set()
     
@@ -236,8 +232,6 @@ def load_data():
             target = 'Mã Dự Án'
         elif 'dự án' in c_low and not any(kw in c_low for kw in ['chủ nhiệm', 'cnda', 'quản lý', 'mã']): 
             target = 'Dự Án'
-        elif any(kw in c_low for kw in ['chủ đầu tư', 'cdt']): 
-            target = 'Chủ đầu tư'
         elif any(kw in c_low for kw in ['chủ nhiệm', 'quản lý', 'trưởng nhóm', 'cnda']): 
             target = 'Chủ nhiệm dự án'
         elif any(kw in c_low for kw in ['hợp đồng', 'hđ', 'plhđ']): 
@@ -251,6 +245,7 @@ def load_data():
             if not any(kw in c_low for kw in ['%', 'tiến độ', 'trạng thái', 'tình trạng']):
                 target = 'Ngày Hoàn Thành'
                 
+        # Chỉ cập nhật nếu tên mục tiêu chưa được gắn cho cột nào trước đó (Chống gộp cột/mất cột)
         if target and target not in seen_targets:
             rename_dict[col] = target
             seen_targets.add(target)
@@ -258,6 +253,7 @@ def load_data():
     df.rename(columns=rename_dict, inplace=True)
     df = df.loc[:, ~df.columns.duplicated()]
     
+    # LÀM SẠCH VÀ ĐỒNG NHẤT DỮ LIỆU TÌNH TRẠNG TRIỂN KHAI
     if 'Tình trạng triển khai' in df.columns:
         def clean_status(x):
             val = str(x).strip().lower()
@@ -269,7 +265,8 @@ def load_data():
         
         df['Tình trạng triển khai'] = df['Tình trạng triển khai'].apply(clean_status)
 
-    cols_to_fill = ['Mã Dự Án', 'Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục', 'Chủ nhiệm dự án', 'Chuyên viên thực hiện', 'Chủ đầu tư']
+    # FORWARD FILL ĐỂ XỬ LÝ CÁC Ô GỘP (MERGE CELLS) TRONG GOOGLE SHEETS
+    cols_to_fill = ['Mã Dự Án', 'Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục', 'Chủ nhiệm dự án', 'Chuyên viên thực hiện']
     for col in cols_to_fill:
         if col in df.columns: 
             df[col] = df[col].replace('', pd.NA).ffill()
@@ -283,6 +280,7 @@ def load_data():
         
     return df
 
+# LƯU TRỮ VÀ CẬP NHẬT DỮ LIỆU (TỰ LÀM MỚI KHI F5 DO KHÔNG DÙNG ST.CACHE)
 if 'raw_data' not in st.session_state:
     with st.spinner("⏳ Đang tải dữ liệu mới nhất từ Google Sheets..."):
         st.session_state.raw_data = load_data()
@@ -371,7 +369,7 @@ if selected_hm and 'Hạng Mục' in df_display.columns: df_display = df_display
 if selected_ql and 'Chủ nhiệm dự án' in df_display.columns: df_display = df_display[df_display['Chủ nhiệm dự án'].astype(str).isin(selected_ql)]
 if selected_cb and 'Chuyên viên thực hiện' in df_display.columns: df_display = df_display[df_display['Chuyên viên thực hiện'].astype(str).isin(selected_cb)]
 
-# --- TÍNH TOÁN 10 CHỈ SỐ KPI ---
+# --- TÍNH TOÁN 10 CHỈ SỐ KPI ĐẢM BẢO KHÔNG TRÙNG LẶP ---
 p_projects = 0
 if 'Dự Án' in df_display.columns:
     _prjs = df_display['Dự Án'].astype(str).str.strip().str.upper()
@@ -462,7 +460,7 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
 # TIÊU ĐỀ BẢNG CHI TIẾT
 st.markdown("""
 <div class="title-card-center">
-    <div style="font-size: 18px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2; text-align: center;">BẢNG CHI TIẾT CÔNG VIỆC</div>
+    <div style="font-size: 18px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2; text-align: center;">BẢNG CHI TIẾT CÔNG VIÊC</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -532,67 +530,24 @@ if 'Tình trạng triển khai' in df_display.columns and 'Tiến Độ (%)' in 
     df_display = df_display.sort_values(by=sort_cols, ascending=[True] * len(sort_cols))
     df_display = df_display.drop(columns=['Mức Ưu Tiên'])
 
-# ÁP DỤNG MÀU SẮC LÊN BẢNG
 def color_rows(row):
     vm = str(row.get('Vướng Mắc', '')).strip().lower()
     if vm and vm not in ['nan', 'none', '']:
-        return ['background-color: #FFEeba !important; color: #000000 !important;'] * len(row)
+        return ['background-color: #FFEeba; color: #000;'] * len(row)
         
-    status = str(row.get('Tình trạng triển khai', '')).strip()
-    if status == 'Đã hoàn thành': return ['background-color: #a5d6a7 !important; color: #000000 !important;'] * len(row)
-    if status == 'Tạm dừng': return ['background-color: #ef9a9a !important; color: #000000 !important;'] * len(row)
-    if status == 'Chưa triển khai': return ['background-color: #adb5bd !important; color: #000000 !important;'] * len(row)
-    return ['background-color: #ffffff !important; color: #000000 !important;'] * len(row)
+    status = row.get('Tình trạng triển khai', '')
+    if status == 'Đã hoàn thành': return ['background-color: #a5d6a7; color: #000;'] * len(row)
+    if status == 'Tạm dừng': return ['background-color: #ef9a9a; color: #000;'] * len(row)
+    if status == 'Chưa triển khai': return ['background-color: #adb5bd; color: #000;'] * len(row)
+    return ['background-color: #ffffff; color: #000;'] * len(row)
 
-styled_df = df_display.style.apply(color_rows, axis=1)
+# ÁP DỤNG MÀU SẮC LÊN BẢNG VÀ CSS CHO TIÊU ĐỀ
+styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
+    'selector': 'th',
+    'props': [('background-color', '#e9d8fd'), ('color', '#000000'), ('font-weight', '800'), ('font-size', '15.5px'), ('text-transform', 'uppercase')]
+}])
 
-# ÉP CỨNG THU NHỎ CỘT HỢP ĐỒNG VÀ CHỦ ĐẦU TƯ BẰNG CẢ ĐỘ RỘNG TH HEADER VÀ CELL
-if 'Hợp Đồng - PLHĐ' in df_display.columns:
-    styled_df = styled_df.set_properties(subset=['Hợp Đồng - PLHĐ'], **{
-        'width': '50px',
-        'max-width': '60px',
-        'min-width': '45px',
-        'text-align': 'left'
-    })
-
-if 'Chủ đầu tư' in df_display.columns:
-    styled_df = styled_df.set_properties(subset=['Chủ đầu tư'], **{
-        'width': '30px',
-        'max-width': '40px',
-        'min-width': '25px',
-        'text-align': 'left'
-    })
-
-# CÁC CỘT KHÁC THU NHỎ VỪA PHẢI
-other_narrow_cols = [c for c in ['Hạng Mục', 'Dự Án'] if c in df_display.columns]
-if other_narrow_cols:
-    styled_df = styled_df.set_properties(subset=other_narrow_cols, **{
-        'width': '90px',
-        'max-width': '105px',
-        'min-width': '75px',
-        'text-align': 'left'
-    })
-
-# KHÓA KÍCH THƯỚC TIÊU ĐỀ TRONG THẺ DIV ĐỂ TRÌNH DUYỆT BẮT BUỘC CO LẠI
-break_line_cols = {
-    'Mã Dự Án': '<div style="width: 50px; overflow: hidden;">MÃ<br>DỰ&nbsp;ÁN</div>',
-    'Dự Án': '<div style="width: 90px; overflow: hidden;">DỰ&nbsp;ÁN</div>',
-    'Chủ đầu tư': '<div style="width: 30px; overflow: hidden;">CHỦ<br>ĐẦU&nbsp;TƯ</div>',
-    'Hợp Đồng - PLHĐ': '<div style="width: 50px; overflow: hidden;">HỢP&nbsp;ĐỒNG<br>PLHĐ</div>',
-    'Hạng Mục': '<div style="width: 90px; overflow: hidden;">HẠNG&nbsp;MỤC</div>',
-    'Chủ nhiệm dự án': '<div style="width: 90px; overflow: hidden;">CHỦ&nbsp;NHIỆM<br>DỰ&nbsp;ÁN</div>',
-    'Chuyên viên thực hiện': '<div style="width: 90px; overflow: hidden;">CHUYÊN<br>VIÊN</div>',
-    'Công việc triển khai': '<div style="overflow: hidden;">CÔNG&nbsp;VIỆC<br>TRIỂN&nbsp;KHAI</div>',
-    'Ngày Bắt Đầu': '<div style="overflow: hidden;">NGÀY<br>BẮT&nbsp;ĐẦU</div>',
-    'Ngày Hoàn Thành': '<div style="overflow: hidden;">NGÀY<br>HOÀN&nbsp;THÀNH</div>',
-    'Tiến Độ (%)': '<div style="overflow: hidden;">TIẾN&nbsp;ĐỘ<br>(%)</div>',
-    'Tình trạng triển khai': '<div style="overflow: hidden;">TÌNH<br>TRẠNG</div>',
-    'Vướng Mắc': '<div style="overflow: hidden;">VƯỚNG&nbsp;MẮC</div>'
-}
-
-styled_df = styled_df.format_index(lambda col: break_line_cols.get(col, f'<div style="overflow: hidden;">{str(col).replace(" ", "&nbsp;")}</div>'), axis=1)
-
-# ẨN CỘT INDEX
+# ẨN CỘT INDEX CỦA PANDAS ĐỂ BẢNG TRÔNG GỌN HƠN
 try:
     styled_df = styled_df.hide(axis='index')
 except Exception:
@@ -602,6 +557,6 @@ except Exception:
         pass
 
 # ================= RENDER BẢNG BẰNG TÙY CHỈNH HTML =================
-html_table = styled_df.to_html(escape=False)
+html_table = styled_df.to_html()
 html_table = html_table.replace('<table', '<table class="custom-table"')
 st.markdown(f'<div class="custom-table-wrapper">{html_table}</div>', unsafe_allow_html=True)
