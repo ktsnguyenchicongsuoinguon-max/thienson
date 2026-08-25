@@ -158,6 +158,7 @@ st.markdown("""
         word-wrap: break-word !important; 
         vertical-align: middle !important; 
         color: #000000 !important;
+        text-align: left !important; /* CĂN LỀ TRÁI CHO TOÀN BỘ PHẦN NỘI DUNG BẢNG */
     }
     
     .title-card-center { 
@@ -542,18 +543,18 @@ def color_rows(row):
 
 styled_df = df_display.style.apply(color_rows, axis=1)
 
-# ÉP THU NHỎ RIÊNG CỘT HỢP ĐỒNG CHO SIÊU GỌN
+# THU NHỎ TỐI ĐA CỘT HỢP ĐỒNG (XUỐNG KHOẢNG 55PX)
 if 'Hợp Đồng - PLHĐ' in df_display.columns:
     styled_df = styled_df.set_properties(subset=['Hợp Đồng - PLHĐ'], **{
-        'max-width': '75px', 
-        'min-width': '65px', 
-        'width': '70px',
+        'max-width': '60px', 
+        'min-width': '50px', 
+        'width': '55px',
         'white-space': 'normal',
         'word-wrap': 'break-word',
-        'text-align': 'center'
+        'text-align': 'left'
     })
 
-# ÉP THU NHỎ CÁC CỘT PHỤ CÒN LẠI VỪA PHẢI
+# THU NHỎ CÁC CỘT PHỤ CÒN LẠI VỪA PHẢI
 other_narrow_cols = [c for c in ['Hạng Mục', 'Dự Án', 'Chủ đầu tư'] if c in df_display.columns]
 if other_narrow_cols:
     styled_df = styled_df.set_properties(subset=other_narrow_cols, **{
@@ -562,7 +563,7 @@ if other_narrow_cols:
         'width': '90px',
         'white-space': 'normal',
         'word-wrap': 'break-word',
-        'text-align': 'center'
+        'text-align': 'left'
     })
 
 # KHÓA CHẶT CHỮ, ÉP TIÊU ĐỀ XUỐNG TỐI ĐA 2 DÒNG
