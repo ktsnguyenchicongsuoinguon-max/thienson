@@ -1,25 +1,32 @@
-import streamlit as st
-import pandas as pd
-import io
 import base64
-import os
 from datetime import datetime, timedelta
+import io
+import os
+import pandas as pd
+import streamlit as st
 
 # ================= 1. THIẾT LẬP GIAO DIỆN =================
-st.set_page_config(page_title="Tiến độ PTK-Thiên Sơn", page_icon="logothienson.png", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(
+    page_title="Tiến độ PTK-Thiên Sơn",
+    page_icon="logothienson.png",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
 
 # ================= HÀM ĐỌC ẢNH LOCAL LÀM BACKGROUND =================
 def get_base64_image(image_path):
-    if os.path.exists(image_path):
-        with open(image_path, "rb") as img_file:
-            return base64.b64encode(img_file.read()).decode()
-    return None
+  if os.path.exists(image_path):
+    with open(image_path, "rb") as img_file:
+      return base64.b64encode(img_file.read()).decode()
+  return None
 
-background_image_path = "background.jpg" 
+
+background_image_path = "background.jpg"
 bg_base64 = get_base64_image(background_image_path)
 
 if bg_base64:
-    bg_css = f"""
+  bg_css = f"""
     <style>
         .stApp::before {{
             content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -30,9 +37,10 @@ if bg_base64:
         .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"] {{ background: transparent !important; }}
     </style>
     """
-    st.markdown(bg_css, unsafe_allow_html=True)
+  st.markdown(bg_css, unsafe_allow_html=True)
 else:
-    st.markdown("""
+  st.markdown(
+      """
     <style>
         .stApp::before { 
             content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -42,10 +50,13 @@ else:
         }
         .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"] { background: transparent !important; }
     </style>
-    """, unsafe_allow_html=True)
+    """,
+      unsafe_allow_html=True,
+  )
 
 # ================= CSS TÙY CHỈNH CHUYÊN SÂU =================
-st.markdown("""
+st.markdown(
+    """
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
     html, body { overflow: hidden !important; margin: 0 !important; padding: 0 !important; }
@@ -193,224 +204,421 @@ st.markdown("""
     div[data-testid="stRadio"] > div[role="radiogroup"] > label { cursor: pointer; background: transparent !important; border: none !important; box-shadow: none !important; padding: 2px !important; }
     div[data-testid="stRadio"] > div[role="radiogroup"] > label p { font-weight: 600 !important; color: #0f172a !important; margin: 0 !important; font-size: 0.95rem !important; }
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 
 # ================= 2. ĐỌC DỮ LIỆU TỪ GOOGLE SHEETS =================
 def load_data():
-    sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
-    try:
-        df = pd.read_csv(sheet_url)
-        # LOẠI BỎ CÁC CỘT RỖNG VÀ LỖI UNNAMED ĐỂ ĐẢM BẢO KHÔNG BỊ RÁC BẢNG
-        df = df.dropna(how='all', axis=1)
-        df = df.loc[:, ~df.columns.str.contains('^unnamed', case=False, na=False)]
-    except Exception:
-        return pd.DataFrame()
-    
-    df.columns = df.columns.str.strip()
-    
-    # THUẬT TOÁN NHẬN DIỆN CỘT THÔNG MINH - CHỐNG GHI ĐÈ 1-1 (HIỂN THỊ ĐỦ 100% CỘT)
-    rename_dict = {}
-    seen_targets = set()
-    
-    for col in df.columns:
-        c_low = str(col).lower().strip()
-        target = None
-        
-        if any(kw in c_low for kw in ['trạng thái', 'tình trạng', 'trình trạng']): 
-            target = 'Tình trạng triển khai'
-        elif any(kw in c_low for kw in ['tiến độ', '%']): 
-            target = 'Tiến Độ (%)'
-        elif any(kw in c_low for kw in ['đầu việc', 'công việc', 'task']):
-            if not any(kw in c_low for kw in ['trạng thái', 'tình trạng', 'tiến độ', 'mức']):
-                target = 'Công việc triển khai' 
-        elif any(kw in c_low for kw in ['hạng mục', 'gói thầu']): 
-            target = 'Hạng Mục'
-        elif any(kw in c_low for kw in ['vướng mắc', 'ghi chú', 'ý kiến', 'note', 'lý do']): 
-            target = 'Vướng Mắc'
-        elif 'mã dự án' in c_low or 'mã da' in c_low:
-            target = 'Mã Dự Án'
-        elif 'dự án' in c_low and not any(kw in c_low for kw in ['chủ nhiệm', 'cnda', 'quản lý', 'mã']): 
-            target = 'Dự Án'
-        elif any(kw in c_low for kw in ['chủ nhiệm', 'quản lý', 'trưởng nhóm', 'cnda']): 
-            target = 'Chủ nhiệm dự án'
-        elif any(kw in c_low for kw in ['hợp đồng', 'hđ', 'plhđ']): 
-            target = 'Hợp Đồng - PLHĐ'
-        elif any(kw in c_low for kw in ['chuyên viên', 'triển khai', 'thực hiện', 'cán bộ', 'nhân sự']): 
-            if not any(kw in c_low for kw in ['tình trạng', 'trình trạng', 'trạng thái', 'công việc', 'ngày']):
-                target = 'Chuyên viên thực hiện'
-        elif any(kw in c_low for kw in ['bắt đầu', 'start']):
-            target = 'Ngày Bắt Đầu'
-        elif any(kw in c_low for kw in ['hoàn thành', 'kết thúc', 'deadline', 'mục tiêu', 'hạn chót']):
-            if not any(kw in c_low for kw in ['%', 'tiến độ', 'trạng thái', 'tình trạng']):
-                target = 'Ngày Hoàn Thành'
-                
-        # Chỉ cập nhật nếu tên mục tiêu chưa được gắn cho cột nào trước đó (Chống gộp cột/mất cột)
-        if target and target not in seen_targets:
-            rename_dict[col] = target
-            seen_targets.add(target)
-            
-    df.rename(columns=rename_dict, inplace=True)
-    df = df.loc[:, ~df.columns.duplicated()]
-    
-    # LÀM SẠCH VÀ ĐỒNG NHẤT DỮ LIỆU TÌNH TRẠNG TRIỂN KHAI
-    if 'Tình trạng triển khai' in df.columns:
-        def clean_status(x):
-            val = str(x).strip().lower()
-            if val in ['hoàn thành', 'đã hoàn thành', 'done', 'hoàn tất']: return 'Đã hoàn thành'
-            if val in ['chưa bắt đầu', 'chưa triển khai', 'not started']: return 'Chưa triển khai'
-            if val in ['đang triển khai', 'đang thực hiện', 'in progress']: return 'Đang triển khai'
-            if val in ['tạm dừng', 'pending', 'pause']: return 'Tạm dừng'
-            return str(x).strip()
-        
-        df['Tình trạng triển khai'] = df['Tình trạng triển khai'].apply(clean_status)
+  sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
+  try:
+    df = pd.read_csv(sheet_url)
+    # LOẠI BỎ CÁC CỘT RỖNG VÀ LỖI UNNAMED ĐỂ ĐẢM BẢO KHÔNG BỊ RÁC BẢNG
+    df = df.dropna(how="all", axis=1)
+    df = df.loc[:, ~df.columns.str.contains("^unnamed", case=False, na=False)]
+  except Exception:
+    return pd.DataFrame()
 
-    # FORWARD FILL ĐỂ XỬ LÝ CÁC Ô GỘP (MERGE CELLS) TRONG GOOGLE SHEETS
-    cols_to_fill = ['Mã Dự Án', 'Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục', 'Chủ nhiệm dự án', 'Chuyên viên thực hiện']
-    for col in cols_to_fill:
-        if col in df.columns: 
-            df[col] = df[col].replace('', pd.NA).ffill()
-            
-    df = df.fillna('') 
-    
-    if 'Ngày Bắt Đầu' in df.columns: 
-        df['Ngày_Bat_Dau_Obj'] = pd.to_datetime(df['Ngày Bắt Đầu'].astype(str).str.strip(), dayfirst=True, errors='coerce')
-    if 'Ngày Hoàn Thành' in df.columns: 
-        df['Ngày_Hoan_Thanh_Obj'] = pd.to_datetime(df['Ngày Hoàn Thành'].astype(str).str.strip(), dayfirst=True, errors='coerce')
-        
-    return df
+  df.columns = df.columns.str.strip()
+
+  # THUẬT TOÁN NHẬN DIỆN CỘT THÔNG MINH - CHỐNG GHI ĐÈ 1-1 (HIỂN THỊ ĐỦ 100% CỘT)
+  rename_dict = {}
+  seen_targets = set()
+
+  for col in df.columns:
+    c_low = str(col).lower().strip()
+    target = None
+
+    if any(kw in c_low for kw in ["trạng thái", "tình trạng", "trình trạng"]):
+      target = "Tình trạng triển khai"
+    elif any(kw in c_low for kw in ["tiến độ", "%"]):
+      target = "Tiến Độ (%)"
+    elif any(kw in c_low for kw in ["đầu việc", "công việc", "task"]):
+      if not any(
+          kw in c_low for kw in ["trạng thái", "tình trạng", "tiến độ", "mức"]
+      ):
+        target = "Công việc triển khai"
+    elif any(kw in c_low for kw in ["hạng mục", "gói thầu"]):
+      target = "Hạng Mục"
+    elif any(kw in c_low for kw in ["vướng mắc", "ghi chú", "ý kiến", "note", "lý do"]):
+      target = "Vướng Mắc"
+    elif "mã dự án" in c_low or "mã da" in c_low:
+      target = "Mã Dự Án"
+    elif "dự án" in c_low and not any(
+        kw in c_low for kw in ["chủ nhiệm", "cnda", "quản lý", "mã"]
+    ):
+      target = "Dự Án"
+    elif any(
+        kw in c_low for kw in ["chủ nhiệm", "quản lý", "trưởng nhóm", "cnda"]
+    ):
+      target = "Chủ nhiệm dự án"
+    elif any(kw in c_low for kw in ["hợp đồng", "hđ", "plhđ"]):
+      target = "Hợp Đồng - PLHĐ"
+    elif any(
+        kw in c_low
+        for kw in ["chuyên viên", "triển khai", "thực hiện", "cán bộ", "nhân sự"]
+    ):
+      if not any(
+          kw in c_low
+          for kw in ["tình trạng", "trình trạng", "trạng thái", "công việc", "ngày"]
+      ):
+        target = "Chuyên viên thực hiện"
+    elif any(kw in c_low for kw in ["bắt đầu", "start"]):
+      target = "Ngày Bắt Đầu"
+    elif any(
+        kw in c_low
+        for kw in ["hoàn thành", "kết thúc", "deadline", "mục tiêu", "hạn chót"]
+    ):
+      if not any(
+          kw in c_low for kw in ["%", "tiến độ", "trạng thái", "tình trạng"]
+      ):
+        target = "Ngày Hoàn Thành"
+
+    # Chỉ cập nhật nếu tên mục tiêu chưa được gắn cho cột nào trước đó (Chống gộp cột/mất cột)
+    if target and target not in seen_targets:
+      rename_dict[col] = target
+      seen_targets.add(target)
+
+  df.rename(columns=rename_dict, inplace=True)
+  df = df.loc[:, ~df.columns.duplicated()]
+
+  # LÀM SẠCH VÀ ĐỒNG NHẤT DỮ LIỆU TÌNH TRẠNG TRIỂN KHAI
+  if "Tình trạng triển khai" in df.columns:
+
+    def clean_status(x):
+      val = str(x).strip().lower()
+      if val in ["hoàn thành", "đã hoàn thành", "done", "hoàn tất"]:
+        return "Đã hoàn thành"
+      if val in ["chưa bắt đầu", "chưa triển khai", "not started"]:
+        return "Chưa triển khai"
+      if val in ["đang triển khai", "đang thực hiện", "in progress"]:
+        return "Đang triển khai"
+      if val in ["tạm dừng", "pending", "pause"]:
+        return "Tạm dừng"
+      return str(x).strip()
+
+    df["Tình trạng triển khai"] = df["Tình trạng triển khai"].apply(clean_status)
+
+  # FORWARD FILL ĐỂ XỬ LÝ CÁC Ô GỘP (MERGE CELLS) TRONG GOOGLE SHEETS
+  cols_to_fill = [
+      "Mã Dự Án",
+      "Dự Án",
+      "Hợp Đồng - PLHĐ",
+      "Hạng Mục",
+      "Chủ nhiệm dự án",
+      "Chuyên viên thực hiện",
+  ]
+  for col in cols_to_fill:
+    if col in df.columns:
+      df[col] = df[col].replace("", pd.NA).ffill()
+
+  df = df.fillna("")
+
+  if "Ngày Bắt Đầu" in df.columns:
+    df["Ngày_Bat_Dau_Obj"] = pd.to_datetime(
+        df["Ngày Bắt Đầu"].astype(str).str.strip(),
+        dayfirst=True,
+        errors="coerce",
+    )
+  if "Ngày Hoàn Thành" in df.columns:
+    df["Ngày_Hoan_Thanh_Obj"] = pd.to_datetime(
+        df["Ngày Hoàn Thành"].astype(str).str.strip(),
+        dayfirst=True,
+        errors="coerce",
+    )
+
+  return df
+
 
 # LƯU TRỮ VÀ CẬP NHẬT DỮ LIỆU (TỰ LÀM MỚI KHI F5 DO KHÔNG DÙNG ST.CACHE)
-if 'raw_data' not in st.session_state:
-    with st.spinner("⏳ Đang tải dữ liệu mới nhất từ Google Sheets..."):
-        st.session_state.raw_data = load_data()
+if "raw_data" not in st.session_state:
+  with st.spinner("⏳ Đang tải dữ liệu mới nhất từ Google Sheets..."):
+    st.session_state.raw_data = load_data()
 
 df = st.session_state.raw_data.copy()
 
 # ================= 3. KHỐI SIDEBAR BỘ LỌC =================
 with st.sidebar:
-    col_logo1, col_logo2, col_logo3 = st.columns([0.1, 2.8, 0.1])
-    with col_logo2:
-        st.image("logothienson.png", use_container_width=True) 
-        
-    st.markdown("<h3 style='text-align: left; margin-top: 15px; margin-bottom: 5px; color: #0f172a; font-size: 15px;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
-    
-    unique_projects = [str(p) for p in df['Dự Án'].unique() if pd.notna(p) and str(p).strip() != '' and str(p).lower() != 'nan'] if 'Dự Án' in df.columns else []
-    st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">domain</span> DỰ ÁN</div>', unsafe_allow_html=True)
-    selected_projects = st.multiselect("DỰ ÁN", options=unique_projects, placeholder="Chọn Tất cả", label_visibility="collapsed")
+  col_logo1, col_logo2, col_logo3 = st.columns([0.1, 2.8, 0.1])
+  with col_logo2:
+    st.image("logothienson.png", use_container_width=True)
 
-    df_temp = df.copy()
-    if selected_projects and 'Dự Án' in df_temp.columns: 
-        df_temp = df_temp[df_temp['Dự Án'].astype(str).isin(selected_projects)]
+  st.markdown(
+      "<h3 style='text-align: left; margin-top: 15px; margin-bottom: 5px; color:"
+      " #0f172a; font-size: 15px;'>BỘ LỌC DỮ LIỆU</h3>",
+      unsafe_allow_html=True,
+  )
 
-    hd_opts = [str(x) for x in df_temp['Hợp Đồng - PLHĐ'].unique() if pd.notna(x) and str(x).strip() != '' and str(x).lower() != 'nan'] if 'Hợp Đồng - PLHĐ' in df_temp.columns else []
-    st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">description</span> SỐ HỢP ĐỒNG</div>', unsafe_allow_html=True)
-    selected_hd = st.multiselect("SỐ HỢP ĐỒNG", options=hd_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
-    if selected_hd and 'Hợp Đồng - PLHĐ' in df_temp.columns: 
-        df_temp = df_temp[df_temp['Hợp Đồng - PLHĐ'].astype(str).isin(selected_hd)]
+  unique_projects = (
+      [
+          str(p)
+          for p in df["Dự Án"].unique()
+          if pd.notna(p) and str(p).strip() != "" and str(p).lower() != "nan"
+      ]
+      if "Dự Án" in df.columns
+      else []
+  )
+  st.markdown(
+      '<div class="sidebar-title"><span'
+      ' class="material-symbols-rounded">domain</span> DỰ ÁN</div>',
+      unsafe_allow_html=True,
+  )
+  selected_projects = st.multiselect(
+      "DỰ ÁN",
+      options=unique_projects,
+      placeholder="Chọn Tất cả",
+      label_visibility="collapsed",
+  )
 
-    hm_opts = [str(x) for x in df_temp['Hạng Mục'].unique() if pd.notna(x) and str(x).strip() != '' and str(x).lower() != 'nan'] if 'Hạng Mục' in df_temp.columns else []
-    st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">folder_open</span> HẠNG MỤC</div>', unsafe_allow_html=True)
-    selected_hm = st.multiselect("HẠNG MỤC", options=hm_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
-    if selected_hm and 'Hạng Mục' in df_temp.columns: 
-        df_temp = df_temp[df_temp['Hạng Mục'].astype(str).isin(selected_hm)]
+  df_temp = df.copy()
+  if selected_projects and "Dự Án" in df_temp.columns:
+    df_temp = df_temp[df_temp["Dự Án"].astype(str).isin(selected_projects)]
 
-    ql_opts = [str(x) for x in df_temp['Chủ nhiệm dự án'].unique() if pd.notna(x) and str(x).strip() != '' and str(x).lower() != 'nan'] if 'Chủ nhiệm dự án' in df_temp.columns else []
-    st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">manage_accounts</span> TRƯỞNG NHÓM - CNDA</div>', unsafe_allow_html=True)
-    selected_ql = st.multiselect("TRƯỞNG NHÓM - CNDA", options=ql_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
+  hd_opts = (
+      [
+          str(x)
+          for x in df_temp["Hợp Đồng - PLHĐ"].unique()
+          if pd.notna(x) and str(x).strip() != "" and str(x).lower() != "nan"
+      ]
+      if "Hợp Đồng - PLHĐ" in df_temp.columns
+      else []
+  )
+  st.markdown(
+      '<div class="sidebar-title"><span'
+      ' class="material-symbols-rounded">description</span> SỐ HỢP ĐỒNG</div>',
+      unsafe_allow_html=True,
+  )
+  selected_hd = st.multiselect(
+      "SỐ HỢP ĐỒNG",
+      options=hd_opts,
+      placeholder="Chọn Tất cả",
+      label_visibility="collapsed",
+  )
+  if selected_hd and "Hợp Đồng - PLHĐ" in df_temp.columns:
+    df_temp = df_temp[df_temp["Hợp Đồng - PLHĐ"].astype(str).isin(selected_hd)]
 
-    cb_opts = [str(x) for x in df_temp['Chuyên viên thực hiện'].unique() if pd.notna(x) and str(x).strip() != '' and str(x).lower() != 'nan'] if 'Chuyên viên thực hiện' in df_temp.columns else []
-    st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">engineering</span> CHUYÊN VIÊN THỰC HIỆN</div>', unsafe_allow_html=True)
-    selected_cb = st.multiselect("CHUYÊN VIÊN THỰC HIỆN", options=cb_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
+  hm_opts = (
+      [
+          str(x)
+          for x in df_temp["Hạng Mục"].unique()
+          if pd.notna(x) and str(x).strip() != "" and str(x).lower() != "nan"
+      ]
+      if "Hạng Mục" in df_temp.columns
+      else []
+  )
+  st.markdown(
+      '<div class="sidebar-title"><span'
+      ' class="material-symbols-rounded">folder_open</span> HẠNG MỤC</div>',
+      unsafe_allow_html=True,
+  )
+  selected_hm = st.multiselect(
+      "HẠNG MỤC",
+      options=hm_opts,
+      placeholder="Chọn Tất cả",
+      label_visibility="collapsed",
+  )
+  if selected_hm and "Hạng Mục" in df_temp.columns:
+    df_temp = df_temp[df_temp["Hạng Mục"].astype(str).isin(selected_hm)]
 
-    st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">calendar_month</span> KHOẢNG THỜI GIAN</div>', unsafe_allow_html=True)
-    time_filter = st.selectbox("KHOẢNG THỜI GIAN", 
-                               ["Tất cả", "Hôm nay", "Tuần này", "Tháng này", "Năm nay", "Tùy chọn khoảng ngày"],
-                               label_visibility="collapsed")
-    
-    today = datetime.today().date()
-    start_date, end_date = None, None
-    if time_filter == "Hôm nay":
-        start_date = end_date = today
-    elif time_filter == "Tuần này":
-        start_date = today - timedelta(days=today.weekday())
-        end_date = start_date + timedelta(days=6)
-    elif time_filter == "Tháng này":
-        start_date = today.replace(day=1)
-        if today.month == 12: end_date = today.replace(year=today.year+1, month=1, day=1) - timedelta(days=1)
-        else: end_date = today.replace(month=today.month+1, day=1) - timedelta(days=1)
-    elif time_filter == "Năm nay":
-        start_date = today.replace(month=1, day=1); end_date = today.replace(month=12, day=31)
-    elif time_filter == "Tùy chọn khoảng ngày":
-        date_range = st.date_input("Chọn khoảng thời gian:", [today, today])
-        if len(date_range) == 2: start_date, end_date = date_range
-        elif len(date_range) == 1: start_date = end_date = date_range[0]
+  ql_opts = (
+      [
+          str(x)
+          for x in df_temp["Chủ nhiệm dự án"].unique()
+          if pd.notna(x) and str(x).strip() != "" and str(x).lower() != "nan"
+      ]
+      if "Chủ nhiệm dự án" in df_temp.columns
+      else []
+  )
+  st.markdown(
+      '<div class="sidebar-title"><span'
+      ' class="material-symbols-rounded">manage_accounts</span> TRƯỞNG NHÓM -'
+      " CNDA</div>",
+      unsafe_allow_html=True,
+  )
+  selected_ql = st.multiselect(
+      "TRƯỞNG NHÓM - CNDA",
+      options=ql_opts,
+      placeholder="Chọn Tất cả",
+      label_visibility="collapsed",
+  )
+
+  cb_opts = (
+      [
+          str(x)
+          for x in df_temp["Chuyên viên thực hiện"].unique()
+          if pd.notna(x) and str(x).strip() != "" and str(x).lower() != "nan"
+      ]
+      if "Chuyên viên thực hiện" in df_temp.columns
+      else []
+  )
+  st.markdown(
+      '<div class="sidebar-title"><span'
+      ' class="material-symbols-rounded">engineering</span> CHUYÊN VIÊN THỰC'
+      " HIỆN</div>",
+      unsafe_allow_html=True,
+  )
+  selected_cb = st.multiselect(
+      "CHUYÊN VIÊN THỰC HIỆN",
+      options=cb_opts,
+      placeholder="Chọn Tất cả",
+      label_visibility="collapsed",
+  )
+
+  st.markdown(
+      '<div class="sidebar-title"><span'
+      ' class="material-symbols-rounded">calendar_month</span> KHOẢNG THỜI'
+      " GIAN</div>",
+      unsafe_allow_html=True,
+  )
+  time_filter = st.selectbox(
+      "KHOẢNG THỜI GIAN",
+      [
+          "Tất cả",
+          "Hôm nay",
+          "Tuần này",
+          "Tháng này",
+          "Năm nay",
+          "Tùy chọn khoảng ngày",
+      ],
+      label_visibility="collapsed",
+  )
+
+  today = datetime.today().date()
+  start_date, end_date = None, None
+  if time_filter == "Hôm nay":
+    start_date = end_date = today
+  elif time_filter == "Tuần này":
+    start_date = today - timedelta(days=today.weekday())
+    end_date = start_date + timedelta(days=6)
+  elif time_filter == "Tháng này":
+    start_date = today.replace(day=1)
+    if today.month == 12:
+      end_date = today.replace(year=today.year + 1, month=1, day=1) - timedelta(
+          days=1
+      )
+    else:
+      end_date = today.replace(month=today.month + 1, day=1) - timedelta(days=1)
+  elif time_filter == "Năm nay":
+    start_date = today.replace(month=1, day=1)
+    end_date = today.replace(month=12, day=31)
+  elif time_filter == "Tùy chọn khoảng ngày":
+    date_range = st.date_input("Chọn khoảng thời gian:", [today, today])
+    if len(date_range) == 2:
+      start_date, end_date = date_range
+    elif len(date_range) == 1:
+      start_date = end_date = date_range[0]
 
 
 # ================= 4. KHỐI CHÍNH (BÊN PHẢI) =================
 
-st.markdown("""
+st.markdown(
+    """
 <div class="title-card-center" style="padding: 8px 25px; margin-top: 0px; margin-bottom: 15px;">
     <div style="font-size: 26px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2; text-align: center;">BÁO CÁO CÔNG VIỆC - PHÒNG THIẾT KẾ</div>
 </div>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
+# CẬP NHẬT THUẬT TOÁN LỌC THỜI GIAN THEO GIAO THOA (CHUẨN XÁC, KHÔNG BỎ SÓT)
 df_display = df.copy()
-if start_date and end_date and 'Ngày_Bat_Dau_Obj' in df_display.columns and 'Ngày_Hoan_Thanh_Obj' in df_display.columns:
-    start_ts = pd.to_datetime(start_date)
-    end_ts = pd.to_datetime(end_date)
-    cond_start = df_display['Ngày_Bat_Dau_Obj'].between(start_ts, end_ts)
-    cond_end = df_display['Ngày_Hoan_Thanh_Obj'].between(start_ts, end_ts)
-    df_display = df_display[cond_start | cond_end]
+if start_date and end_date:
+  start_ts = pd.to_datetime(start_date)
+  end_ts = pd.to_datetime(end_date)
 
-if selected_projects and 'Dự Án' in df_display.columns: df_display = df_display[df_display['Dự Án'].astype(str).isin(selected_projects)]
-if selected_hd and 'Hợp Đồng - PLHĐ' in df_display.columns: df_display = df_display[df_display['Hợp Đồng - PLHĐ'].astype(str).isin(selected_hd)]
-if selected_hm and 'Hạng Mục' in df_display.columns: df_display = df_display[df_display['Hạng Mục'].astype(str).isin(selected_hm)]
-if selected_ql and 'Chủ nhiệm dự án' in df_display.columns: df_display = df_display[df_display['Chủ nhiệm dự án'].astype(str).isin(selected_ql)]
-if selected_cb and 'Chuyên viên thực hiện' in df_display.columns: df_display = df_display[df_display['Chuyên viên thực hiện'].astype(str).isin(selected_cb)]
+  has_start = "Ngày_Bat_Dau_Obj" in df_display.columns
+  has_end = "Ngày_Hoan_Thanh_Obj" in df_display.columns
+
+  if has_start and has_end:
+    cond = (df_display["Ngày_Bat_Dau_Obj"] <= end_ts) & (
+        df_display["Ngày_Hoan_Thanh_Obj"] >= start_ts
+    )
+    df_display = df_display[cond]
+  elif has_start:
+    df_display = df_display[
+        df_display["Ngày_Bat_Dau_Obj"].between(start_ts, end_ts)
+    ]
+  elif has_end:
+    df_display = df_display[
+        df_display["Ngày_Hoan_Thanh_Obj"].between(start_ts, end_ts)
+    ]
+
+if selected_projects and "Dự Án" in df_display.columns:
+  df_display = df_display[df_display["Dự Án"].astype(str).isin(selected_projects)]
+if selected_hd and "Hợp Đồng - PLHĐ" in df_display.columns:
+  df_display = df_display[
+      df_display["Hợp Đồng - PLHĐ"].astype(str).isin(selected_hd)
+  ]
+if selected_hm and "Hạng Mục" in df_display.columns:
+  df_display = df_display[df_display["Hạng Mục"].astype(str).isin(selected_hm)]
+if selected_ql and "Chủ nhiệm dự án" in df_display.columns:
+  df_display = df_display[
+      df_display["Chủ nhiệm dự án"].astype(str).isin(selected_ql)
+  ]
+if selected_cb and "Chuyên viên thực hiện" in df_display.columns:
+  df_display = df_display[
+      df_display["Chuyên viên thực hiện"].astype(str).isin(selected_cb)
+  ]
 
 # --- TÍNH TOÁN 10 CHỈ SỐ KPI ĐẢM BẢO KHÔNG TRÙNG LẶP ---
 p_projects = 0
-if 'Dự Án' in df_display.columns:
-    _prjs = df_display['Dự Án'].astype(str).str.strip().str.upper()
-    p_projects = _prjs[(_prjs != '') & (_prjs != 'NAN')].nunique()
+if "Dự Án" in df_display.columns:
+  _prjs = df_display["Dự Án"].astype(str).str.strip().str.upper()
+  p_projects = _prjs[(_prjs != "") & (_prjs != "NAN")].nunique()
 
 p_contracts = 0
-if 'Hợp Đồng - PLHĐ' in df_display.columns:
-    _cts = df_display['Hợp Đồng - PLHĐ'].astype(str).str.strip().str.upper()
-    p_contracts = _cts[(_cts != '') & (_cts != 'NAN')].nunique()
+if "Hợp Đồng - PLHĐ" in df_display.columns:
+  _cts = df_display["Hợp Đồng - PLHĐ"].astype(str).str.strip().str.upper()
+  p_contracts = _cts[(_cts != "") & (_cts != "NAN")].nunique()
 
 p_categories = 0
-if 'Hạng Mục' in df_display.columns:
-    _cats = df_display['Hạng Mục'].astype(str).str.strip().str.upper()
-    p_categories = _cats[(_cats != '') & (_cats != 'NAN')].nunique()
+if "Hạng Mục" in df_display.columns:
+  _cats = df_display["Hạng Mục"].astype(str).str.strip().str.upper()
+  p_categories = _cats[(_cats != "") & (_cats != "NAN")].nunique()
 
 p_total = len(df_display)
 
-if 'Tiến Độ (%)' in df_display.columns and p_total > 0:
-    tien_do_clean = pd.to_numeric(df_display['Tiến Độ (%)'].astype(str).str.replace('%', '', regex=False).str.strip(), errors='coerce')
-    p_prog = tien_do_clean.mean()
-    if pd.isna(p_prog):
-        p_prog = 0
-else:
+if "Tiến Độ (%)" in df_display.columns and p_total > 0:
+  tien_do_clean = pd.to_numeric(
+      df_display["Tiến Độ (%)"]
+      .astype(str)
+      .str.replace("%", "", regex=False)
+      .str.strip(),
+      errors="coerce",
+  )
+  p_prog = tien_do_clean.mean()
+  if pd.isna(p_prog):
     p_prog = 0
-
-if 'Tình trạng triển khai' in df_display.columns:
-    p_done = len(df_display[df_display['Tình trạng triển khai'] == 'Đã hoàn thành'])
-    p_inprogress = len(df_display[df_display['Tình trạng triển khai'] == 'Đang triển khai'])
-    p_notstarted = len(df_display[df_display['Tình trạng triển khai'] == 'Chưa triển khai'])
-    p_paused = len(df_display[df_display['Tình trạng triển khai'] == 'Tạm dừng'])
 else:
-    p_done = p_inprogress = p_notstarted = p_paused = 0
+  p_prog = 0
 
-if 'Vướng Mắc' in df_display.columns:
-    _issues = df_display['Vướng Mắc'].astype(str).str.strip().str.lower()
-    p_issues = sum((_issues != '') & (_issues != 'nan') & (_issues != 'none') & (_issues != 'null'))
+if "Tình trạng triển khai" in df_display.columns:
+  p_done = len(df_display[df_display["Tình trạng triển khai"] == "Đã hoàn thành"])
+  p_inprogress = len(
+      df_display[df_display["Tình trạng triển khai"] == "Đang triển khai"]
+  )
+  p_notstarted = len(
+      df_display[df_display["Tình trạng triển khai"] == "Chưa triển khai"]
+  )
+  p_paused = len(df_display[df_display["Tình trạng triển khai"] == "Tạm dừng"])
 else:
-    p_issues = 0
+  p_done = p_inprogress = p_notstarted = p_paused = 0
+
+if "Vướng Mắc" in df_display.columns:
+  _issues = df_display["Vướng Mắc"].astype(str).str.strip().str.lower()
+  p_issues = sum(
+      (_issues != "")
+      & (_issues != "nan")
+      & (_issues != "none")
+      & (_issues != "null")
+  )
+else:
+  p_issues = 0
+
 
 def render_transparent_shadow_kpi(title, value, icon_name):
-    return f"""
+  return f"""
     <div class="kpi-card">
         <div class="kpi-icon-wrapper">
             <span class="material-symbols-rounded">{icon_name}</span>
@@ -422,141 +630,251 @@ def render_transparent_shadow_kpi(title, value, icon_name):
     </div>
     """
 
+
 # --- HÀNG 1: 5 Ô ---
 r1_c1, r1_c2, r1_c3, r1_c4, r1_c5 = st.columns(5)
-with r1_c1: st.markdown(render_transparent_shadow_kpi("Tổng Dự án", p_projects, "domain"), unsafe_allow_html=True)
-with r1_c2: st.markdown(render_transparent_shadow_kpi("Hợp đồng", p_contracts, "description"), unsafe_allow_html=True)
-with r1_c3: st.markdown(render_transparent_shadow_kpi("Hạng mục", p_categories, "folder_open"), unsafe_allow_html=True)
-with r1_c4: st.markdown(render_transparent_shadow_kpi("Công việc", p_total, "assignment"), unsafe_allow_html=True)
-with r1_c5: st.markdown(render_transparent_shadow_kpi("Tiến độ TB", f"{p_prog:.1f}%", "speed"), unsafe_allow_html=True)
+with r1_c1:
+  st.markdown(
+      render_transparent_shadow_kpi("Tổng Dự án", p_projects, "domain"),
+      unsafe_allow_html=True,
+  )
+with r1_c2:
+  st.markdown(
+      render_transparent_shadow_kpi("Hợp đồng", p_contracts, "description"),
+      unsafe_allow_html=True,
+  )
+with r1_c3:
+  st.markdown(
+      render_transparent_shadow_kpi("Hạng mục", p_categories, "folder_open"),
+      unsafe_allow_html=True,
+  )
+with r1_c4:
+  st.markdown(
+      render_transparent_shadow_kpi("Công việc", p_total, "assignment"),
+      unsafe_allow_html=True,
+  )
+with r1_c5:
+  st.markdown(
+      render_transparent_shadow_kpi("Tiến độ TB", f"{p_prog:.1f}%", "speed"),
+      unsafe_allow_html=True,
+  )
 
 # --- HÀNG 2: 5 Ô ---
 r2_c1, r2_c2, r2_c3, r2_c4, r2_c5 = st.columns(5)
-with r2_c1: st.markdown(render_transparent_shadow_kpi("Đã hoàn thành", p_done, "check_circle"), unsafe_allow_html=True)
-with r2_c2: st.markdown(render_transparent_shadow_kpi("Đang triển khai", p_inprogress, "sync"), unsafe_allow_html=True)
-with r2_c3: st.markdown(render_transparent_shadow_kpi("Chưa triển khai", p_notstarted, "hourglass_empty"), unsafe_allow_html=True)
-with r2_c4: st.markdown(render_transparent_shadow_kpi("Tạm dừng", p_paused, "pause_circle"), unsafe_allow_html=True)
-with r2_c5: st.markdown(render_transparent_shadow_kpi("Vướng mắc", p_issues, "error"), unsafe_allow_html=True)
+with r2_c1:
+  st.markdown(
+      render_transparent_shadow_kpi("Đã hoàn thành", p_done, "check_circle"),
+      unsafe_allow_html=True,
+  )
+with r2_c2:
+  st.markdown(
+      render_transparent_shadow_kpi("Đang triển khai", p_inprogress, "sync"),
+      unsafe_allow_html=True,
+  )
+with r2_c3:
+  st.markdown(
+      render_transparent_shadow_kpi(
+          "Chưa triển khai", p_notstarted, "hourglass_empty"
+      ),
+      unsafe_allow_html=True,
+  )
+with r2_c4:
+  st.markdown(
+      render_transparent_shadow_kpi("Tạm dừng", p_paused, "pause_circle"),
+      unsafe_allow_html=True,
+  )
+with r2_c5:
+  st.markdown(
+      render_transparent_shadow_kpi("Vướng mắc", p_issues, "error"),
+      unsafe_allow_html=True,
+  )
 
-status_options = ["Tất cả", "Chưa triển khai", "Đang triển khai", "Đã hoàn thành", "Tạm dừng", "Vướng mắc"]
-actual_status = st.radio("Bộ lọc Trạng Thái", options=status_options, horizontal=True, label_visibility="collapsed")
+status_options = [
+    "Tất cả",
+    "Chưa triển khai",
+    "Đang triển khai",
+    "Đã hoàn thành",
+    "Tạm dừng",
+    "Vướng mắc",
+]
+actual_status = st.radio(
+    "Bộ lọc Trạng Thái",
+    options=status_options,
+    horizontal=True,
+    label_visibility="collapsed",
+)
 
 if actual_status != "Tất cả":
-    if actual_status == "Vướng mắc":
-        if 'Vướng Mắc' in df_display.columns:
-            _iss = df_display['Vướng Mắc'].astype(str).str.strip().str.lower()
-            df_display = df_display[(_iss != '') & (_iss != 'nan') & (_iss != 'none') & (_iss != 'null')]
-        else:
-            df_display = df_display.iloc[0:0]
+  if actual_status == "Vướng mắc":
+    if "Vướng Mắc" in df_display.columns:
+      _iss = df_display["Vướng Mắc"].astype(str).str.strip().str.lower()
+      df_display = df_display[
+          (_iss != "")
+          & (_iss != "nan")
+          & (_iss != "none")
+          & (_iss != "null")
+      ]
     else:
-        if 'Tình trạng triển khai' in df_display.columns:
-            df_display = df_display[df_display['Tình trạng triển khai'] == actual_status]
+      df_display = df_display.iloc[0:0]
+  else:
+    if "Tình trạng triển khai" in df_display.columns:
+      df_display = df_display[
+          df_display["Tình trạng triển khai"] == actual_status
+      ]
 
 df_export = df_display.copy()
-for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
-    if col in df_display.columns: df_display = df_display.drop(columns=[col])
-    if col in df_export.columns: df_export = df_export.drop(columns=[col])
+for col in ["Ngày_Bat_Dau_Obj", "Ngày_Hoan_Thanh_Obj"]:
+  if col in df_display.columns:
+    df_display = df_display.drop(columns=[col])
+  if col in df_export.columns:
+    df_export = df_export.drop(columns=[col])
 
 # TIÊU ĐỀ BẢNG CHI TIẾT
-st.markdown("""
+st.markdown(
+    """
 <div class="title-card-center">
     <div style="font-size: 18px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2; text-align: center;">BẢNG CHI TIẾT CÔNG VIÊC</div>
 </div>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
+
 
 def generate_excel_with_colors(df_data):
-    output = io.BytesIO()
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        df_data.to_excel(writer, index=False, sheet_name='TienDo')
-    output.seek(0)
-    import openpyxl
-    from openpyxl.styles import PatternFill
-    wb = openpyxl.load_workbook(output)
-    ws = wb.active
-    green_fill = PatternFill(start_color="A5D6A7", end_color="A5D6A7", fill_type="solid")
-    red_fill = PatternFill(start_color="EF9A9A", end_color="EF9A9A", fill_type="solid")
-    gray_fill = PatternFill(start_color="ADB5BD", end_color="ADB5BD", fill_type="solid")
-    yellow_fill = PatternFill(start_color="FFEeba", end_color="FFEeba", fill_type="solid")
+  output = io.BytesIO()
+  with pd.ExcelWriter(output, engine="openpyxl") as writer:
+    df_data.to_excel(writer, index=False, sheet_name="TienDo")
+  output.seek(0)
+  import openpyxl
+  from openpyxl.styles import PatternFill
 
-    status_col_idx = None
-    vướng_col_idx = None
-    for col_idx, col_name in enumerate(df_data.columns, 1):
-        if col_name == 'Tình trạng triển khai': status_col_idx = col_idx
-        if col_name == 'Vướng Mắc': vướng_col_idx = col_idx
+  wb = openpyxl.load_workbook(output)
+  ws = wb.active
+  green_fill = PatternFill(
+      start_color="A5D6A7", end_color="A5D6A7", fill_type="solid"
+  )
+  red_fill = PatternFill(
+      start_color="EF9A9A", end_color="EF9A9A", fill_type="solid"
+  )
+  gray_fill = PatternFill(
+      start_color="ADB5BD", end_color="ADB5BD", fill_type="solid"
+  )
+  yellow_fill = PatternFill(
+      start_color="FFEeba", end_color="FFEeba", fill_type="solid"
+  )
 
-    for row_idx in range(2, ws.max_row + 1):
-        fill_to_use = None
-        
-        if vướng_col_idx:
-            v_val = str(ws.cell(row=row_idx, column=vướng_col_idx).value).strip().lower()
-            if v_val and v_val not in ['nan', 'none', '']:
-                fill_to_use = yellow_fill
+  status_col_idx = None
+  vướng_col_idx = None
+  for col_idx, col_name in enumerate(df_data.columns, 1):
+    if col_name == "Tình trạng triển khai":
+      status_col_idx = col_idx
+    if col_name == "Vướng Mắc":
+      vướng_col_idx = col_idx
 
-        if not fill_to_use and status_col_idx:
-            status_val = str(ws.cell(row=row_idx, column=status_col_idx).value).strip()
-            if status_val == 'Đã hoàn thành': fill_to_use = green_fill
-            elif status_val == 'Tạm dừng': fill_to_use = red_fill
-            elif status_val == 'Chưa triển khai': fill_to_use = gray_fill
+  for row_idx in range(2, ws.max_row + 1):
+    fill_to_use = None
 
-        if fill_to_use:
-            for col in range(1, ws.max_column + 1):
-                ws.cell(row=row_idx, column=col).fill = fill_to_use
+    if vướng_col_idx:
+      v_val = str(ws.cell(row=row_idx, column=vướng_col_idx).value).strip().lower()
+      if v_val and v_val not in ["nan", "none", ""]:
+        fill_to_use = yellow_fill
 
-    final_output = io.BytesIO()
-    wb.save(final_output)
-    return final_output.getvalue()
+    if not fill_to_use and status_col_idx:
+      status_val = str(ws.cell(row=row_idx, column=status_col_idx).value).strip()
+      if status_val == "Đã hoàn thành":
+        fill_to_use = green_fill
+      elif status_val == "Tạm dừng":
+        fill_to_use = red_fill
+      elif status_val == "Chưa triển khai":
+        fill_to_use = gray_fill
+
+    if fill_to_use:
+      for col in range(1, ws.max_column + 1):
+        ws.cell(row=row_idx, column=col).fill = fill_to_use
+
+  final_output = io.BytesIO()
+  wb.save(final_output)
+  return final_output.getvalue()
+
 
 try:
-    excel_bytes = generate_excel_with_colors(df_export)
-    b64 = base64.b64encode(excel_bytes).decode()
-    mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    filename = "Bao_cao_tien_do_Thien_Son.xlsx"
+  excel_bytes = generate_excel_with_colors(df_export)
+  b64 = base64.b64encode(excel_bytes).decode()
+  mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  filename = "Bao_cao_tien_do_Thien_Son.xlsx"
 except Exception:
-    csv_bytes = df_export.to_csv(index=False).encode('utf-8-sig')
-    b64 = base64.b64encode(csv_bytes).decode()
-    mime_type = "text/csv"
-    filename = "Bao_cao_tien_do_Thien_Son.csv"
+  csv_bytes = df_export.to_csv(index=False).encode("utf-8-sig")
+  b64 = base64.b64encode(csv_bytes).decode()
+  mime_type = "text/csv"
+  filename = "Bao_cao_tien_do_Thien_Son.csv"
 
 # NÚT TẢI EXCEL
 download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}">Tải Excel</a>'
 st.markdown(download_html, unsafe_allow_html=True)
 
-priority_map = {'Chưa triển khai': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
+priority_map = {
+    "Chưa triển khai": 1,
+    "Đang triển khai": 2,
+    "Đã hoàn thành": 3,
+    "Tạm dừng": 4,
+}
 
-if 'Tình trạng triển khai' in df_display.columns and 'Tiến Độ (%)' in df_display.columns:
-    df_display['Mức Ưu Tiên'] = df_display['Tình trạng triển khai'].map(priority_map).fillna(99)
-    sort_cols = ['Mức Ưu Tiên', 'Tiến Độ (%)']
-    if 'Hạng Mục' in df_display.columns: sort_cols = ['Hạng Mục'] + sort_cols
-    df_display = df_display.sort_values(by=sort_cols, ascending=[True] * len(sort_cols))
-    df_display = df_display.drop(columns=['Mức Ưu Tiên'])
+if (
+    "Tình trạng triển khai" in df_display.columns
+    and "Tiến Độ (%)" in df_display.columns
+):
+  df_display["Mức Ưu Tiên"] = (
+      df_display["Tình trạng triển khai"].map(priority_map).fillna(99)
+  )
+  sort_cols = ["Mức Ưu Tiên", "Tiến Độ (%)"]
+  if "Hạng Mục" in df_display.columns:
+    sort_cols = ["Hạng Mục"] + sort_cols
+  df_display = df_display.sort_values(
+      by=sort_cols, ascending=[True] * len(sort_cols)
+  )
+  df_display = df_display.drop(columns=["Mức Ưu Tiên"])
+
 
 def color_rows(row):
-    vm = str(row.get('Vướng Mắc', '')).strip().lower()
-    if vm and vm not in ['nan', 'none', '']:
-        return ['background-color: #FFEeba; color: #000;'] * len(row)
-        
-    status = row.get('Tình trạng triển khai', '')
-    if status == 'Đã hoàn thành': return ['background-color: #a5d6a7; color: #000;'] * len(row)
-    if status == 'Tạm dừng': return ['background-color: #ef9a9a; color: #000;'] * len(row)
-    if status == 'Chưa triển khai': return ['background-color: #adb5bd; color: #000;'] * len(row)
-    return ['background-color: #ffffff; color: #000;'] * len(row)
+  vm = str(row.get("Vướng Mắc", "")).strip().lower()
+  if vm and vm not in ["nan", "none", ""]:
+    return ["background-color: #FFEeba; color: #000;"] * len(row)
+
+  status = row.get("Tình trạng triển khai", "")
+  if status == "Đã hoàn thành":
+    return ["background-color: #a5d6a7; color: #000;"] * len(row)
+  if status == "Tạm dừng":
+    return ["background-color: #ef9a9a; color: #000;"] * len(row)
+  if status == "Chưa triển khai":
+    return ["background-color: #adb5bd; color: #000;"] * len(row)
+  return ["background-color: #ffffff; color: #000;"] * len(row)
+
 
 # ÁP DỤNG MÀU SẮC LÊN BẢNG VÀ CSS CHO TIÊU ĐỀ
 styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
-    'selector': 'th',
-    'props': [('background-color', '#e9d8fd'), ('color', '#000000'), ('font-weight', '800'), ('font-size', '15.5px'), ('text-transform', 'uppercase')]
+    "selector": "th",
+    "props": [
+        ("background-color", "#e9d8fd"),
+        ("color", "#000000"),
+        ("font-weight", "800"),
+        ("font-size", "15.5px"),
+        ("text-transform", "uppercase"),
+    ],
 }])
 
 # ẨN CỘT INDEX CỦA PANDAS ĐỂ BẢNG TRÔNG GỌN HƠN
 try:
-    styled_df = styled_df.hide(axis='index')
+  styled_df = styled_df.hide(axis="index")
 except Exception:
-    try:
-        styled_df = styled_df.hide_index()
-    except:
-        pass
+  try:
+    styled_df = styled_df.hide_index()
+  except:
+    pass
 
 # ================= RENDER BẢNG BẰNG TÙY CHỈNH HTML =================
 html_table = styled_df.to_html()
-html_table = html_table.replace('<table', '<table class="custom-table"')
-st.markdown(f'<div class="custom-table-wrapper">{html_table}</div>', unsafe_allow_html=True)
+html_table = html_table.replace("<table", '<table class="custom-table"')
+st.markdown(
+    f'<div class="custom-table-wrapper">{html_table}</div>',
+    unsafe_allow_html=True,
+)
