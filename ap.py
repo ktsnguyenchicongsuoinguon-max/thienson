@@ -44,15 +44,21 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-# ================= CSS TÙY CHỈNH CHUYÊN SÂU =================
+# ================= CSS TÙY CHỈNH CHUYÊN SÂU LÕI =================
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* KHÓA CUỘN TOÀN TRANG: ÉP TRANG WEB CỐ ĐỊNH, KHÔNG HIỆN THANH CUỘN BÊN NGOÀI */
-    html, body { overflow: hidden !important; margin: 0 !important; padding: 0 !important; height: 100vh !important; width: 100vw !important; }
-    [data-testid="stAppViewContainer"], [data-testid="stMain"] { overflow: hidden !important; height: 100vh !important; width: 100vw !important; }
+    /* 1. KHÓA CỨNG TRANG WEB: KHÔNG CHO CUỘN BÊN NGOÀI, GIỮ CỐ ĐỊNH 100% */
+    html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"] { 
+        overflow: hidden !important; 
+        margin: 0 !important; 
+        padding: 0 !important; 
+        height: 100vh !important; 
+        width: 100vw !important; 
+    }
     
-    ::-webkit-scrollbar { width: 8px !important; height: 8px !important; display: block !important; }
+    /* TÙY CHỈNH THANH CUỘN ĐẸP MẮT */
+    ::-webkit-scrollbar { width: 10px !important; height: 10px !important; display: block !important; }
     ::-webkit-scrollbar-track { background: transparent !important; }
     ::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.25) !important; border-radius: 10px !important; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.45) !important; }
@@ -61,7 +67,7 @@ st.markdown("""
     [data-testid="stHeaderActionElements"], .stAppDeployButton { display: none !important; }
     footer { display: none !important; }
 
-    /* BỘ LỌC SIDEBAR */
+    /* 2. CỐ ĐỊNH BỘ LỌC SIDEBAR - CÁCH VIỀN TRÊN, DƯỚI, TRÁI 30PX */
     [data-testid="stSidebar"] { background-color: transparent !important; border: none !important; }
     [data-testid="stSidebarResizer"] { display: none !important; }
     [data-testid="stSidebar"] > div:first-child {
@@ -69,14 +75,13 @@ st.markdown("""
         backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important;
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important; 
-        margin: 20px 0px 20px 20px !important; 
-        width: calc(100% - 20px) !important; 
-        height: calc(100vh - 40px) !important; 
+        margin: 30px 0px 30px 30px !important; /* Lề 30px */
+        width: calc(100% - 30px) !important; 
+        height: calc(100vh - 60px) !important; /* Trừ lề trên dưới 60px */
         overflow: hidden !important; 
     }
     [data-testid="stSidebarUserContent"] { padding: 5px 20px 20px 20px !important; overflow-y: auto !important; height: 100% !important; }
     
-    /* HIỆU ỨNG BÓNG ĐỔ CHO LOGO TRONG SIDEBAR */
     [data-testid="stSidebar"] img {
         filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.25)) drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.15)) !important;
         transition: transform 0.3s ease !important;
@@ -92,52 +97,45 @@ st.markdown("""
     }
     div.row-widget.stSelectbox, div.row-widget.stMultiSelect { margin-bottom: -5px !important; }
 
-    /* ================= KHUNG CHÍNH (CỐ ĐỊNH HOÀN TOÀN) ================= */
+    /* 3. KHỐI CHÍNH BÊN PHẢI (MAIN BLOCK) - CỐ ĐỊNH, CÁCH VIỀN 30PX Ở MỌI HƯỚNG */
     .block-container { 
         background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
-        width: calc(100% - 40px) !important; max-width: 100% !important; 
-        margin: 20px 20px !important; 
+        max-width: none !important; 
+        margin: 30px 30px 30px 30px !important; /* CÁCH ĐỀU 30PX KHẮP NƠI */
         padding: 25px 30px 30px 30px !important; 
-        height: calc(100vh - 40px) !important; /* GIỚI HẠN CHIỀU CAO CHÍNH XÁC */
-        max-height: calc(100vh - 40px) !important;
+        height: calc(100vh - 60px) !important; /* CHIỀU CAO CHÍNH XÁC KHI ĐÃ TRỪ 30PX TRÊN DƯỚI */
         display: flex !important; flex-direction: column !important; 
-        overflow: hidden !important; /* KHÓA CUỘN KHỐI CHÍNH */
+        overflow-y: auto !important; /* Chỉ cuộn toàn bộ khối này NẾU zoom quá to khiến nội dung đẩy bảng xuống */
+        overflow-x: hidden !important; 
     }
-    .block-container > div[data-testid="stVerticalBlock"] { 
-        flex-grow: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; height: 100% !important; 
-    }
-    .block-container > div[data-testid="stVerticalBlock"] > div { flex-shrink: 0 !important; }
+    .block-container > div[data-testid="stVerticalBlock"] { flex-grow: 1 !important; display: flex !important; flex-direction: column !important; min-height: 100% !important; }
     
-    /* ================= BẢNG CHI TIẾT TÙY CHỈNH THÔNG MINH ================= */
-    
-    /* Đảm bảo khung chứa hiển thị linh hoạt nhưng không ép mất bảng */
+    /* 4. SỬA LỖI MẤT CỘT VÀ THANH CUỘN BẢNG CHI TIẾT */
     div.element-container:has(.table-responsive-wrapper),
     .stMarkdown:has(.table-responsive-wrapper),
     div[data-testid="stMarkdownContainer"]:has(.table-responsive-wrapper) {
-        flex: 1 1 auto !important; 
+        flex-grow: 1 !important; 
+        display: flex !important; 
+        flex-direction: column !important; 
+        min-height: 400px !important; /* KHÓA BẢNG TỐI THIỂU 400PX ĐỂ KHÔNG BỊ ZOOM BÓP MẤT */
         width: 100% !important; 
-        min-height: 200px !important; /* Bảo vệ bảng không bị bóp nghẹt */
     }
     
-    /* FIX LỖI MẤT THANH CUỘN: Sử dụng chiều cao tối đa cụ thể để kích hoạt cuộn */
     .table-responsive-wrapper {
+        flex-grow: 1 !important; 
         width: 100% !important; 
-        max-width: 100% !important;
-        height: auto !important;
-        max-height: calc(100vh - 360px) !important; /* KÍCH HOẠT THANH CUỘN DỌC TẠI ĐÂY */
-        overflow-y: auto !important; 
-        overflow-x: auto !important; /* KÍCH HOẠT THANH CUỘN NGANG KHI ZOOM */
+        height: 100% !important; /* TỰ ĐỘNG ĐIỀN KÍN CHỖ TRỐNG CÒN LẠI DƯỚI CÙNG */
+        overflow: auto !important; /* LUÔN HIỆN THANH CUỘN NGANG VÀ DỌC Ở ĐÂY NẾU BẢNG LỚN HƠN */
         display: block !important;
         border-radius: 12px; 
         border: 1px solid rgba(255,255,255,0.5);
-        background-color: rgba(255, 255, 255, 0.45);
+        background-color: rgba(255, 255, 255, 0.65); /* Làm trắng sáng hơn để dễ đọc chữ */
         box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        margin-bottom: 0px !important; 
     }
     
     .custom-table { 
-        width: max-content !important; /* Cho bảng giãn ngang tự do để chống mất cột */
+        width: max-content !important; /* CỐT LÕI: Cho phép bảng rộng thoải mái -> Chống mất cột */
         min-width: 100% !important; 
         border-collapse: separate !important; 
         border-spacing: 0; 
@@ -145,24 +143,25 @@ st.markdown("""
         margin: 0 !important;
     }
     
+    /* TIÊU ĐỀ BẢNG TÍM NHẠT - CHỮ ĐEN - CĂN GIỮA - XUỐNG DÒNG THÔNG MINH */
     .custom-table thead th {
-        background-color: #e9d8fd !important; /* MÀU TÍM NHẠT */
-        color: #000000 !important; /* CHỮ ĐEN */
+        background-color: #e9d8fd !important; 
+        color: #000000 !important; 
         font-weight: 800 !important; 
-        font-size: 15px !important; 
-        text-transform: uppercase !important; /* VIẾT HOA TOÀN BỘ */
+        font-size: 15.5px !important; 
+        text-transform: uppercase !important; /* CHỮ VIẾT HOA */
         position: sticky !important; 
         top: 0 !important; 
         z-index: 10 !important; 
         padding: 12px 10px !important; 
-        text-align: center !important; 
+        text-align: center !important; /* CĂN GIỮA */
         vertical-align: middle !important; 
         border-bottom: 2px solid #d6bcfa !important; 
         border-right: 1px solid rgba(0,0,0,0.05) !important; 
         white-space: normal !important; 
         word-wrap: break-word !important; 
-        min-width: 160px !important; /* Chống mất cột khi màn hình thu nhỏ */
-        max-width: 250px !important; /* Giới hạn ép chữ rớt thành 2 dòng */
+        min-width: 150px !important; /* CHỐNG MẤT CỘT: Cột sẽ không bao giờ nhỏ hơn 150px */
+        max-width: 250px !important; /* ÉP TIÊU ĐỀ RỚT XUỐNG DÒNG (Chỉ tối đa 2 dòng) */
         line-height: 1.3 !important;
     }
     
@@ -171,15 +170,15 @@ st.markdown("""
         font-size: 13.5px !important; 
         border-bottom: 1px solid rgba(0,0,0,0.05) !important;
         border-right: 1px solid rgba(0,0,0,0.05); 
-        white-space: normal !important; /* ÉP XUỐNG DÒNG */
+        white-space: normal !important; 
         word-wrap: break-word !important; 
         overflow-wrap: break-word !important; 
         vertical-align: middle !important; 
-        min-width: 160px !important; 
-        max-width: 350px !important;
+        min-width: 150px !important; 
+        max-width: 350px !important; /* ÉP NỘI DUNG XUỐNG DÒNG */
     }
     
-    /* CĂN GIỮA TUYỆT ĐỐI KHUNG TIÊU ĐỀ */
+    /* CĂN GIỮA TUYỆT ĐỐI KHUNG TIÊU ĐỀ BÁO CÁO CÔNG VIỆC */
     .title-card-center { 
         border-radius: 16px; 
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.05); 
@@ -223,7 +222,6 @@ def load_data():
     sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
     try:
         df = pd.read_csv(sheet_url)
-        # LOẠI BỎ CÁC CỘT RỖNG VÀ LỖI UNNAMED ĐỂ ĐẢM BẢO KHÔNG BỊ RÁC BẢNG
         df = df.dropna(how='all', axis=1)
         df = df.loc[:, ~df.columns.str.contains('^unnamed', case=False, na=False)]
     except Exception:
@@ -231,7 +229,6 @@ def load_data():
     
     df.columns = df.columns.str.strip()
     
-    # THUẬT TOÁN NHẬN DIỆN CỘT THÔNG MINH - CHỐNG GHI ĐÈ 1-1 (HIỂN THỊ ĐỦ 100% CỘT)
     rename_dict = {}
     seen_targets = set()
     
@@ -267,7 +264,6 @@ def load_data():
             if not any(kw in c_low for kw in ['%', 'tiến độ', 'trạng thái', 'tình trạng']):
                 target = 'Ngày Hoàn Thành'
                 
-        # Chỉ cập nhật nếu tên mục tiêu chưa được gắn cho cột nào trước đó (Chống gộp cột/mất cột)
         if target and target not in seen_targets:
             rename_dict[col] = target
             seen_targets.add(target)
@@ -275,7 +271,6 @@ def load_data():
     df.rename(columns=rename_dict, inplace=True)
     df = df.loc[:, ~df.columns.duplicated()]
     
-    # LÀM SẠCH VÀ ĐỒNG NHẤT DỮ LIỆU TÌNH TRẠNG TRIỂN KHAI
     if 'Tình trạng triển khai' in df.columns:
         def clean_status(x):
             val = str(x).strip().lower()
@@ -287,7 +282,6 @@ def load_data():
         
         df['Tình trạng triển khai'] = df['Tình trạng triển khai'].apply(clean_status)
 
-    # FORWARD FILL ĐỂ XỬ LÝ CÁC Ô GỘP (MERGE CELLS) TRONG GOOGLE SHEETS
     cols_to_fill = ['Mã Dự Án', 'Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục', 'Chủ nhiệm dự án', 'Chuyên viên thực hiện']
     for col in cols_to_fill:
         if col in df.columns: 
@@ -302,7 +296,6 @@ def load_data():
         
     return df
 
-# LƯU TRỮ VÀ CẬP NHẬT DỮ LIỆU (TỰ LÀM MỚI KHI F5 DO KHÔNG DÙNG ST.CACHE)
 if 'raw_data' not in st.session_state:
     with st.spinner("⏳ Đang tải dữ liệu mới nhất từ Google Sheets..."):
         st.session_state.raw_data = load_data()
@@ -561,7 +554,7 @@ if 'Tình trạng triển khai' in df_display.columns and 'Tiến Độ (%)' in 
     df_display = df_display.drop(columns=['Mức Ưu Tiên'])
 
 def color_rows(row):
-    # Dùng chữ in hoa vì sau đây ta ép tên cột là in hoa
+    # Trích xuất dữ liệu mượt mà, chống lỗi chữ in hoa/thường
     vm = str(row.get('VƯỚNG MẮC', '')).strip().lower()
     if vm and vm not in ['nan', 'none', '']:
         return ['background-color: #FFEeba; color: #000;'] * len(row)
@@ -572,7 +565,7 @@ def color_rows(row):
     if status == 'Chưa triển khai': return ['background-color: #adb5bd; color: #000;'] * len(row)
     return ['background-color: #ffffff; color: #000;'] * len(row)
 
-# ÉP TÊN CỘT THÀNH IN HOA NGAY TRƯỚC KHI TÔ MÀU ĐỂ MAP ĐÚNG TÊN
+# ĐẨY TOÀN BỘ TIÊU ĐỀ THÀNH CHỮ IN HOA TRƯỚC KHI ÁP DỤNG MÀU
 df_display.columns = df_display.columns.str.upper()
 
 styled_df = df_display.style.apply(color_rows, axis=1)
@@ -589,6 +582,7 @@ except Exception:
 html_table = styled_df.to_html()
 html_table = html_table.replace('<table', '<table class="custom-table"')
 
+# GÓI BẢNG VÀO TRONG KHUNG HTML ĐỂ BẢO VỆ THANH CUỘN VÀ CHỐNG TRÀN
 final_html = f"""
 <div class="table-responsive-wrapper">
     {html_table}
