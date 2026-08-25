@@ -237,7 +237,7 @@ with st.sidebar:
 
 st.markdown("""
 <div class="title-card" style="padding: 8px 25px; margin-top: 0px; margin-bottom: 15px;">
-    <div style="font-size: 26px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">TỔNG HỢP CÔNG VIỆC VÀ KẾ HOẠCH TRIỂN KHAI PTK</div>
+    <div style="font-size: 26px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2;">BÁO CÁO CÔNG VIỆC - PHÒNG THIẾT KẾ</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -323,11 +323,14 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
     if col in df_display.columns: df_display = df_display.drop(columns=[col])
     if col in df_export.columns: df_export = df_export.drop(columns=[col])
 
-st.markdown("""
-<div class="title-card" style="padding: 6px 20px; margin-top: 15px; margin-bottom: 15px;">
-    <div style="font-size: 18px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2;">BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</div>
-</div>
-""", unsafe_allow_html=True)
+# THANH TIÊU ĐỀ VÀ NÚT TẢI EXCEL
+col_t1, col_t2 = st.columns([5, 1])
+with col_t1:
+    st.markdown("""
+    <div class="title-card" style="padding: 6px 20px; margin-top: 10px; margin-bottom: 10px; margin-left: 0;">
+        <div style="font-size: 18px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2;">BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</div>
+    </div>
+    """, unsafe_allow_html=True)
 
 def generate_excel_with_colors(df_data):
     output = io.BytesIO()
@@ -371,19 +374,21 @@ def generate_excel_with_colors(df_data):
     wb.save(final_output)
     return final_output.getvalue()
 
-try:
-    excel_bytes = generate_excel_with_colors(df_export)
-    b64 = base64.b64encode(excel_bytes).decode()
-    mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    filename = "Bao_cao_tien_do_Thien_Son.xlsx"
-except Exception:
-    csv_bytes = df_export.to_csv(index=False).encode('utf-8-sig')
-    b64 = base64.b64encode(csv_bytes).decode()
-    mime_type = "text/csv"
-    filename = "Bao_cao_tien_do_Thien_Son.csv"
+with col_t2:
+    st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
+    try:
+        excel_bytes = generate_excel_with_colors(df_export)
+        b64 = base64.b64encode(excel_bytes).decode()
+        mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        filename = "Bao_cao_tien_do_Thien_Son.xlsx"
+    except Exception:
+        csv_bytes = df_export.to_csv(index=False).encode('utf-8-sig')
+        b64 = base64.b64encode(csv_bytes).decode()
+        mime_type = "text/csv"
+        filename = "Bao_cao_tien_do_Thien_Son.csv"
 
-download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}">Tải Excel</a>'
-st.markdown(download_html, unsafe_allow_html=True)
+    download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}">📥 Tải Excel</a>'
+    st.markdown(download_html, unsafe_allow_html=True)
 
 priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
 
