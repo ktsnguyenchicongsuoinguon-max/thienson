@@ -94,7 +94,7 @@ st.markdown("""
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         width: calc(100% - 40px) !important; max-width: 100% !important; 
         margin: 20px 20px !important; 
-        padding: 25px 30px 30px 30px !important; /* Lớp đệm dưới 30px */
+        padding: 25px 30px 30px 30px !important; 
         height: calc(100vh - 40px) !important; 
         display: flex !important; flex-direction: column !important; overflow: hidden !important; 
     }
@@ -111,7 +111,7 @@ st.markdown("""
     
     .custom-table-wrapper {
         width: 100% !important; 
-        max-height: calc(100vh - 355px) !important; /* Tự động giới hạn chiều cao để nhường chỗ cho lề 30px ở đáy */
+        max-height: calc(100vh - 355px) !important; 
         overflow-y: auto !important; 
         overflow-x: auto !important; 
         border-radius: 12px; 
@@ -133,16 +133,17 @@ st.markdown("""
         margin: 0 !important;
     }
     .custom-table thead th {
-        background-color: #e2e8f0 !important; /* MÀU GHI NHẠT CHO TIÊU ĐỀ */
+        background-color: #e9d8fd !important; /* MÀU TÍM NHẠT CHO TIÊU ĐỀ */
         color: #000000 !important; /* CHỮ MÀU ĐEN */
         font-weight: 800 !important; 
         font-size: 15.5px !important; /* TĂNG KÍCH THƯỚC CHỮ LÊN 1 CHÚT */
+        text-transform: uppercase !important; /* CHỮ VIẾT HOA */
         position: sticky !important; 
         top: 0 !important; 
         z-index: 10 !important; 
         padding: 12px 10px !important; 
         text-align: left !important;
-        border-bottom: 2px solid #cbd5e1 !important; 
+        border-bottom: 2px solid #d6bcfa !important; 
         border-right: 1px solid rgba(0,0,0,0.05) !important; 
         white-space: nowrap !important; 
     }
@@ -540,10 +541,10 @@ def color_rows(row):
     if status == 'Chưa triển khai': return ['background-color: #adb5bd; color: #000;'] * len(row)
     return ['background-color: #ffffff; color: #000;'] * len(row)
 
-# ÁP DỤNG MÀU SẮC LÊN BẢNG 
+# ÁP DỤNG MÀU SẮC LÊN BẢNG VÀ CSS CHO TIÊU ĐỀ
 styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
     'selector': 'th',
-    'props': [('background-color', '#e2e8f0'), ('color', '#000000'), ('font-weight', '800'), ('font-size', '15.5px')]
+    'props': [('background-color', '#e9d8fd'), ('color', '#000000'), ('font-weight', '800'), ('font-size', '15.5px'), ('text-transform', 'uppercase')]
 }])
 
 # ẨN CỘT INDEX CỦA PANDAS ĐỂ BẢNG TRÔNG GỌN HƠN
