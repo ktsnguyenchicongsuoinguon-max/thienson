@@ -171,9 +171,9 @@ def load_data():
         elif c_low in ['đầu việc', 'đầu việc shopdrawing', 'hạng mục']: rename_dict[col] = 'Hạng Mục'
         elif c_low in ['ghi chú', 'vướng mắc', 'ý kiến', 'vuong mac', 'ghi chu', 'note', 'ghi chú/vướng mắc']: rename_dict[col] = 'Vướng Mắc'
         elif c_low == 'dự án': rename_dict[col] = 'Dự Án'
-        elif c_low in ['cán bộ quản lý', 'người quản lý']: rename_dict[col] = 'Cán Bộ Quản Lý'
+        elif c_low in ['cán bộ quản lý', 'người quản lý', 'trưởng nhóm -cnda', 'trưởng nhóm - cnda', 'trưởng nhóm']: rename_dict[col] = 'Trưởng nhóm -CNDA'
         elif c_low in ['hợp đồng - plhđ', 'hợp đồng', 'số hợp đồng', 'hợp đồng plhđ']: rename_dict[col] = 'Hợp Đồng - PLHĐ'
-        elif c_low in ['cán bộ triển khai - sđt', 'người triển khai', 'cán bộ triển khai']: rename_dict[col] = 'Cán Bộ Triển Khai - SĐT'
+        elif c_low in ['cán bộ triển khai - sđt', 'người triển khai', 'cán bộ triển khai', 'chuyên viên thực hiện']: rename_dict[col] = 'Chuyên viên thực hiện'
             
     df.rename(columns=rename_dict, inplace=True)
     df = df.loc[:, ~df.columns.duplicated()]
@@ -219,14 +219,14 @@ with st.sidebar:
     selected_hm = st.multiselect("HẠNG MỤC", options=hm_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
     if selected_hm: df_temp = df_temp[df_temp['Hạng Mục'].isin(selected_hm)]
 
-    ql_opts = [x for x in df_temp.get('Cán Bộ Quản Lý', pd.Series()).unique() if x != ''] if 'Cán Bộ Quản Lý' in df_temp.columns else []
-    st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">manage_accounts</span> CÁN BỘ QUẢN LÝ</div>', unsafe_allow_html=True)
-    selected_ql = st.multiselect("CÁN BỘ QUẢN LÝ", options=ql_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
+    ql_opts = [x for x in df_temp.get('Trưởng nhóm -CNDA', pd.Series()).unique() if x != ''] if 'Trưởng nhóm -CNDA' in df_temp.columns else []
+    st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">manage_accounts</span> TRƯỞNG NHÓM -CNDA</div>', unsafe_allow_html=True)
+    selected_ql = st.multiselect("TRƯỞNG NHÓM -CNDA", options=ql_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
 
-    cb_col = 'Cán Bộ Triển Khai - SĐT' if 'Cán Bộ Triển Khai - SĐT' in df_temp.columns else ('Người Triển Khai' if 'Người Triển Khai' in df_temp.columns else None)
+    cb_col = 'Chuyên viên thực hiện' if 'Chuyên viên thực hiện' in df_temp.columns else None
     cb_opts = [x for x in df_temp[cb_col].unique() if x != ''] if cb_col else []
-    st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">engineering</span> CÁN BỘ TRIỂN KHAI</div>', unsafe_allow_html=True)
-    selected_cb = st.multiselect("CÁN BỘ TRIỂN KHAI", options=cb_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
+    st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">engineering</span> CHUYÊN VIÊN THỰC HIỆN</div>', unsafe_allow_html=True)
+    selected_cb = st.multiselect("CHUYÊN VIÊN THỰC HIỆN", options=cb_opts, placeholder="Chọn Tất cả", label_visibility="collapsed")
 
     st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">calendar_month</span> KHOẢNG THỜI GIAN</div>', unsafe_allow_html=True)
     time_filter = st.selectbox("KHOẢNG THỜI GIAN", 
@@ -271,7 +271,7 @@ if start_date and end_date and 'Ngày_Bat_Dau_Obj' in df_display.columns and 'Ng
 if selected_projects and 'Dự Án' in df_display.columns: df_display = df_display[df_display['Dự Án'].isin(selected_projects)]
 if selected_hd and 'Hợp Đồng - PLHĐ' in df_display.columns: df_display = df_display[df_display['Hợp Đồng - PLHĐ'].isin(selected_hd)]
 if selected_hm and 'Hạng Mục' in df_display.columns: df_display = df_display[df_display['Hạng Mục'].isin(selected_hm)]
-if selected_ql and 'Cán Bộ Quản Lý' in df_display.columns: df_display = df_display[df_display['Cán Bộ Quản Lý'].isin(selected_ql)]
+if selected_ql and 'Trưởng nhóm -CNDA' in df_display.columns: df_display = df_display[df_display['Trưởng nhóm -CNDA'].isin(selected_ql)]
 if selected_cb and cb_col in df_display.columns: df_display = df_display[df_display[cb_col].isin(selected_cb)]
 
 # --- TÍNH TOÁN 10 CHỈ SỐ KPI ---
@@ -342,7 +342,7 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
     if col in df_display.columns: df_display = df_display.drop(columns=[col])
     if col in df_export.columns: df_export = df_export.drop(columns=[col])
 
-# TIÊU ĐỀ BẢNG CHI TIẾT ĐÃ ĐƯỢC CĂN GIỮA VÀ ĐỔI TÊN
+# TIÊU ĐỀ BẢNG CHI TIẾT
 st.markdown("""
 <div class="title-card-center">
     <div style="font-size: 18px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2; text-align: center;">BẢNG CHI TIẾT CÔNG VIÊC</div>
@@ -402,7 +402,7 @@ except Exception:
     mime_type = "text/csv"
     filename = "Bao_cao_tien_do_Thien_Son.csv"
 
-# TRẢ LẠI CHỮ TẢI EXCEL KẾ BÊN PHẢI TIÊU ĐỀ
+# NÚT TẢI EXCEL
 download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}">Tải Excel</a>'
 st.markdown(download_html, unsafe_allow_html=True)
 
