@@ -134,6 +134,22 @@ st.markdown("""
 
     .custom-download-link { display: block; float: right; text-align: right; color: #0A3622 !important; font-size: 13.5px !important; font-weight: 700 !important; text-decoration: none !important; margin-top: -30px !important; margin-right: 0px !important; margin-bottom: 5px !important; position: relative; z-index: 9999; cursor: pointer; }
     .custom-download-link:hover { color: #198754 !important; text-decoration: underline !important; }
+    
+    /* NÚT TẢI EXCEL VÀ LÀM MỚI DỮ LIỆU */
+    div[data-testid="stButton"] button {
+        background-color: rgba(25, 135, 84, 0.85) !important;
+        color: white !important;
+        border-radius: 10px !important;
+        font-weight: bold !important;
+        font-size: 13px !important;
+        border: 1px solid rgba(255,255,255,0.5) !important;
+        padding: 4px 12px !important;
+        min-height: 32px !important;
+    }
+    div[data-testid="stButton"] button:hover {
+        background-color: rgba(25, 135, 84, 1) !important;
+        box-shadow: 0 4px 10px rgba(25, 135, 84, 0.3) !important;
+    }
 
     /* 10 Ô KPI */
     .kpi-card { width: 100%; padding: 10px 12px; border-radius: 18px !important; border: 1px solid rgba(255, 255, 255, 0.4) !important; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 10px; min-height: 85px; background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden !important; }
@@ -153,6 +169,7 @@ st.markdown("""
 
 
 # ================= 2. ĐỌC DỮ LIỆU TỪ GOOGLE SHEETS =================
+# LƯU Ý: Đã gỡ bỏ @st.cache_data để file luôn cập nhật mới nhất khi tải lại
 def load_data():
     sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
     try:
@@ -172,6 +189,9 @@ def load_data():
             rename_dict[col] = 'Tình trạng triển khai'
         elif any(kw in c_low for kw in ['tiến độ', '%']): 
             rename_dict[col] = 'Tiến Độ (%)'
+        elif any(kw in c_low for kw in ['đầu việc', 'công việc', 'task']):
+            if not any(kw in c_low for kw in ['trạng thái', 'tình trạng', 'tiến độ', 'mức']):
+                rename_dict[col] = 'Đầu Việc'
         elif any(kw in c_low for kw in ['hạng mục', 'gói thầu']): 
             rename_dict[col] = 'Hạng Mục'
         elif any(kw in c_low for kw in ['vướng mắc', 'ghi chú', 'ý kiến', 'note', 'lý do']): 
@@ -192,9 +212,6 @@ def load_data():
         elif any(kw in c_low for kw in ['hoàn thành', 'kết thúc', 'deadline', 'mục tiêu', 'hạn chót']):
             if not any(kw in c_low for kw in ['%', 'tiến độ', 'trạng thái', 'tình trạng']):
                 rename_dict[col] = 'Ngày Hoàn Thành'
-        elif any(kw in c_low for kw in ['đầu việc', 'nội dung', 'công việc', 'task']):
-            if not any(kw in c_low for kw in ['trạng thái', 'tình trạng', 'tiến độ', 'mức']):
-                rename_dict[col] = 'Đầu Việc'
             
     df.rename(columns=rename_dict, inplace=True)
     df = df.loc[:, ~df.columns.duplicated()]
@@ -215,7 +232,7 @@ def load_data():
         
     return df
 
-# SỬ DỤNG SESSION STATE ĐỂ CHỈ CẬP NHẬT GOOGLE SHEET KHI BẤM F5
+# SỬ DỤNG SESSION STATE ĐỂ CHỈ CẬP NHẬT GOOGLE SHEET KHI BẤM F5 HOẶC NÚT LÀM MỚI
 if 'raw_data' not in st.session_state:
     with st.spinner("⏳ Đang tải dữ liệu mới nhất từ Google Sheets..."):
         st.session_state.raw_data = load_data()
@@ -228,7 +245,14 @@ with st.sidebar:
     with col_logo2:
         st.image("logothienson.png", use_container_width=True) 
         
-    st.markdown("<h3 style='text-align: left; margin-top: 5px; margin-bottom: 5px; color: #0f172a; font-size: 15px;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-top: 15px;'></div>", unsafe_allow_html=True)
+    
+    # NÚT LÀM MỚI DỮ LIỆU
+    if st.button("🔄 LÀM MỚI DỮ LIỆU", use_container_width=True):
+        st.session_state.pop('raw_data', None)
+        st.rerun()
+        
+    st.markdown("<h3 style='text-align: left; margin-top: 15px; margin-bottom: 5px; color: #0f172a; font-size: 15px;'>BỘ LỌC DỮ LIỆU</h3>", unsafe_allow_html=True)
     
     unique_projects = [str(p) for p in df['Dự Án'].unique() if pd.notna(p) and str(p).strip() != '' and str(p).lower() != 'nan'] if 'Dự Án' in df.columns else []
     st.markdown('<div class="sidebar-title"><span class="material-symbols-rounded">domain</span> DỰ ÁN</div>', unsafe_allow_html=True)
