@@ -134,6 +134,22 @@ st.markdown("""
 
     .custom-download-link { display: block; float: right; text-align: right; color: #0A3622 !important; font-size: 13.5px !important; font-weight: 700 !important; text-decoration: none !important; margin-top: -30px !important; margin-right: 0px !important; margin-bottom: 5px !important; position: relative; z-index: 9999; cursor: pointer; }
     .custom-download-link:hover { color: #198754 !important; text-decoration: underline !important; }
+    
+    /* NÚT TẢI EXCEL VÀ LÀM MỚI DỮ LIỆU */
+    div[data-testid="stButton"] button {
+        background-color: rgba(25, 135, 84, 0.85) !important;
+        color: white !important;
+        border-radius: 10px !important;
+        font-weight: bold !important;
+        font-size: 13px !important;
+        border: 1px solid rgba(255,255,255,0.5) !important;
+        padding: 4px 12px !important;
+        min-height: 32px !important;
+    }
+    div[data-testid="stButton"] button:hover {
+        background-color: rgba(25, 135, 84, 1) !important;
+        box-shadow: 0 4px 10px rgba(25, 135, 84, 0.3) !important;
+    }
 
     /* 10 Ô KPI */
     .kpi-card { width: 100%; padding: 10px 12px; border-radius: 18px !important; border: 1px solid rgba(255, 255, 255, 0.4) !important; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 10px; min-height: 85px; background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden !important; }
@@ -162,9 +178,7 @@ def load_data():
     
     df.columns = df.columns.str.strip()
     
-    # -------------------------------------------------------------
-    # THUẬT TOÁN NHẬN DIỆN CỘT THÔNG MINH (DỰA TRÊN TỪ KHÓA)
-    # -------------------------------------------------------------
+    # THUẬT TOÁN NHẬN DIỆN CỘT THÔNG MINH
     rename_dict = {}
     for col in df.columns:
         c_low = str(col).lower().strip()
@@ -174,7 +188,7 @@ def load_data():
             rename_dict[col] = 'Tiến Độ (%)'
         elif any(kw in c_low for kw in ['đầu việc', 'công việc', 'task']):
             if not any(kw in c_low for kw in ['trạng thái', 'tình trạng', 'tiến độ', 'mức']):
-                rename_dict[col] = 'Công việc triển khai' # CẬP NHẬT TÊN MỚI THEO YÊU CẦU
+                rename_dict[col] = 'Công việc triển khai' 
         elif any(kw in c_low for kw in ['hạng mục', 'gói thầu']): 
             rename_dict[col] = 'Hạng Mục'
         elif any(kw in c_low for kw in ['vướng mắc', 'ghi chú', 'ý kiến', 'note', 'lý do']): 
@@ -198,8 +212,22 @@ def load_data():
             
     df.rename(columns=rename_dict, inplace=True)
     df = df.loc[:, ~df.columns.duplicated()]
+    
+    # -------------------------------------------------------------
+    # SỬA LỖI: LÀM SẠCH VÀ ĐỒNG NHẤT DỮ LIỆU TÌNH TRẠNG TRIỂN KHAI
+    # -------------------------------------------------------------
+    if 'Tình trạng triển khai' in df.columns:
+        def clean_status(x):
+            val = str(x).strip().lower()
+            if val in ['hoàn thành', 'đã hoàn thành', 'done', 'hoàn tất']: return 'Đã hoàn thành'
+            if val in ['chưa bắt đầu', 'chưa triển khai', 'not started']: return 'Chưa triển khai'
+            if val in ['đang triển khai', 'đang thực hiện', 'in progress']: return 'Đang triển khai'
+            if val in ['tạm dừng', 'pending', 'pause']: return 'Tạm dừng'
+            return str(x).strip() # Giữ nguyên nếu không thuộc các trường hợp trên
         
-    # FORWARD FILL ĐỂ XỬ LÝ CÁC Ô GỘP (MERGE CELLS) TRONG GOOGLE SHEETS
+        df['Tình trạng triển khai'] = df['Tình trạng triển khai'].apply(clean_status)
+
+    # FORWARD FILL ĐỂ XỬ LÝ CÁC Ô GỘP (MERGE CELLS)
     cols_to_fill = ['Mã Dự Án', 'Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục', 'Chủ nhiệm dự án', 'Chuyên viên thực hiện']
     for col in cols_to_fill:
         if col in df.columns: 
@@ -207,7 +235,6 @@ def load_data():
             
     df = df.fillna('') 
     
-    # XỬ LÝ ĐỊNH DẠNG NGÀY THÁNG LINH HOẠT HƠN
     if 'Ngày Bắt Đầu' in df.columns: 
         df['Ngày_Bat_Dau_Obj'] = pd.to_datetime(df['Ngày Bắt Đầu'].astype(str).str.strip(), dayfirst=True, errors='coerce')
     if 'Ngày Hoàn Thành' in df.columns: 
@@ -215,7 +242,7 @@ def load_data():
         
     return df
 
-# SỬ DỤNG SESSION STATE ĐỂ CHỈ CẬP NHẬT GOOGLE SHEET KHI BẤM F5 HOẶC NÚT LÀM MỚI
+# LƯU TRỮ VÀ CẬP NHẬT DỮ LIỆU
 if 'raw_data' not in st.session_state:
     with st.spinner("⏳ Đang tải dữ liệu mới nhất từ Google Sheets..."):
         st.session_state.raw_data = load_data()
@@ -230,7 +257,6 @@ with st.sidebar:
         
     st.markdown("<div style='margin-top: 15px;'></div>", unsafe_allow_html=True)
     
-    # NÚT LÀM MỚI DỮ LIỆU
     if st.button("🔄 LÀM MỚI DỮ LIỆU", use_container_width=True):
         st.session_state.pop('raw_data', None)
         st.rerun()
@@ -311,7 +337,7 @@ if selected_hm and 'Hạng Mục' in df_display.columns: df_display = df_display
 if selected_ql and 'Chủ nhiệm dự án' in df_display.columns: df_display = df_display[df_display['Chủ nhiệm dự án'].astype(str).isin(selected_ql)]
 if selected_cb and 'Chuyên viên thực hiện' in df_display.columns: df_display = df_display[df_display['Chuyên viên thực hiện'].astype(str).isin(selected_cb)]
 
-# --- TÍNH TOÁN 10 CHỈ SỐ KPI ĐẢM BẢO KHÔNG TRÙNG LẶP ---
+# --- TÍNH TOÁN 10 CHỈ SỐ KPI ---
 p_projects = 0
 if 'Dự Án' in df_display.columns:
     _prjs = df_display['Dự Án'].astype(str).str.strip().str.upper()
@@ -338,10 +364,10 @@ else:
     p_prog = 0
 
 if 'Tình trạng triển khai' in df_display.columns:
-    p_done = len(df_display[df_display['Tình trạng triển khai'].astype(str).str.strip() == 'Đã hoàn thành'])
-    p_inprogress = len(df_display[df_display['Tình trạng triển khai'].astype(str).str.strip() == 'Đang triển khai'])
-    p_notstarted = len(df_display[df_display['Tình trạng triển khai'].astype(str).str.strip() == 'Chưa bắt đầu'])
-    p_paused = len(df_display[df_display['Tình trạng triển khai'].astype(str).str.strip() == 'Tạm dừng'])
+    p_done = len(df_display[df_display['Tình trạng triển khai'] == 'Đã hoàn thành'])
+    p_inprogress = len(df_display[df_display['Tình trạng triển khai'] == 'Đang triển khai'])
+    p_notstarted = len(df_display[df_display['Tình trạng triển khai'] == 'Chưa triển khai'])
+    p_paused = len(df_display[df_display['Tình trạng triển khai'] == 'Tạm dừng'])
 else:
     p_done = p_inprogress = p_notstarted = p_paused = 0
 
@@ -376,16 +402,13 @@ with r1_c5: st.markdown(render_transparent_shadow_kpi("Tiến độ TB", f"{p_pr
 r2_c1, r2_c2, r2_c3, r2_c4, r2_c5 = st.columns(5)
 with r2_c1: st.markdown(render_transparent_shadow_kpi("Đã hoàn thành", p_done, "check_circle"), unsafe_allow_html=True)
 with r2_c2: st.markdown(render_transparent_shadow_kpi("Đang triển khai", p_inprogress, "sync"), unsafe_allow_html=True)
-with r2_c3: st.markdown(render_transparent_shadow_kpi("Chưa bắt đầu", p_notstarted, "hourglass_empty"), unsafe_allow_html=True)
+with r2_c3: st.markdown(render_transparent_shadow_kpi("Chưa triển khai", p_notstarted, "hourglass_empty"), unsafe_allow_html=True)
 with r2_c4: st.markdown(render_transparent_shadow_kpi("Tạm dừng", p_paused, "pause_circle"), unsafe_allow_html=True)
 with r2_c5: st.markdown(render_transparent_shadow_kpi("Vướng mắc", p_issues, "error"), unsafe_allow_html=True)
 
-status_options = ["Tất cả", "Chưa bắt đầu", "Đang triển khai", "Đã hoàn thành", "Tạm dừng", "Vướng mắc"]
+status_options = ["Tất cả", "Chưa triển khai", "Đang triển khai", "Đã hoàn thành", "Tạm dừng", "Vướng mắc"]
 actual_status = st.radio("Bộ lọc Trạng Thái", options=status_options, horizontal=True, label_visibility="collapsed")
 
-# -------------------------------------------------------------
-# SỬA LỖI: LỌC TRẠNG THÁI CHÍNH XÁC VỚI LOẠI BỎ KHOẢNG TRẮNG
-# -------------------------------------------------------------
 if actual_status != "Tất cả":
     if actual_status == "Vướng mắc":
         if 'Vướng Mắc' in df_display.columns:
@@ -395,7 +418,7 @@ if actual_status != "Tất cả":
             df_display = df_display.iloc[0:0]
     else:
         if 'Tình trạng triển khai' in df_display.columns:
-            df_display = df_display[df_display['Tình trạng triển khai'].astype(str).str.strip() == actual_status]
+            df_display = df_display[df_display['Tình trạng triển khai'] == actual_status]
 
 df_export = df_display.copy()
 for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
@@ -441,7 +464,7 @@ def generate_excel_with_colors(df_data):
             status_val = str(ws.cell(row=row_idx, column=status_col_idx).value).strip()
             if status_val == 'Đã hoàn thành': fill_to_use = green_fill
             elif status_val == 'Tạm dừng': fill_to_use = red_fill
-            elif status_val == 'Chưa bắt đầu': fill_to_use = gray_fill
+            elif status_val == 'Chưa triển khai': fill_to_use = gray_fill
 
         if fill_to_use:
             for col in range(1, ws.max_column + 1):
@@ -466,7 +489,7 @@ except Exception:
 download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}">Tải Excel</a>'
 st.markdown(download_html, unsafe_allow_html=True)
 
-priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
+priority_map = {'Chưa triển khai': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
 
 if 'Tình trạng triển khai' in df_display.columns and 'Tiến Độ (%)' in df_display.columns:
     df_display['Mức Ưu Tiên'] = df_display['Tình trạng triển khai'].map(priority_map).fillna(99)
@@ -483,7 +506,7 @@ def color_rows(row):
     status = row.get('Tình trạng triển khai', '')
     if status == 'Đã hoàn thành': return ['background-color: #a5d6a7; color: #000;'] * len(row)
     if status == 'Tạm dừng': return ['background-color: #ef9a9a; color: #000;'] * len(row)
-    if status == 'Chưa bắt đầu': return ['background-color: #adb5bd; color: #000;'] * len(row)
+    if status == 'Chưa triển khai': return ['background-color: #adb5bd; color: #000;'] * len(row)
     return ['background-color: #ffffff; color: #000;'] * len(row)
 
 styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
