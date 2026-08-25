@@ -48,7 +48,6 @@ else:
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* KHẮC PHỤC LỖI MẤT CỘT KHI ZOOM: Gỡ bỏ overflow hidden ép cứng màn hình */
     html, body { overflow: auto !important; margin: 0 !important; padding: 0 !important; }
     
     ::-webkit-scrollbar { width: 8px !important; height: 8px !important; display: block !important; }
@@ -90,7 +89,7 @@ st.markdown("""
     }
     div.row-widget.stSelectbox, div.row-widget.stMultiSelect { margin-bottom: -5px !important; }
 
-    /* KHUNG CHÍNH (ĐÃ CHO PHÉP SCROLL CHỐNG CẮT NỘI DUNG KHI ZOOM) */
+    /* KHUNG CHÍNH */
     .block-container { 
         background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
@@ -99,7 +98,7 @@ st.markdown("""
         padding: 25px 30px 30px 30px !important; 
         min-height: calc(100vh - 40px) !important; 
         display: flex !important; flex-direction: column !important; 
-        overflow-y: auto !important; overflow-x: hidden !important; /* Mở khóa để chống tràn */
+        overflow-y: auto !important; overflow-x: hidden !important; 
     }
     .block-container > div[data-testid="stVerticalBlock"] { flex-grow: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; }
     .block-container > div[data-testid="stVerticalBlock"] > div { flex-shrink: 0 !important; width: 100% !important; }
@@ -117,7 +116,7 @@ st.markdown("""
         max-width: 100% !important;
         max-height: calc(100vh - 355px) !important; 
         overflow-y: auto !important; 
-        overflow-x: auto !important; /* THANH CUỘN NGANG HOẠT ĐỘNG KHI ZOOM */
+        overflow-x: auto !important; 
         display: block !important;
         border-radius: 12px; 
         border: 1px solid rgba(255,255,255,0.5);
@@ -128,7 +127,7 @@ st.markdown("""
     
     .custom-table { 
         width: 100% !important; 
-        min-width: 800px !important; /* Khi zoom quá to, ép hiện thanh cuộn chứ không bóp nát chữ */
+        min-width: 800px !important; 
         border-collapse: separate !important; 
         border-spacing: 0; 
         font-family: inherit; 
@@ -136,20 +135,24 @@ st.markdown("""
     }
     
     .custom-table thead th {
-        background-color: #e9d8fd !important; /* MÀU TÍM NHẠT */
-        color: #000000 !important; /* CHỮ ĐEN */
+        background-color: #e9d8fd !important; 
+        color: #000000 !important; 
         font-weight: 800 !important; 
-        font-size: 15px !important; /* CHỮ TO */
-        text-transform: uppercase !important; /* VIẾT HOA TOÀN BỘ */
+        font-size: 15px !important; 
+        text-transform: uppercase !important; 
         position: sticky !important; 
         top: 0 !important; 
         z-index: 10 !important; 
         padding: 12px 10px !important; 
-        text-align: left !important;
+        text-align: center !important; /* CĂN GIỮA CHIỀU NGANG */
+        vertical-align: middle !important; /* CĂN GIỮA CHIỀU DỌC */
         border-bottom: 2px solid #d6bcfa !important; 
         border-right: 1px solid rgba(0,0,0,0.05) !important; 
-        white-space: normal !important; /* CỐT LÕI: CHO TIÊU ĐỀ XUỐNG DÒNG */
+        white-space: normal !important; 
         word-wrap: break-word !important; 
+        min-width: 160px !important; /* ĐỘ RỘNG TỐI THIỂU: ÉP CHỮ CHỈ RỚT XUỐNG TỐI ĐA 2 DÒNG */
+        max-width: 250px !important;
+        line-height: 1.3 !important;
     }
     
     .custom-table tbody td {
@@ -157,7 +160,7 @@ st.markdown("""
         font-size: 13.5px !important; 
         border-bottom: 1px solid rgba(0,0,0,0.05) !important;
         border-right: 1px solid rgba(0,0,0,0.05); 
-        white-space: normal !important; /* CỐT LÕI: ÉP CHỮ TRONG BẢNG XUỐNG DÒNG */
+        white-space: normal !important; 
         word-wrap: break-word !important; 
         overflow-wrap: break-word !important; 
         vertical-align: middle !important; 
@@ -214,7 +217,6 @@ def load_data():
     
     df.columns = df.columns.str.strip()
     
-    # THUẬT TOÁN NHẬN DIỆN CỘT THÔNG MINH - CHỐNG GHI ĐÈ 1-1
     rename_dict = {}
     seen_targets = set()
     
@@ -257,7 +259,6 @@ def load_data():
     df.rename(columns=rename_dict, inplace=True)
     df = df.loc[:, ~df.columns.duplicated()]
     
-    # LÀM SẠCH VÀ ĐỒNG NHẤT DỮ LIỆU TÌNH TRẠNG TRIỂN KHAI
     if 'Tình trạng triển khai' in df.columns:
         def clean_status(x):
             val = str(x).strip().lower()
@@ -269,7 +270,6 @@ def load_data():
         
         df['Tình trạng triển khai'] = df['Tình trạng triển khai'].apply(clean_status)
 
-    # FORWARD FILL ĐỂ XỬ LÝ CÁC Ô GỘP (MERGE CELLS) TRONG GOOGLE SHEETS
     cols_to_fill = ['Mã Dự Án', 'Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục', 'Chủ nhiệm dự án', 'Chuyên viên thực hiện']
     for col in cols_to_fill:
         if col in df.columns: 
@@ -284,7 +284,6 @@ def load_data():
         
     return df
 
-# LƯU TRỮ VÀ CẬP NHẬT DỮ LIỆU (TỰ LÀM MỚI KHI F5 DO KHÔNG DÙNG ST.CACHE)
 if 'raw_data' not in st.session_state:
     with st.spinner("⏳ Đang tải dữ liệu mới nhất từ Google Sheets..."):
         st.session_state.raw_data = load_data()
@@ -373,7 +372,7 @@ if selected_hm and 'Hạng Mục' in df_display.columns: df_display = df_display
 if selected_ql and 'Chủ nhiệm dự án' in df_display.columns: df_display = df_display[df_display['Chủ nhiệm dự án'].astype(str).isin(selected_ql)]
 if selected_cb and 'Chuyên viên thực hiện' in df_display.columns: df_display = df_display[df_display['Chuyên viên thực hiện'].astype(str).isin(selected_cb)]
 
-# --- TÍNH TOÁN 10 CHỈ SỐ KPI ĐẢM BẢO KHÔNG TRÙNG LẶP ---
+# --- TÍNH TOÁN 10 CHỈ SỐ KPI ---
 p_projects = 0
 if 'Dự Án' in df_display.columns:
     _prjs = df_display['Dự Án'].astype(str).str.strip().str.upper()
@@ -471,7 +470,7 @@ st.markdown("""
 def generate_excel_with_colors(df_data):
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        df_data.columns = df_data.columns.str.upper() # In hoa tiêu đề cho Excel
+        df_data.columns = df_data.columns.str.upper() 
         df_data.to_excel(writer, index=False, sheet_name='TienDo')
     output.seek(0)
     import openpyxl
@@ -479,7 +478,6 @@ def generate_excel_with_colors(df_data):
     wb = openpyxl.load_workbook(output)
     ws = wb.active
     
-    # Định dạng màu cho Excel
     green_fill = PatternFill(start_color="A5D6A7", end_color="A5D6A7", fill_type="solid")
     red_fill = PatternFill(start_color="EF9A9A", end_color="EF9A9A", fill_type="solid")
     gray_fill = PatternFill(start_color="ADB5BD", end_color="ADB5BD", fill_type="solid")
@@ -491,7 +489,6 @@ def generate_excel_with_colors(df_data):
     vướng_col_idx = None
     
     for col_idx, col_name in enumerate(df_data.columns, 1):
-        # Tô màu tím nhạt và in đậm cho tiêu đề Excel
         cell = ws.cell(row=1, column=col_idx)
         cell.fill = header_fill
         cell.font = header_font
@@ -532,7 +529,6 @@ except Exception:
     mime_type = "text/csv"
     filename = "Bao_cao_tien_do_Thien_Son.csv"
 
-# NÚT TẢI EXCEL
 download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}">Tải Excel</a>'
 st.markdown(download_html, unsafe_allow_html=True)
 
@@ -545,21 +541,21 @@ if 'Tình trạng triển khai' in df_display.columns and 'Tiến Độ (%)' in 
     df_display = df_display.sort_values(by=sort_cols, ascending=[True] * len(sort_cols))
     df_display = df_display.drop(columns=['Mức Ưu Tiên'])
 
+# Ép toàn bộ tên cột thành in hoa 
+df_display.columns = df_display.columns.str.upper()
+
+# KHẮC PHỤC LỖI TÔ MÀU (Dùng key in hoa)
 def color_rows(row):
-    vm = str(row.get('Vướng Mắc', '')).strip().lower()
+    vm = str(row.get('VƯỚNG MẮC', '')).strip().lower()
     if vm and vm not in ['nan', 'none', '']:
         return ['background-color: #FFEeba; color: #000;'] * len(row)
         
-    status = row.get('Tình trạng triển khai', '')
+    status = str(row.get('TÌNH TRẠNG TRIỂN KHAI', '')).strip()
     if status == 'Đã hoàn thành': return ['background-color: #a5d6a7; color: #000;'] * len(row)
     if status == 'Tạm dừng': return ['background-color: #ef9a9a; color: #000;'] * len(row)
     if status == 'Chưa triển khai': return ['background-color: #adb5bd; color: #000;'] * len(row)
     return ['background-color: #ffffff; color: #000;'] * len(row)
 
-# ĐẨY TOÀN BỘ TIÊU ĐỀ THÀNH CHỮ IN HOA TRƯỚC KHI RENDER HTML (Để chắc chắn)
-df_display.columns = df_display.columns.str.upper()
-
-# ÁP DỤNG MÀU SẮC LÊN BẢNG
 styled_df = df_display.style.apply(color_rows, axis=1)
 
 try:
@@ -571,11 +567,9 @@ except Exception:
         pass
 
 # ================= RENDER BẢNG BẰNG TÙY CHỈNH HTML CAO CẤP =================
-# Thay thế mã HTML để bọc bảng vào trong div table-responsive-wrapper chống cắt xén
 html_table = styled_df.to_html()
 html_table = html_table.replace('<table', '<table class="custom-table"')
 
-# Gắn toàn bộ khung HTML
 final_html = f"""
 <div class="table-responsive-wrapper">
     {html_table}
