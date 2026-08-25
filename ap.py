@@ -27,7 +27,7 @@ if bg_base64:
             background-size: cover; background-position: center; background-repeat: no-repeat;
             z-index: -99999;
         }}
-        .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"] {{ background: transparent !important; padding: 0 !important; margin: 0 !important; }}
+        .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"] {{ background: transparent !important; }}
     </style>
     """
     st.markdown(bg_css, unsafe_allow_html=True)
@@ -40,28 +40,22 @@ else:
             background-size: cover; background-position: center; background-repeat: no-repeat;
             z-index: -99999;
         }
-        .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"] { background: transparent !important; padding: 0 !important; margin: 0 !important; }
+        .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"] { background: transparent !important; }
     </style>
     """, unsafe_allow_html=True)
 
-# ================= CSS TÙY CHỈNH CHUYÊN SÂU LÕI =================
+# ================= CSS TÙY CHỈNH CHUYÊN SÂU =================
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" rel="stylesheet" />
 <style>
-    /* 1. KHÓA CỨNG TRANG WEB: KHÔNG HIỆN THANH CUỘN THỪA BÊN NGOÀI */
-    html, body { overflow: hidden !important; margin: 0 !important; padding: 0 !important; width: 100vw !important; height: 100vh !important; }
-    [data-testid="stAppViewContainer"], [data-testid="stMain"] { overflow: hidden !important; height: 100vh !important; }
-    
-    ::-webkit-scrollbar { width: 8px !important; height: 8px !important; display: block !important; }
-    ::-webkit-scrollbar-track { background: transparent !important; }
-    ::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.25) !important; border-radius: 10px !important; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.45) !important; }
-
+    html, body { overflow: hidden !important; margin: 0 !important; padding: 0 !important; }
+    ::-webkit-scrollbar { display: none !important; }
+    * { scrollbar-width: none !important; -ms-overflow-style: none !important; box-sizing: border-box !important; }
     header[data-testid="stHeader"] { background: transparent !important; box-shadow: none !important; }
     [data-testid="stHeaderActionElements"], .stAppDeployButton { display: none !important; }
     footer { display: none !important; }
 
-    /* 2. CỐ ĐỊNH SIDEBAR - CÁCH VIỀN TRÁI, TRÊN, DƯỚI ĐÚNG 30PX */
+    /* KHOẢNG CÁCH TRÊN DƯỚI CHO KHUNG BỘ LỌC (SIDEBAR) */
     [data-testid="stSidebar"] { background-color: transparent !important; border: none !important; }
     [data-testid="stSidebarResizer"] { display: none !important; }
     [data-testid="stSidebar"] > div:first-child {
@@ -69,15 +63,21 @@ st.markdown("""
         backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important;
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important; 
-        margin: 30px 0px 30px 30px !important; /* Lề: Trên 30, Phải 0, Dưới 30, Trái 30 */
-        width: calc(100% - 30px) !important; 
-        height: calc(100vh - 60px) !important; 
+        margin: 20px 0px 20px 20px !important; 
+        width: calc(100% - 20px) !important; 
+        height: calc(100vh - 40px) !important; 
         overflow: hidden !important; 
     }
-    [data-testid="stSidebarUserContent"] { padding: 5px 20px 20px 20px !important; overflow-y: auto !important; height: 100% !important; }
+    [data-testid="stSidebarUserContent"] { padding: 5px 20px 20px 20px !important; overflow: hidden !important; }
     
-    [data-testid="stSidebar"] img { filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.25)) drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.15)) !important; transition: transform 0.3s ease !important; }
-    [data-testid="stSidebar"] img:hover { transform: scale(1.03); }
+    /* HIỆU ỨNG BÓNG ĐỔ CHO LOGO TRONG SIDEBAR */
+    [data-testid="stSidebar"] img {
+        filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.25)) drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.15)) !important;
+        transition: transform 0.3s ease !important;
+    }
+    [data-testid="stSidebar"] img:hover {
+        transform: scale(1.03);
+    }
 
     .sidebar-title { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #0f172a; margin-top: 10px; margin-bottom: 2px; text-transform: uppercase; }
     .sidebar-title .material-symbols-rounded { font-size: 18px; color: #198754; }
@@ -88,96 +88,65 @@ st.markdown("""
     }
     div.row-widget.stSelectbox, div.row-widget.stMultiSelect { margin-bottom: -5px !important; }
 
-    /* 3. KHỐI CHÍNH BẤT TỬ - LUÔN CÁCH BỘ LỌC 10PX VÀ CÁC VIỀN CÒN LẠI 30PX */
+    /* KHOẢNG CÁCH ĐỀU 30PX (TRÁI/PHẢI/DƯỚI) CHO KHUNG CHÍNH */
     .block-container { 
         background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
-        max-width: none !important; 
-        width: auto !important; 
-        margin: 30px 30px 30px 10px !important; /* Lề: Trên 30, Phải 30, Dưới 30, Trái 10 */
-        padding: 25px 30px !important; 
-        height: calc(100vh - 60px) !important; 
-        display: flex !important; flex-direction: column !important; 
-        overflow: hidden !important; /* ÉP CHẶT: Không bao giờ cho phép khối này bị cuộn hay tràn viền */
+        width: calc(100% - 40px) !important; max-width: 100% !important; 
+        margin: 20px 20px !important; 
+        padding: 25px 30px 30px 30px !important; 
+        height: calc(100vh - 40px) !important; 
+        display: flex !important; flex-direction: column !important; overflow: hidden !important; 
+    }
+    .block-container * { max-width: 100% !important; }
+    .block-container > div[data-testid="stVerticalBlock"] { flex-grow: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; }
+    .block-container > div[data-testid="stVerticalBlock"] > div { flex-shrink: 0 !important; width: 100% !important; }
+    
+    /* BẢNG CHI TIẾT CÔNG VIỆC TÙY CHỈNH BẰNG HTML (CHỐNG TRÀN VÀ CÁCH ĐỀU 30PX ĐÁY) */
+    div.element-container:has(.custom-table-wrapper),
+    .stMarkdown:has(.custom-table-wrapper),
+    div[data-testid="stMarkdownContainer"]:has(.custom-table-wrapper) {
+        flex-grow: 1 !important; flex-shrink: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; 
     }
     
-    /* ÉP FLEXBOX VÀO CẤU TRÚC LÕI CỦA STREAMLIT ĐỂ CO GIÃN THÔNG MINH */
-    .block-container > div[data-testid="stVerticalBlock"] { 
-        flex-grow: 1 !important; 
-        display: flex !important; 
-        flex-direction: column !important; 
-        min-height: 0 !important; /* Chìa khóa chống tràn khi Zoom */
+    .custom-table-wrapper {
         width: 100% !important; 
-        height: 100% !important;
-    }
-    
-    /* Giữ nguyên kích thước cho Title và KPI */
-    .block-container > div[data-testid="stVerticalBlock"] > div { 
-        flex-shrink: 0 !important; 
-        width: 100% !important; 
-    }
-    
-    /* 4. ================= BẢNG CHI TIẾT CO GIÃN THÔNG MINH ================= */
-    
-    /* Giao toàn bộ không gian còn trống cho Bảng */
-    div.element-container:has(.table-responsive-wrapper),
-    .stMarkdown:has(.table-responsive-wrapper),
-    div[data-testid="stMarkdownContainer"]:has(.table-responsive-wrapper) {
-        flex-grow: 1 !important; 
-        flex-shrink: 1 !important; 
-        display: flex !important; 
-        flex-direction: column !important; 
-        min-height: 0 !important; /* Khi zoom, bảng sẽ tự co lại nhường chỗ cho KPI, bảo vệ viền khối chính */
-        width: 100% !important; 
-        height: 100% !important;
-    }
-    
-    /* Vùng chứa tạo thanh cuộn */
-    .table-responsive-wrapper {
-        flex-grow: 1 !important; 
-        width: 100% !important; 
-        height: 100% !important; 
-        overflow: auto !important; /* TỰ ĐỘNG HIỆN THANH CUỘN KHI NỘI DUNG VƯỢT QUÁ */
-        display: block !important;
+        max-height: calc(100vh - 355px) !important; 
+        overflow-y: auto !important; 
+        overflow-x: auto !important; 
         border-radius: 12px; 
         border: 1px solid rgba(255,255,255,0.5);
-        background-color: rgba(255, 255, 255, 0.65); 
+        background-color: rgba(255, 255, 255, 0.45);
         box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        margin: 0 !important; 
+        margin-bottom: 0px !important; 
     }
+    .custom-table-wrapper::-webkit-scrollbar { width: 8px !important; height: 8px !important; display: block !important; }
+    .custom-table-wrapper::-webkit-scrollbar-track { background: transparent !important; }
+    .custom-table-wrapper::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.3) !important; border-radius: 10px !important; }
+    .custom-table-wrapper::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.5) !important; }
     
     .custom-table { 
-        width: max-content !important; /* CHỐNG MẤT CỘT: Cho bảng rộng thoải mái */
-        min-width: 100% !important; 
+        width: 100% !important; 
         border-collapse: separate !important; 
         border-spacing: 0; 
         font-family: inherit; 
         margin: 0 !important;
     }
-    
-    /* TIÊU ĐỀ BẢNG - TÍM NHẠT, CĂN GIỮA, XUỐNG DÒNG TỐI ĐA 2 HÀNG */
     .custom-table thead th {
-        background-color: #e9d8fd !important; 
-        color: #000000 !important; 
-        font-weight: bold !important; 
-        font-size: 15px !important; 
-        text-transform: uppercase !important; 
-        text-align: center !important; 
-        vertical-align: middle !important; 
+        background-color: #e9d8fd !important; /* MÀU TÍM NHẠT CHO TIÊU ĐỀ */
+        color: #000000 !important; /* CHỮ MÀU ĐEN */
+        font-weight: 800 !important; 
+        font-size: 15.5px !important; /* TĂNG KÍCH THƯỚC CHỮ LÊN 1 CHÚT */
+        text-transform: uppercase !important; /* CHỮ VIẾT HOA */
         position: sticky !important; 
         top: 0 !important; 
         z-index: 10 !important; 
         padding: 12px 10px !important; 
+        text-align: left !important;
         border-bottom: 2px solid #d6bcfa !important; 
         border-right: 1px solid rgba(0,0,0,0.05) !important; 
-        white-space: normal !important; 
-        word-wrap: break-word !important; 
-        min-width: 130px !important; /* Bảo vệ không bị mất cột */
-        max-width: 250px !important; /* Ép chữ rớt xuống 2 hàng */
-        line-height: 1.3 !important;
+        white-space: nowrap !important; 
     }
-    
-    /* NỘI DUNG BẢNG */
     .custom-table tbody td {
         padding: 10px 10px !important; 
         font-size: 13.5px !important; 
@@ -185,13 +154,10 @@ st.markdown("""
         border-right: 1px solid rgba(0,0,0,0.05); 
         white-space: normal !important; 
         word-wrap: break-word !important; 
-        overflow-wrap: break-word !important; 
         vertical-align: middle !important; 
-        min-width: 130px !important; 
-        max-width: 350px !important; /* Ép văn bản rớt xuống dòng */
     }
     
-    /* CĂN GIỮA TUYỆT ĐỐI KHUNG TIÊU ĐỀ BÁO CÁO CÔNG VIỆC */
+    /* CĂN GIỮA TUYỆT ĐỐI KHUNG TIÊU ĐỀ */
     .title-card-center { 
         border-radius: 16px; 
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.05); 
@@ -243,6 +209,7 @@ def load_data():
     
     df.columns = df.columns.str.strip()
     
+    # THUẬT TOÁN NHẬN DIỆN CỘT THÔNG MINH - CHỐNG GHI ĐÈ 1-1 (HIỂN THỊ ĐỦ 100% CỘT)
     rename_dict = {}
     seen_targets = set()
     
@@ -278,6 +245,7 @@ def load_data():
             if not any(kw in c_low for kw in ['%', 'tiến độ', 'trạng thái', 'tình trạng']):
                 target = 'Ngày Hoàn Thành'
                 
+        # Chỉ cập nhật nếu tên mục tiêu chưa được gắn cho cột nào trước đó (Chống gộp cột/mất cột)
         if target and target not in seen_targets:
             rename_dict[col] = target
             seen_targets.add(target)
@@ -285,6 +253,7 @@ def load_data():
     df.rename(columns=rename_dict, inplace=True)
     df = df.loc[:, ~df.columns.duplicated()]
     
+    # LÀM SẠCH VÀ ĐỒNG NHẤT DỮ LIỆU TÌNH TRẠNG TRIỂN KHAI
     if 'Tình trạng triển khai' in df.columns:
         def clean_status(x):
             val = str(x).strip().lower()
@@ -296,6 +265,7 @@ def load_data():
         
         df['Tình trạng triển khai'] = df['Tình trạng triển khai'].apply(clean_status)
 
+    # FORWARD FILL ĐỂ XỬ LÝ CÁC Ô GỘP (MERGE CELLS) TRONG GOOGLE SHEETS
     cols_to_fill = ['Mã Dự Án', 'Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục', 'Chủ nhiệm dự án', 'Chuyên viên thực hiện']
     for col in cols_to_fill:
         if col in df.columns: 
@@ -310,6 +280,7 @@ def load_data():
         
     return df
 
+# LƯU TRỮ VÀ CẬP NHẬT DỮ LIỆU (TỰ LÀM MỚI KHI F5 DO KHÔNG DÙNG ST.CACHE)
 if 'raw_data' not in st.session_state:
     with st.spinner("⏳ Đang tải dữ liệu mới nhất từ Google Sheets..."):
         st.session_state.raw_data = load_data()
@@ -398,7 +369,7 @@ if selected_hm and 'Hạng Mục' in df_display.columns: df_display = df_display
 if selected_ql and 'Chủ nhiệm dự án' in df_display.columns: df_display = df_display[df_display['Chủ nhiệm dự án'].astype(str).isin(selected_ql)]
 if selected_cb and 'Chuyên viên thực hiện' in df_display.columns: df_display = df_display[df_display['Chuyên viên thực hiện'].astype(str).isin(selected_cb)]
 
-# --- TÍNH TOÁN 10 CHỈ SỐ KPI ---
+# --- TÍNH TOÁN 10 CHỈ SỐ KPI ĐẢM BẢO KHÔNG TRÙNG LẶP ---
 p_projects = 0
 if 'Dự Án' in df_display.columns:
     _prjs = df_display['Dự Án'].astype(str).str.strip().str.upper()
@@ -496,31 +467,22 @@ st.markdown("""
 def generate_excel_with_colors(df_data):
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        df_data.columns = df_data.columns.str.upper() 
         df_data.to_excel(writer, index=False, sheet_name='TienDo')
     output.seek(0)
     import openpyxl
-    from openpyxl.styles import PatternFill, Font
+    from openpyxl.styles import PatternFill
     wb = openpyxl.load_workbook(output)
     ws = wb.active
-    
     green_fill = PatternFill(start_color="A5D6A7", end_color="A5D6A7", fill_type="solid")
     red_fill = PatternFill(start_color="EF9A9A", end_color="EF9A9A", fill_type="solid")
     gray_fill = PatternFill(start_color="ADB5BD", end_color="ADB5BD", fill_type="solid")
     yellow_fill = PatternFill(start_color="FFEeba", end_color="FFEeba", fill_type="solid")
-    header_fill = PatternFill(start_color="E9D8FD", end_color="E9D8FD", fill_type="solid")
-    header_font = Font(color="000000", bold=True)
 
     status_col_idx = None
     vướng_col_idx = None
-    
     for col_idx, col_name in enumerate(df_data.columns, 1):
-        cell = ws.cell(row=1, column=col_idx)
-        cell.fill = header_fill
-        cell.font = header_font
-        
-        if str(col_name).strip().upper() == 'TÌNH TRẠNG TRIỂN KHAI': status_col_idx = col_idx
-        if str(col_name).strip().upper() == 'VƯỚNG MẮC': vướng_col_idx = col_idx
+        if col_name == 'Tình trạng triển khai': status_col_idx = col_idx
+        if col_name == 'Vướng Mắc': vướng_col_idx = col_idx
 
     for row_idx in range(2, ws.max_row + 1):
         fill_to_use = None
@@ -555,6 +517,7 @@ except Exception:
     mime_type = "text/csv"
     filename = "Bao_cao_tien_do_Thien_Son.csv"
 
+# NÚT TẢI EXCEL
 download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}">Tải Excel</a>'
 st.markdown(download_html, unsafe_allow_html=True)
 
@@ -568,21 +531,23 @@ if 'Tình trạng triển khai' in df_display.columns and 'Tiến Độ (%)' in 
     df_display = df_display.drop(columns=['Mức Ưu Tiên'])
 
 def color_rows(row):
-    vm = str(row.get('VƯỚNG MẮC', '')).strip().lower()
+    vm = str(row.get('Vướng Mắc', '')).strip().lower()
     if vm and vm not in ['nan', 'none', '']:
         return ['background-color: #FFEeba; color: #000;'] * len(row)
         
-    status = str(row.get('TÌNH TRẠNG TRIỂN KHAI', '')).strip()
+    status = row.get('Tình trạng triển khai', '')
     if status == 'Đã hoàn thành': return ['background-color: #a5d6a7; color: #000;'] * len(row)
     if status == 'Tạm dừng': return ['background-color: #ef9a9a; color: #000;'] * len(row)
     if status == 'Chưa triển khai': return ['background-color: #adb5bd; color: #000;'] * len(row)
     return ['background-color: #ffffff; color: #000;'] * len(row)
 
-# Ép toàn bộ tên cột thành in hoa
-df_display.columns = df_display.columns.str.upper()
+# ÁP DỤNG MÀU SẮC LÊN BẢNG VÀ CSS CHO TIÊU ĐỀ
+styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
+    'selector': 'th',
+    'props': [('background-color', '#e9d8fd'), ('color', '#000000'), ('font-weight', '800'), ('font-size', '15.5px'), ('text-transform', 'uppercase')]
+}])
 
-styled_df = df_display.style.apply(color_rows, axis=1)
-
+# ẨN CỘT INDEX CỦA PANDAS ĐỂ BẢNG TRÔNG GỌN HƠN
 try:
     styled_df = styled_df.hide(axis='index')
 except Exception:
@@ -591,14 +556,7 @@ except Exception:
     except:
         pass
 
-# ================= RENDER BẢNG BẰNG TÙY CHỈNH HTML CAO CẤP =================
+# ================= RENDER BẢNG BẰNG TÙY CHỈNH HTML =================
 html_table = styled_df.to_html()
 html_table = html_table.replace('<table', '<table class="custom-table"')
-
-# GÓI BẢNG VÀO TRONG KHUNG HTML
-final_html = f"""
-<div class="table-responsive-wrapper">
-    {html_table}
-</div>
-"""
-st.markdown(final_html, unsafe_allow_html=True)
+st.markdown(f'<div class="custom-table-wrapper">{html_table}</div>', unsafe_allow_html=True)
