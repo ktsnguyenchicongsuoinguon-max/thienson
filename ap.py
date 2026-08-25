@@ -116,6 +116,22 @@ st.markdown("""
     .custom-download-link { display: block; float: right; text-align: right; color: #0A3622 !important; font-size: 13.5px !important; font-weight: 700 !important; text-decoration: none !important; margin-top: -30px !important; margin-right: 0px !important; margin-bottom: 5px !important; position: relative; z-index: 9999; cursor: pointer; }
     .custom-download-link:hover { color: #198754 !important; text-decoration: underline !important; }
 
+    /* NÚT HIỆN LẠI CỘT & NÚT TẢI EXCEL */
+    div[data-testid="stButton"] button {
+        background-color: rgba(25, 135, 84, 0.85) !important;
+        color: white !important;
+        border-radius: 10px !important;
+        font-weight: bold !important;
+        font-size: 12px !important;
+        border: 1px solid rgba(255,255,255,0.5) !important;
+        padding: 4px 12px !important;
+        min-height: 30px !important;
+    }
+    div[data-testid="stButton"] button:hover {
+        background-color: rgba(25, 135, 84, 1) !important;
+        box-shadow: 0 4px 10px rgba(25, 135, 84, 0.3) !important;
+    }
+
     /* 10 Ô KPI */
     .kpi-card { width: 100%; padding: 10px 12px; border-radius: 18px !important; border: 1px solid rgba(255, 255, 255, 0.4) !important; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 10px; min-height: 85px; background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden !important; }
     .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 5px 10px rgba(0, 0, 0, 0.1) !important; }
@@ -133,8 +149,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# ================= 2. ĐỌC DỮ LIỆU TỪ GOOGLE SHEETS (LƯU CACHE TỐC ĐỘ CAO) =================
-@st.cache_data(ttl=86400, show_spinner=False) # Lưu cache 24h, chỉ tải lại khi F5 trang
+# ================= 2. ĐỌC DỮ LIỆU TỪ GOOGLE SHEETS =================
+@st.cache_data(ttl=86400, show_spinner=False)
 def load_data():
     sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
     try:
@@ -323,11 +339,22 @@ for col in ['Ngày_Bat_Dau_Obj', 'Ngày_Hoan_Thanh_Obj']:
     if col in df_display.columns: df_display = df_display.drop(columns=[col])
     if col in df_export.columns: df_export = df_export.drop(columns=[col])
 
-st.markdown("""
-<div class="title-card" style="padding: 6px 20px; margin-top: 15px; margin-bottom: 15px;">
-    <div style="font-size: 18px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2;">BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</div>
-</div>
-""", unsafe_allow_html=True)
+# THANH TIÊU ĐỀ VÀ NÚT TẢI EXCEL / RESET CỘT
+col_t1, col_t2, col_t3 = st.columns([4, 1.2, 1])
+with col_t1:
+    st.markdown("""
+    <div class="title-card" style="padding: 6px 20px; margin-top: 10px; margin-bottom: 10px; margin-left: 0;">
+        <div style="font-size: 18px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2;">BẢNG TỔNG HỢP CHI TIẾT CÔNG VIỆC</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col_t2:
+    st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
+    if st.button("🔄 HIỆN LẠI TẤT CẢ CỘT", use_container_width=True):
+        if 'reset_counter' not in st.session_state:
+            st.session_state.reset_counter = 0
+        st.session_state.reset_counter += 1
+        st.rerun()
 
 def generate_excel_with_colors(df_data):
     output = io.BytesIO()
@@ -371,19 +398,21 @@ def generate_excel_with_colors(df_data):
     wb.save(final_output)
     return final_output.getvalue()
 
-try:
-    excel_bytes = generate_excel_with_colors(df_export)
-    b64 = base64.b64encode(excel_bytes).decode()
-    mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    filename = "Bao_cao_tien_do_Thien_Son.xlsx"
-except Exception:
-    csv_bytes = df_export.to_csv(index=False).encode('utf-8-sig')
-    b64 = base64.b64encode(csv_bytes).decode()
-    mime_type = "text/csv"
-    filename = "Bao_cao_tien_do_Thien_Son.csv"
+with col_t3:
+    st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
+    try:
+        excel_bytes = generate_excel_with_colors(df_export)
+        b64 = base64.b64encode(excel_bytes).decode()
+        mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        filename = "Bao_cao_tien_do_Thien_Son.xlsx"
+    except Exception:
+        csv_bytes = df_export.to_csv(index=False).encode('utf-8-sig')
+        b64 = base64.b64encode(csv_bytes).decode()
+        mime_type = "text/csv"
+        filename = "Bao_cao_tien_do_Thien_Son.csv"
 
-download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}">Tải Excel</a>'
-st.markdown(download_html, unsafe_allow_html=True)
+    download_html = f'<a class="custom-download-link" style="float:none; display:block; text-align:right; margin-top: 4px;" href="data:{mime_type};base64,{b64}" download="{filename}">📥 Tải Excel</a>'
+    st.markdown(download_html, unsafe_allow_html=True)
 
 priority_map = {'Chưa bắt đầu': 1, 'Đang triển khai': 2, 'Đã hoàn thành': 3, 'Tạm dừng': 4}
 
@@ -410,4 +439,6 @@ styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
     'props': [('background-color', 'rgba(226, 232, 240, 0.9)'), ('color', '#0F172A'), ('font-weight', 'bold')]
 }])
 
-st.dataframe(styled_df, use_container_width=True, hide_index=True)
+# Sử dụng key độc lập (dựa vào reset_counter) để bảng có thể tái tạo hoàn toàn khi bấm nút hiện lại cột
+reset_key = st.session_state.get('reset_counter', 0)
+st.dataframe(styled_df, use_container_width=True, hide_index=True, key=f"main_df_{reset_key}")
