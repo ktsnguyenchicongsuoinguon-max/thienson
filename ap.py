@@ -152,8 +152,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# ================= 2. ĐỌC DỮ LIỆU TỪ GOOGLE SHEETS (LƯU CACHE TỐC ĐỘ CAO) =================
-@st.cache_data(ttl=86400, show_spinner=False) # Lưu cache 24h, chỉ tải lại khi F5 trang
+# ================= 2. ĐỌC DỮ LIỆU TỪ GOOGLE SHEETS =================
 def load_data():
     sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
     try:
@@ -190,9 +189,12 @@ def load_data():
         
     return df
 
-with st.spinner("⏳ Đang tải dữ liệu..."):
-    df = load_data()
+# SỬ DỤNG SESSION STATE ĐỂ CHỈ CẬP NHẬT GOOGLE SHEET KHI BẤM F5
+if 'raw_data' not in st.session_state:
+    with st.spinner("⏳ Đang tải dữ liệu mới nhất từ Google Sheets..."):
+        st.session_state.raw_data = load_data()
 
+df = st.session_state.raw_data.copy()
 
 # ================= 3. KHỐI SIDEBAR BỘ LỌC =================
 with st.sidebar:
@@ -260,7 +262,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-df_display = df.copy()
 if start_date and end_date and 'Ngày_Bat_Dau_Obj' in df_display.columns and 'Ngày_Hoan_Thanh_Obj' in df_display.columns:
     start_ts = pd.to_datetime(start_date)
     end_ts = pd.to_datetime(end_date)
