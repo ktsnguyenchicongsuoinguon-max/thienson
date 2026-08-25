@@ -552,7 +552,7 @@ if small_cols:
     styled_df = styled_df.set_properties(subset=small_cols, **{
         'width': '40px',
         'max-width': '40px',
-        'min-width': '45px',
+        'min-width': '30px',
         'text-align': 'left'
     })
 
