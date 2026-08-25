@@ -150,7 +150,7 @@ st.markdown("""
         line-height: 1.3 !important;
     }
     .custom-table tbody td {
-        padding: 10px 10px !important; 
+        padding: 8px 8px !important; 
         font-size: 13.5px !important; 
         border-bottom: 1px solid rgba(0,0,0,0.05) !important;
         border-right: 1px solid rgba(0,0,0,0.05); 
@@ -158,6 +158,7 @@ st.markdown("""
         word-wrap: break-word !important; 
         vertical-align: middle !important; 
         color: #000000 !important;
+        max-width: 250px; /* Ép bảng bẻ dòng nếu nội dung bên trong quá dài */
     }
     
     .title-card-center { 
@@ -265,6 +266,7 @@ def load_data():
         
         df['Tình trạng triển khai'] = df['Tình trạng triển khai'].apply(clean_status)
 
+    # Đã thêm 'Chủ đầu tư' vào danh sách fill nan
     cols_to_fill = ['Mã Dự Án', 'Dự Án', 'Hợp Đồng - PLHĐ', 'Hạng Mục', 'Chủ nhiệm dự án', 'Chuyên viên thực hiện', 'Chủ đầu tư']
     for col in cols_to_fill:
         if col in df.columns: 
@@ -542,24 +544,37 @@ def color_rows(row):
 
 styled_df = df_display.style.apply(color_rows, axis=1)
 
-# NGẮT DÒNG TỐI ĐA 2 DÒNG + THU NHỎ CHIỀU RỘNG BẰNG CSS INLINE
+# ÉP KÍCH THƯỚC THU NHỎ CHO CÁC CỘT CỤ THỂ
+narrow_cols = [c for c in ['Dự Án', 'Hợp Đồng - PLHĐ', 'Chủ đầu tư'] if c in df_display.columns]
+if narrow_cols:
+    styled_df = styled_df.set_properties(subset=narrow_cols, **{
+        'max-width': '120px', 
+        'min-width': '90px', 
+        'width': '100px',
+        'white-space': 'normal',
+        'word-wrap': 'break-word',
+        'text-align': 'center'
+    })
+
+# KHÓA CHẶT CHỮ, ÉP TIÊU ĐỀ XUỐNG TỐI ĐA 2 DÒNG BẰNG KÝ TỰ &nbsp; (Thay vì dấu cách thường)
 break_line_cols = {
-    'Mã Dự Án': 'MÃ<br>DỰ ÁN',
-    'Dự Án': '<div style="width: 140px; min-width: 100px; white-space: normal; margin: auto;">DỰ ÁN</div>',
-    'Chủ đầu tư': '<div style="width: 120px; min-width: 90px; white-space: normal; margin: auto;">CHỦ<br>ĐẦU TƯ</div>',
-    'Hợp Đồng - PLHĐ': '<div style="width: 120px; min-width: 90px; white-space: normal; margin: auto;">HỢP ĐỒNG<br>PLHĐ</div>',
-    'Hạng Mục': 'HẠNG MỤC',
-    'Chủ nhiệm dự án': '<div style="width: 120px; min-width: 90px; white-space: normal; margin: auto;">CHỦ NHIỆM<br>DỰ ÁN</div>',
-    'Chuyên viên thực hiện': 'CHUYÊN VIÊN<br>THỰC HIỆN',
-    'Công việc triển khai': 'CÔNG VIỆC<br>TRIỂN KHAI',
-    'Ngày Bắt Đầu': 'NGÀY<br>BẮT ĐẦU',
-    'Ngày Hoàn Thành': 'NGÀY<br>HOÀN THÀNH',
-    'Tiến Độ (%)': 'TIẾN ĐỘ<br>(%)',
-    'Tình trạng triển khai': 'TÌNH TRẠNG<br>TRIỂN KHAI',
-    'Vướng Mắc': 'VƯỚNG MẮC'
+    'Mã Dự Án': 'MÃ<br>DỰ&nbsp;ÁN',
+    'Dự Án': 'DỰ&nbsp;ÁN',
+    'Chủ đầu tư': 'CHỦ<br>ĐẦU&nbsp;TƯ',
+    'Hợp Đồng - PLHĐ': 'HỢP&nbsp;ĐỒNG<br>PLHĐ',
+    'Hạng Mục': 'HẠNG&nbsp;MỤC',
+    'Chủ nhiệm dự án': 'CHỦ&nbsp;NHIỆM<br>DỰ&nbsp;ÁN',
+    'Chuyên viên thực hiện': 'CHUYÊN&nbsp;VIÊN<br>THỰC&nbsp;HIỆN',
+    'Công việc triển khai': 'CÔNG&nbsp;VIỆC<br>TRIỂN&nbsp;KHAI',
+    'Ngày Bắt Đầu': 'NGÀY<br>BẮT&nbsp;ĐẦU',
+    'Ngày Hoàn Thành': 'NGÀY<br>HOÀN&nbsp;THÀNH',
+    'Tiến Độ (%)': 'TIẾN&nbsp;ĐỘ<br>(%)',
+    'Tình trạng triển khai': 'TÌNH&nbsp;TRẠNG<br>TRIỂN&nbsp;KHAI',
+    'Vướng Mắc': 'VƯỚNG&nbsp;MẮC'
 }
 
-styled_df = styled_df.format_index(lambda col: break_line_cols.get(col, col), axis=1)
+# Các cột không định nghĩa sẵn trong từ điển cũng sẽ bị thay dấu cách bằng &nbsp; để chống rớt dòng bậy bạ
+styled_df = styled_df.format_index(lambda col: break_line_cols.get(col, str(col).replace(' ', '&nbsp;')), axis=1)
 
 # ẨN CỘT INDEX
 try:
