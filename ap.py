@@ -94,12 +94,13 @@ st.markdown(
     }
     div.row-widget.stSelectbox, div.row-widget.stMultiSelect { margin-bottom: -5px !important; }
 
+    /* GIẢM PADDING-TOP XUỐNG CÒN 5PX ĐỂ ĐẨY NỘI DUNG LÊN TRÊN */
     .block-container { 
         background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         width: calc(100% - 40px) !important; max-width: 100% !important; 
         margin: 20px 20px !important; 
-        padding: 25px 30px 30px 30px !important; 
+        padding: 5px 30px 30px 30px !important; /* Cũ là 25px */
         height: calc(100vh - 40px) !important; 
         display: flex !important; flex-direction: column !important; overflow: hidden !important; 
     }
@@ -137,12 +138,11 @@ st.markdown(
         margin: 0 !important;
     }
     
-    /* CĂN GIỮA TIÊU ĐỀ VÀ ÉP RỚT 2 DÒNG - MÀU CHỮ TIÊU ĐỀ DỊU HƠN */
     .custom-table thead th {
         background-color: #e9d8fd !important;
-        color: #334155 !important; /* Đã đổi từ đen #000000 sang xám đậm dịu mắt */
+        color: #334155 !important;
         font-weight: 800 !important; 
-        font-size: 14.5px !important; /* Giữ nguyên size tiêu đề */
+        font-size: 14.5px !important;
         text-transform: uppercase !important;
         position: sticky !important; 
         top: 0 !important; 
@@ -158,10 +158,9 @@ st.markdown(
         overflow: hidden !important;       
     }
     
-    /* CHỮ TRONG BẢNG TO LÊN */
     .custom-table tbody td {
         padding: 10px 10px !important; 
-        font-size: 15px !important; /* Tăng chữ thân bảng lên 15px để dễ đọc */
+        font-size: 15px !important; 
         border-bottom: 1px solid rgba(0,0,0,0.05) !important;
         border-right: 1px solid rgba(0,0,0,0.05); 
         white-space: normal !important; 
@@ -183,8 +182,6 @@ st.markdown(
         align-items: center; 
         justify-content: center; 
         padding: 6px 25px; 
-        margin-top: 15px; 
-        margin-bottom: 15px;
     }
 
     .custom-download-link { display: block; float: right; text-align: right; color: #0A3622 !important; font-size: 13.5px !important; font-weight: 700 !important; text-decoration: none !important; margin-top: -30px !important; margin-right: 0px !important; margin-bottom: 5px !important; position: relative; z-index: 9999; cursor: pointer; }
@@ -501,9 +498,10 @@ with st.sidebar:
 
 
 # ================= 4. KHỐI CHÍNH =================
+# THÊM MARGIN-TOP ÂM VÀO ĐÂY ĐỂ ĐẨY TIÊU ĐỀ LÊN 20PX
 st.markdown(
     """
-<div class="title-card-center" style="padding: 8px 25px; margin-top: 0px; margin-bottom: 15px;">
+<div class="title-card-center" style="padding: 8px 25px; margin-top: -20px; margin-bottom: 15px;">
     <div style="font-size: 26px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2; text-align: center;">BÁO CÁO CÔNG VIỆC - PHÒNG THIẾT KẾ</div>
 </div>
 """,
@@ -717,7 +715,7 @@ for col in ["Ngày_Bat_Dau_Obj", "Ngày_Hoan_Thanh_Obj"]:
 
 st.markdown(
     """
-<div class="title-card-center">
+<div class="title-card-center" style="margin-top: 5px; margin-bottom: 10px;">
     <div style="font-size: 18px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2; text-align: center;">BẢNG CHI TIẾT CÔNG VIỆC</div>
 </div>
 """,
@@ -832,15 +830,15 @@ def color_rows(row):
     return ["background-color: #adb5bd; color: #000;"] * len(row)
   return ["background-color: #ffffff; color: #000;"] * len(row)
 
-# --- CẬP NHẬT KIỂU DÁNG CĂN GIỮA VÀ ĐIỀU CHỈNH CỘT CHI TIẾT THEO YÊU CẦU ---
+
 table_styles = [
     {
         "selector": "th",
         "props": [
             ("background-color", "#e9d8fd"),
-            ("color", "#334155"),         # Màu tiêu đề đổi từ đen sang xám đậm (dịu mắt hơn)
+            ("color", "#334155"),         
             ("font-weight", "800"),
-            ("font-size", "14.5px"),      # Kích thước tiêu đề giữ nguyên
+            ("font-size", "14.5px"),      
             ("text-transform", "uppercase"),
             ("text-align", "center"),     
             ("vertical-align", "middle"), 
@@ -848,7 +846,6 @@ table_styles = [
     }
 ]
 
-# Các từ khóa phân nhóm cột:
 target_100_keywords = ["chuyên viên", "chủ nhiệm", "bắt đầu", "hoàn thành"]
 target_130_keywords = ["dự án", "hợp đồng", "hđ", "plhđ", "hạng mục"]
 target_shrink_keywords = ["chủ đầu tư", "cdt", "cđt"]
@@ -866,7 +863,7 @@ for idx, col_name in enumerate(df_display.columns):
             ("min-width", "70px"),
             ("white-space", "normal !important"),
             ("word-break", "break-word"),
-            ("font-size", "14px"),         # Chữ nội dung bên trong to lên 
+            ("font-size", "14px"),         
             ("text-align", "center"), 
         ],
     })
@@ -879,7 +876,7 @@ for idx, col_name in enumerate(df_display.columns):
             ("min-width", "90px"),
             ("white-space", "normal !important"), 
             ("word-break", "break-word"),
-            ("font-size", "14.5px"),       # Chữ nội dung bên trong to lên
+            ("font-size", "14.5px"),       
             ("text-align", "center"), 
         ],
     })
@@ -892,7 +889,7 @@ for idx, col_name in enumerate(df_display.columns):
             ("min-width", "120px"),
             ("white-space", "normal !important"), 
             ("word-break", "break-word"),
-            ("font-size", "14.5px"),       # Chữ nội dung bên trong to lên
+            ("font-size", "14.5px"),       
         ],
     })
   elif any(kw in col_str for kw in target_wrap_keywords):
@@ -904,7 +901,7 @@ for idx, col_name in enumerate(df_display.columns):
             ("min-width", "100px"),
             ("white-space", "normal !important"), 
             ("word-break", "break-word"),
-            ("font-size", "14.5px"),       # Chữ nội dung bên trong to lên
+            ("font-size", "14.5px"),       
             ("text-align", "center"), 
         ],
     })
