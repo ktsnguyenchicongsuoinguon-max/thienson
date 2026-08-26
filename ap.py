@@ -79,6 +79,14 @@ st.markdown(
     }
     [data-testid="stSidebarUserContent"] { padding: 5px 20px 20px 20px !important; overflow: hidden !important; }
     
+    /* ÉP LOGO TO LÊN 120% VÀ CĂN GIỮA */
+    [data-testid="stSidebar"] div[data-testid="stImage"] {
+        width: 120% !important;
+        margin-left: -10% !important;
+        margin-top: 5px !important;
+        margin-bottom: 15px !important;
+    }
+    
     [data-testid="stSidebar"] img {
         filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.25)) drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.15)) !important;
         transition: transform 0.3s ease !important;
@@ -94,7 +102,6 @@ st.markdown(
     }
     div.row-widget.stSelectbox, div.row-widget.stMultiSelect { margin-bottom: -5px !important; }
 
-    /* GIẢM PADDING-TOP XUỐNG CÒN 5PX ĐỂ ĐẨY NỘI DUNG LÊN TRÊN */
     .block-container { 
         background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
@@ -295,7 +302,6 @@ def load_data():
 
     df["Tình trạng triển khai"] = df["Tình trạng triển khai"].apply(clean_status)
 
-  # CẬP NHẬT MỚI: Chỉ tự động điền cho các cột chung, không tự động điền nhân sự
   cols_to_fill = [
       "Mã Dự Án",
       "Dự Án",
@@ -328,9 +334,8 @@ df = load_data().copy()
 
 # ================= 3. KHỐI SIDEBAR BỘ LỌC =================
 with st.sidebar:
-  col_logo1, col_logo2, col_logo3 = st.columns([0.1, 2.8, 0.1])
-  with col_logo2:
-    st.image("logothienson.png", use_container_width=True)
+  # HIỂN THỊ LOGO KHÔNG CẦN CỘT ĐỂ LOGO TRÀN VIỀN
+  st.image("logothienson.png", use_container_width=True)
 
   st.markdown(
       "<h3 style='text-align: left; margin-top: 15px; margin-bottom: 5px; color:"
@@ -499,7 +504,6 @@ with st.sidebar:
 
 
 # ================= 4. KHỐI CHÍNH =================
-# THÊM MARGIN-TOP ÂM VÀO ĐÂY ĐỂ ĐẨY TIÊU ĐỀ LÊN 20PX
 st.markdown(
     """
 <div class="title-card-center" style="padding: 8px 25px; margin-top: -20px; margin-bottom: 15px;">
