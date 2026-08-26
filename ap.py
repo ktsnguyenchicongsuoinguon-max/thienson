@@ -79,25 +79,29 @@ st.markdown(
     }
     [data-testid="stSidebarUserContent"] { padding: 5px 20px 20px 20px !important; overflow: hidden !important; }
     
-    /* ĐÃ SỬA: CĂN GIỮA LOGO BẰNG LỆNH SCALE ĐỂ TRÁNH LỆCH PHẢI */
+    /* ÉP KHUNG VÀ ẢNH LOGO CĂN GIỮA TUYỆT ĐỐI */
     [data-testid="stSidebar"] div[data-testid="stImage"] {
-        margin-top: 10px !important;
-        margin-bottom: 25px !important;
-        text-align: center !important;
+        width: 100% !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        margin-top: 5px !important;
+        margin-bottom: 15px !important;
+    }
+    [data-testid="stSidebar"] div[data-testid="stImage"] > div {
+        width: 100% !important;
         display: flex !important;
         justify-content: center !important;
     }
     [data-testid="stSidebar"] img {
-        width: 100% !important;
-        max-width: 100% !important;
-        transform: scale(1.2) !important; /* Phóng to 20% từ tâm */
-        transform-origin: center center !important;
+        width: 120% !important;
+        max-width: 120% !important;
+        display: block !important;
+        margin: 0 auto !important; 
         filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.25)) drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.15)) !important;
         transition: transform 0.3s ease !important;
     }
-    [data-testid="stSidebar"] img:hover { 
-        transform: scale(1.25) !important; /* Khi chuột vào sẽ to nhẹ lên chút nữa */
-    }
+    [data-testid="stSidebar"] img:hover { transform: scale(1.03) !important; }
 
     .sidebar-title { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #0f172a; margin-top: 10px; margin-bottom: 2px; text-transform: uppercase; }
     .sidebar-title .material-symbols-rounded { font-size: 18px; color: #198754; }
@@ -108,7 +112,6 @@ st.markdown(
     }
     div.row-widget.stSelectbox, div.row-widget.stMultiSelect { margin-bottom: -5px !important; }
 
-    /* GIẢM PADDING-TOP XUỐNG CÒN 5PX ĐỂ ĐẨY NỘI DUNG LÊN TRÊN */
     .block-container { 
         background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
@@ -510,10 +513,10 @@ with st.sidebar:
 
 
 # ================= 4. KHỐI CHÍNH =================
-# THÊM MARGIN-TOP ÂM VÀO ĐÂY ĐỂ ĐẨY TIÊU ĐỀ LÊN 20PX
+# ĐÃ ĐỔI margin-top XUỐNG -5px (TỨC LÀ HẠ XUỐNG 15px SO VỚI TRƯỚC LÀ -20px)
 st.markdown(
     """
-<div class="title-card-center" style="padding: 8px 25px; margin-top: -20px; margin-bottom: 15px;">
+<div class="title-card-center" style="padding: 8px 25px; margin-top: -5px; margin-bottom: 15px;">
     <div style="font-size: 26px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin: 0; padding: 0; line-height: 1.2; text-align: center;">BÁO CÁO CÔNG VIỆC - PHÒNG THIẾT KẾ</div>
 </div>
 """,
@@ -725,9 +728,10 @@ for col in ["Ngày_Bat_Dau_Obj", "Ngày_Hoan_Thanh_Obj"]:
   if col in df_export.columns:
     df_export = df_export.drop(columns=[col])
 
+# ĐÃ ĐỔI margin-top TỪ 5px XUỐNG -10px (RÚT LÊN 15PX ĐỂ BÙ TRỪ KHOẢNG TRỐNG TỪ BÊN TRÊN BỊ ĐẨY XUỐNG)
 st.markdown(
     """
-<div class="title-card-center" style="margin-top: 5px; margin-bottom: 10px;">
+<div class="title-card-center" style="margin-top: -10px; margin-bottom: 10px;">
     <div style="font-size: 18px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2; text-align: center;">BẢNG CHI TIẾT CÔNG VIỆC</div>
 </div>
 """,
