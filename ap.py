@@ -14,7 +14,6 @@ st.set_page_config(
 )
 
 
-# ================= HÀM ĐỌC ẢNH LOCAL LÀM BACKGROUND =================
 def get_base64_image(image_path):
   if os.path.exists(image_path):
     with open(image_path, "rb") as img_file:
@@ -66,7 +65,6 @@ st.markdown(
     [data-testid="stHeaderActionElements"], .stAppDeployButton { display: none !important; }
     footer { display: none !important; }
 
-    /* KHOẢNG CÁCH TRÊN DƯỚI CHO KHUNG BỘ LỌC (SIDEBAR) */
     [data-testid="stSidebar"] { background-color: transparent !important; border: none !important; }
     [data-testid="stSidebarResizer"] { display: none !important; }
     [data-testid="stSidebar"] > div:first-child {
@@ -81,14 +79,11 @@ st.markdown(
     }
     [data-testid="stSidebarUserContent"] { padding: 5px 20px 20px 20px !important; overflow: hidden !important; }
     
-    /* HIỆU ỨNG BÓNG ĐỔ CHO LOGO TRONG SIDEBAR */
     [data-testid="stSidebar"] img {
         filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.25)) drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.15)) !important;
         transition: transform 0.3s ease !important;
     }
-    [data-testid="stSidebar"] img:hover {
-        transform: scale(1.03);
-    }
+    [data-testid="stSidebar"] img:hover { transform: scale(1.03); }
 
     .sidebar-title { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #0f172a; margin-top: 10px; margin-bottom: 2px; text-transform: uppercase; }
     .sidebar-title .material-symbols-rounded { font-size: 18px; color: #198754; }
@@ -99,7 +94,6 @@ st.markdown(
     }
     div.row-widget.stSelectbox, div.row-widget.stMultiSelect { margin-bottom: -5px !important; }
 
-    /* KHOẢNG CÁCH ĐỀU 30PX (TRÁI/PHẢI/DƯỚI) CHO KHUNG CHÍNH */
     .block-container { 
         background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
@@ -113,7 +107,6 @@ st.markdown(
     .block-container > div[data-testid="stVerticalBlock"] { flex-grow: 1 !important; display: flex !important; flex-direction: column !important; min-height: 0 !important; width: 100% !important; }
     .block-container > div[data-testid="stVerticalBlock"] > div { flex-shrink: 0 !important; width: 100% !important; }
     
-    /* BẢNG CHI TIẾT CÔNG VIỆC TÙY CHỈNH BẰNG HTML (CHỐNG TRÀN VÀ CÁCH ĐỀU 30PX ĐÁY) */
     div.element-container:has(.custom-table-wrapper),
     .stMarkdown:has(.custom-table-wrapper),
     div[data-testid="stMarkdownContainer"]:has(.custom-table-wrapper) {
@@ -144,11 +137,11 @@ st.markdown(
         margin: 0 !important;
     }
     .custom-table thead th {
-        background-color: #e9d8fd !important; /* MÀU TÍM NHẠT CHO TIÊU ĐỀ */
-        color: #000000 !important; /* CHỮ MÀU ĐEN */
+        background-color: #e9d8fd !important;
+        color: #000000 !important;
         font-weight: 800 !important; 
-        font-size: 15.5px !important; /* TĂNG KÍCH THƯỚC CHỮ LÊN 1 CHÚT */
-        text-transform: uppercase !important; /* CHỮ VIẾT HOA */
+        font-size: 15.5px !important;
+        text-transform: uppercase !important;
         position: sticky !important; 
         top: 0 !important; 
         z-index: 10 !important; 
@@ -168,7 +161,6 @@ st.markdown(
         vertical-align: middle !important; 
     }
     
-    /* CĂN GIỮA TUYỆT ĐỐI KHUNG TIÊU ĐỀ */
     .title-card-center { 
         border-radius: 16px; 
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.05); 
@@ -190,7 +182,6 @@ st.markdown(
     .custom-download-link { display: block; float: right; text-align: right; color: #0A3622 !important; font-size: 13.5px !important; font-weight: 700 !important; text-decoration: none !important; margin-top: -30px !important; margin-right: 0px !important; margin-bottom: 5px !important; position: relative; z-index: 9999; cursor: pointer; }
     .custom-download-link:hover { color: #198754 !important; text-decoration: underline !important; }
 
-    /* 10 Ô KPI */
     .kpi-card { width: 100%; padding: 10px 12px; border-radius: 18px !important; border: 1px solid rgba(255, 255, 255, 0.4) !important; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 10px; min-height: 85px; background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden !important; }
     .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 5px 10px rgba(0, 0, 0, 0.1) !important; }
     .kpi-icon-wrapper { position: absolute; left: 12px; width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; z-index: 0; opacity: 0.95; background-color: #cfe2ff !important; color: #0d6efd !important; }
@@ -209,12 +200,12 @@ st.markdown(
 )
 
 
-# ================= 2. ĐỌC DỮ LIỆU TỪ GOOGLE SHEETS =================
+# ================= 2. ĐỌC DỮ LIỆU CÓ CACHE =================
+@st.cache_data(ttl=60)
 def load_data():
   sheet_url = "https://docs.google.com/spreadsheets/d/1Ps6Bq1q_asSuR3FW5FXMJ46Tr6G02HWJh3gqX3LGG0M/export?format=csv&gid=162795196"
   try:
     df = pd.read_csv(sheet_url)
-    # LOẠI BỎ CÁC CỘT RỖNG VÀ LỖI UNNAMED ĐỂ ĐẢM BẢO KHÔNG BỊ RÁC BẢNG
     df = df.dropna(how="all", axis=1)
     df = df.loc[:, ~df.columns.str.contains("^unnamed", case=False, na=False)]
   except Exception:
@@ -222,7 +213,6 @@ def load_data():
 
   df.columns = df.columns.str.strip()
 
-  # THUẬT TOÁN NHẬN DIỆN CỘT THÔNG MINH - CHỐNG GHI ĐÈ 1-1 (HIỂN THỊ ĐỦ 100% CỘT)
   rename_dict = {}
   seen_targets = set()
 
@@ -275,7 +265,6 @@ def load_data():
       ):
         target = "Ngày Hoàn Thành"
 
-    # Chỉ cập nhật nếu tên mục tiêu chưa được gắn cho cột nào trước đó (Chống gộp cột/mất cột)
     if target and target not in seen_targets:
       rename_dict[col] = target
       seen_targets.add(target)
@@ -283,7 +272,6 @@ def load_data():
   df.rename(columns=rename_dict, inplace=True)
   df = df.loc[:, ~df.columns.duplicated()]
 
-  # LÀM SẠCH VÀ ĐỒNG NHẤT DỮ LIỆU TÌNH TRẠNG TRIỂN KHAI
   if "Tình trạng triển khai" in df.columns:
 
     def clean_status(x):
@@ -300,7 +288,6 @@ def load_data():
 
     df["Tình trạng triển khai"] = df["Tình trạng triển khai"].apply(clean_status)
 
-  # FORWARD FILL ĐỂ XỬ LÝ CÁC Ô GỘP (MERGE CELLS) TRONG GOOGLE SHEETS
   cols_to_fill = [
       "Mã Dự Án",
       "Dự Án",
@@ -331,12 +318,7 @@ def load_data():
   return df
 
 
-# LƯU TRỮ VÀ CẬP NHẬT DỮ LIỆU (TỰ LÀM MỚI KHI F5 DO KHÔNG DÙNG ST.CACHE)
-if "raw_data" not in st.session_state:
-  with st.spinner("⏳ Đang tải dữ liệu mới nhất từ Google Sheets..."):
-    st.session_state.raw_data = load_data()
-
-df = st.session_state.raw_data.copy()
+df = load_data().copy()
 
 # ================= 3. KHỐI SIDEBAR BỘ LỌC =================
 with st.sidebar:
@@ -510,8 +492,7 @@ with st.sidebar:
       start_date = end_date = date_range[0]
 
 
-# ================= 4. KHỐI CHÍNH (BÊN PHẢI) =================
-
+# ================= 4. KHỐI CHÍNH =================
 st.markdown(
     """
 <div class="title-card-center" style="padding: 8px 25px; margin-top: 0px; margin-bottom: 15px;">
@@ -521,7 +502,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# CẬP NHẬT THUẬT TOÁN LỌC THỜI GIAN THEO GIAO THOA (CHUẨN XÁC, KHÔNG BỎ SÓT)
 df_display = df.copy()
 if start_date and end_date:
   start_ts = pd.to_datetime(start_date)
@@ -561,22 +541,22 @@ if selected_cb and "Chuyên viên thực hiện" in df_display.columns:
       df_display["Chuyên viên thực hiện"].astype(str).isin(selected_cb)
   ]
 
-# --- TÍNH TOÁN 10 CHỈ SỐ KPI ĐẢM BẢO KHÔNG TRÙNG LẶP ---
-p_projects = 0
-if "Dự Án" in df_display.columns:
-  _prjs = df_display["Dự Án"].astype(str).str.strip().str.upper()
-  p_projects = _prjs[(_prjs != "") & (_prjs != "NAN")].nunique()
-
-p_contracts = 0
-if "Hợp Đồng - PLHĐ" in df_display.columns:
-  _cts = df_display["Hợp Đồng - PLHĐ"].astype(str).str.strip().str.upper()
-  p_contracts = _cts[(_cts != "") & (_cts != "NAN")].nunique()
-
-p_categories = 0
-if "Hạng Mục" in df_display.columns:
-  _cats = df_display["Hạng Mục"].astype(str).str.strip().str.upper()
-  p_categories = _cats[(_cats != "") & (_cats != "NAN")].nunique()
-
+# --- TÍNH TOÁN KPI ---
+p_projects = (
+    df_display["Dự Án"].dropna().nunique()
+    if "Dự Án" in df_display.columns
+    else 0
+)
+p_contracts = (
+    df_display["Hợp Đồng - PLHĐ"].dropna().nunique()
+    if "Hợp Đồng - PLHĐ" in df_display.columns
+    else 0
+)
+p_categories = (
+    df_display["Hạng Mục"].dropna().nunique()
+    if "Hạng Mục" in df_display.columns
+    else 0
+)
 p_total = len(df_display)
 
 if "Tiến Độ (%)" in df_display.columns and p_total > 0:
@@ -587,9 +567,7 @@ if "Tiến Độ (%)" in df_display.columns and p_total > 0:
       .str.strip(),
       errors="coerce",
   )
-  p_prog = tien_do_clean.mean()
-  if pd.isna(p_prog):
-    p_prog = 0
+  p_prog = tien_do_clean.fillna(0).mean()
 else:
   p_prog = 0
 
@@ -631,7 +609,7 @@ def render_transparent_shadow_kpi(title, value, icon_name):
     """
 
 
-# --- HÀNG 1: 5 Ô ---
+# KPI Hàng 1
 r1_c1, r1_c2, r1_c3, r1_c4, r1_c5 = st.columns(5)
 with r1_c1:
   st.markdown(
@@ -659,7 +637,7 @@ with r1_c5:
       unsafe_allow_html=True,
   )
 
-# --- HÀNG 2: 5 Ô ---
+# KPI Hàng 2
 r2_c1, r2_c2, r2_c3, r2_c4, r2_c5 = st.columns(5)
 with r2_c1:
   st.markdown(
@@ -729,11 +707,10 @@ for col in ["Ngày_Bat_Dau_Obj", "Ngày_Hoan_Thanh_Obj"]:
   if col in df_export.columns:
     df_export = df_export.drop(columns=[col])
 
-# TIÊU ĐỀ BẢNG CHI TIẾT
 st.markdown(
     """
 <div class="title-card-center">
-    <div style="font-size: 18px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2; text-align: center;">BẢNG CHI TIẾT CÔNG VIÊC</div>
+    <div style="font-size: 18px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2; text-align: center;">BẢNG CHI TIẾT CÔNG VIỆC</div>
 </div>
 """,
     unsafe_allow_html=True,
@@ -773,7 +750,6 @@ def generate_excel_with_colors(df_data):
 
   for row_idx in range(2, ws.max_row + 1):
     fill_to_use = None
-
     if vướng_col_idx:
       v_val = str(ws.cell(row=row_idx, column=vướng_col_idx).value).strip().lower()
       if v_val and v_val not in ["nan", "none", ""]:
@@ -808,8 +784,7 @@ except Exception:
   mime_type = "text/csv"
   filename = "Bao_cao_tien_do_Thien_Son.csv"
 
-# NÚT TẢI EXCEL
-download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}">Tải Excel</a>'
+download_html = f'<a class="custom-download-link" href="data:{mime_type};base64,{b64}" download="{filename}">📥 Tải file Excel</a>'
 st.markdown(download_html, unsafe_allow_html=True)
 
 priority_map = {
@@ -850,7 +825,6 @@ def color_rows(row):
   return ["background-color: #ffffff; color: #000;"] * len(row)
 
 
-# ÁP DỤNG MÀU SẮC LÊN BẢNG VÀ CSS CHO TIÊU ĐỀ
 styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
     "selector": "th",
     "props": [
@@ -862,7 +836,6 @@ styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
     ],
 }])
 
-# ẨN CỘT INDEX CỦA PANDAS ĐỂ BẢNG TRÔNG GỌN HƠN
 try:
   styled_df = styled_df.hide(axis="index")
 except Exception:
@@ -871,7 +844,6 @@ except Exception:
   except:
     pass
 
-# ================= RENDER BẢNG BẰNG TÙY CHỈNH HTML =================
 html_table = styled_df.to_html()
 html_table = html_table.replace("<table", '<table class="custom-table"')
 st.markdown(
