@@ -100,7 +100,7 @@ st.markdown(
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         width: calc(100% - 40px) !important; max-width: 100% !important; 
         margin: 20px 20px !important; 
-        padding: 5px 30px 30px 30px !important; /* Cũ là 25px */
+        padding: 5px 30px 30px 30px !important; 
         height: calc(100vh - 40px) !important; 
         display: flex !important; flex-direction: column !important; overflow: hidden !important; 
     }
@@ -190,7 +190,6 @@ st.markdown(
     .kpi-card { width: 100%; padding: 10px 12px; border-radius: 18px !important; border: 1px solid rgba(255, 255, 255, 0.4) !important; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 10px; min-height: 85px; background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden !important; }
     .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 5px 10px rgba(0, 0, 0, 0.1) !important; }
     
-    /* ĐÃ CẬP NHẬT: Màu sắc và kích thước icon KPI */
     .kpi-icon-wrapper { position: absolute; left: 12px; width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; z-index: 0; opacity: 0.95; background-color: #d1e7dd !important; color: #198754 !important; }
     .kpi-icon-wrapper .material-symbols-rounded { font-size: 40px; color: #198754 !important; } 
     
@@ -296,13 +295,12 @@ def load_data():
 
     df["Tình trạng triển khai"] = df["Tình trạng triển khai"].apply(clean_status)
 
+  # CẬP NHẬT MỚI: Chỉ tự động điền cho các cột chung, không tự động điền nhân sự
   cols_to_fill = [
       "Mã Dự Án",
       "Dự Án",
       "Hợp Đồng - PLHĐ",
       "Hạng Mục",
-      "Chủ nhiệm dự án",
-      "Chuyên viên thực hiện",
   ]
   for col in cols_to_fill:
     if col in df.columns:
