@@ -189,8 +189,11 @@ st.markdown(
 
     .kpi-card { width: 100%; padding: 10px 12px; border-radius: 18px !important; border: 1px solid rgba(255, 255, 255, 0.4) !important; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 10px; min-height: 85px; background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden !important; }
     .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 5px 10px rgba(0, 0, 0, 0.1) !important; }
-    .kpi-icon-wrapper { position: absolute; left: 12px; width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; z-index: 0; opacity: 0.95; background-color: #cfe2ff !important; color: #0d6efd !important; }
-    .kpi-icon-wrapper .material-symbols-rounded { font-size: 48px; color: #0d6efd !important; } 
+    
+    /* ĐÃ CẬP NHẬT: Màu sắc và kích thước icon KPI */
+    .kpi-icon-wrapper { position: absolute; left: 12px; width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; z-index: 0; opacity: 0.95; background-color: #d1e7dd !important; color: #198754 !important; }
+    .kpi-icon-wrapper .material-symbols-rounded { font-size: 40px; color: #198754 !important; } 
+    
     .kpi-details { display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1; text-align: center; }
     .kpi-title { font-size: 1.1rem; font-weight: 800; opacity: 0.85; text-transform: uppercase; margin-bottom: 2px; white-space: nowrap; color: #0f172a !important; text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8); }
     .kpi-value { font-size: 2.2rem; font-weight: 900; color: #0f172a !important; line-height: 1.1; text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8); }
