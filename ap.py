@@ -79,7 +79,7 @@ st.markdown(
     }
     [data-testid="stSidebarUserContent"] { padding: 5px 20px 20px 20px !important; overflow: hidden !important; }
     
-    /* ÉP KHUNG VÀ ẢNH LOGO CĂN GIỮA TUYỆT ĐỐI (TRỊ LỆCH PHẢI) */
+    /* ÉP KHUNG VÀ ẢNH LOGO CĂN GIỮA TUYỆT ĐỐI */
     [data-testid="stSidebar"] div[data-testid="stImage"] {
         width: 100% !important;
         position: relative !important;
@@ -92,7 +92,7 @@ st.markdown(
         max-width: 100% !important;
         position: relative !important;
         left: 50% !important;
-        transform: translateX(-50%) scale(1.2) !important; /* Dịch ngược 50% và phóng to */
+        transform: translateX(-50%) scale(1.2) !important; 
         transform-origin: center center !important;
         filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.25)) drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.15)) !important;
         transition: transform 0.3s ease !important;
@@ -110,7 +110,6 @@ st.markdown(
     }
     div.row-widget.stSelectbox, div.row-widget.stMultiSelect { margin-bottom: -5px !important; }
 
-    /* GIẢM PADDING-TOP XUỐNG CÒN 5PX ĐỂ ĐẨY NỘI DUNG LÊN TRÊN */
     .block-container { 
         background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
@@ -154,9 +153,10 @@ st.markdown(
         margin: 0 !important;
     }
     
+    /* ĐÃ CẬP NHẬT: TIÊU ĐỀ BẢNG MÀU XANH GREEN NHƯ KPI */
     .custom-table thead th {
-        background-color: #e9d8fd !important;
-        color: #334155 !important;
+        background-color: #d1e7dd !important; /* Đổi sang xanh nhạt */
+        color: #198754 !important;            /* Đổi sang xanh đậm */
         font-weight: 800 !important; 
         font-size: 14.5px !important;
         text-transform: uppercase !important;
@@ -166,7 +166,7 @@ st.markdown(
         padding: 8px 5px !important; 
         text-align: center !important;     
         vertical-align: middle !important; 
-        border-bottom: 2px solid #d6bcfa !important; 
+        border-bottom: 2px solid #a3cfbb !important; /* Đổi viền dưới sang tông xanh */
         border-right: 1px solid rgba(0,0,0,0.05) !important; 
         white-space: normal !important; 
         line-height: 1.3em !important;     
@@ -726,10 +726,11 @@ for col in ["Ngày_Bat_Dau_Obj", "Ngày_Hoan_Thanh_Obj"]:
   if col in df_export.columns:
     df_export = df_export.drop(columns=[col])
 
+# ĐÃ CẬP NHẬT CHỮ LÊN 22px VÀ GIỮ NGUYÊN VỊ TRÍ
 st.markdown(
     """
 <div class="title-card-center" style="margin-top: -10px; margin-bottom: 10px;">
-    <div style="font-size: 18px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2; text-align: center;">BẢNG CHI TIẾT CÔNG VIỆC</div>
+    <div style="font-size: 22px; font-weight: 600; color: #0A3622; text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin: 0; padding: 0; line-height: 1.2; text-align: center;">BẢNG CHI TIẾT CÔNG VIỆC</div>
 </div>
 """,
     unsafe_allow_html=True,
@@ -844,17 +845,19 @@ def color_rows(row):
   return ["background-color: #ffffff; color: #000;"] * len(row)
 
 
+# ĐÃ CẬP NHẬT MÀU TIÊU ĐỀ BẢNG THÀNH MÀU CỦA ICON KPI (Background xanh nhạt, chữ xanh đậm)
 table_styles = [
     {
         "selector": "th",
         "props": [
-            ("background-color", "#e9d8fd"),
-            ("color", "#334155"),         
+            ("background-color", "#d1e7dd"), 
+            ("color", "#198754"),         
             ("font-weight", "800"),
             ("font-size", "14.5px"),      
             ("text-transform", "uppercase"),
             ("text-align", "center"),     
             ("vertical-align", "middle"), 
+            ("border-bottom", "2px solid #a3cfbb"),
         ],
     }
 ]
