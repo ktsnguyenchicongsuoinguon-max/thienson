@@ -149,7 +149,7 @@ st.markdown(
         text-align: left !important;
         border-bottom: 2px solid #d6bcfa !important; 
         border-right: 1px solid rgba(0,0,0,0.05) !important; 
-        white-space: nowrap !important; 
+        white-space: normal !important; /* ĐÃ ĐỔI ĐỂ CHO PHÉP XUỐNG DÒNG */
     }
     .custom-table tbody td {
         padding: 10px 10px !important; 
@@ -200,7 +200,7 @@ st.markdown(
 )
 
 
-# ================= 2. ĐỌC DỮ LIỆU CÓ CACHE =================
+# ================= 2. ĐỌC DỮ LIỆU CÓ CACHE (CẬP NHẬT LINK MỚI) =================
 @st.cache_data(ttl=60)
 def load_data():
   sheet_url = "https://docs.google.com/spreadsheets/d/1dOiPWgLE8o7YUeA6l_g_eF825PnkskRn/export?format=csv&gid=933693217"
@@ -824,17 +824,37 @@ def color_rows(row):
     return ["background-color: #adb5bd; color: #000;"] * len(row)
   return ["background-color: #ffffff; color: #000;"] * len(row)
 
+# --- TÙY CHỈNH KÍCH THƯỚC CỘT (CHỦ ĐẦU TƯ & HỢP ĐỒNG BẰNG 1/2) ---
+table_styles = [
+    {
+        "selector": "th",
+        "props": [
+            ("background-color", "#e9d8fd"),
+            ("color", "#000000"),
+            ("font-weight", "800"),
+            ("font-size", "14.5px"),
+            ("text-transform", "uppercase"),
+        ],
+    }
+]
 
-styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles([{
-    "selector": "th",
-    "props": [
-        ("background-color", "#e9d8fd"),
-        ("color", "#000000"),
-        ("font-weight", "800"),
-        ("font-size", "15.5px"),
-        ("text-transform", "uppercase"),
-    ],
-}])
+target_shrink_keywords = ["chủ đầu tư", "hợp đồng", "hđ", "plhđ", "cdt", "cđt"]
+for idx, col_name in enumerate(df_display.columns):
+  col_str = str(col_name).lower()
+  if any(kw in col_str for kw in target_shrink_keywords):
+    table_styles.append({
+        "selector": f"th.col{idx}, td.col{idx}",
+        "props": [
+            ("width", "95px"),
+            ("max-width", "110px"),
+            ("min-width", "75px"),
+            ("white-space", "normal !important"),
+            ("word-break", "break-word"),
+            ("font-size", "12.5px"), 
+        ],
+    })
+
+styled_df = df_display.style.apply(color_rows, axis=1).set_table_styles(table_styles)
 
 try:
   styled_df = styled_df.hide(axis="index")
