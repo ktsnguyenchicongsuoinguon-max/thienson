@@ -79,19 +79,22 @@ st.markdown(
     }
     [data-testid="stSidebarUserContent"] { padding: 5px 20px 20px 20px !important; overflow: hidden !important; }
     
-    /* ÉP LOGO TO LÊN 120% VÀ CĂN GIỮA */
+    /* CĂN GIỮA HOÀN HẢO VÀ PHÓNG TO LOGO */
     [data-testid="stSidebar"] div[data-testid="stImage"] {
-        width: 120% !important;
-        margin-left: -10% !important;
+        width: 100% !important;
+        display: flex !important;
+        justify-content: center !important;
         margin-top: 5px !important;
         margin-bottom: 15px !important;
     }
-    
     [data-testid="stSidebar"] img {
+        width: 120% !important;
+        max-width: 130% !important;
+        margin: 0 auto !important; 
         filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.25)) drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.15)) !important;
         transition: transform 0.3s ease !important;
     }
-    [data-testid="stSidebar"] img:hover { transform: scale(1.03); }
+    [data-testid="stSidebar"] img:hover { transform: scale(1.03) !important; }
 
     .sidebar-title { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #0f172a; margin-top: 10px; margin-bottom: 2px; text-transform: uppercase; }
     .sidebar-title .material-symbols-rounded { font-size: 18px; color: #198754; }
@@ -102,6 +105,7 @@ st.markdown(
     }
     div.row-widget.stSelectbox, div.row-widget.stMultiSelect { margin-bottom: -5px !important; }
 
+    /* GIẢM PADDING-TOP XUỐNG CÒN 5PX ĐỂ ĐẨY NỘI DUNG LÊN TRÊN */
     .block-container { 
         background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
@@ -334,7 +338,7 @@ df = load_data().copy()
 
 # ================= 3. KHỐI SIDEBAR BỘ LỌC =================
 with st.sidebar:
-  # HIỂN THỊ LOGO KHÔNG CẦN CỘT ĐỂ LOGO TRÀN VIỀN
+  # HIỂN THỊ LOGO TRÀN VIỀN
   st.image("logothienson.png", use_container_width=True)
 
   st.markdown(
