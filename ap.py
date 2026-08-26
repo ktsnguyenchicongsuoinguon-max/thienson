@@ -137,12 +137,12 @@ st.markdown(
         margin: 0 !important;
     }
     
-    /* CĂN GIỮA TIÊU ĐỀ VÀ ÉP RỚT 2 DÒNG */
+    /* CĂN GIỮA TIÊU ĐỀ VÀ ÉP RỚT 2 DÒNG - MÀU CHỮ TIÊU ĐỀ DỊU HƠN */
     .custom-table thead th {
         background-color: #e9d8fd !important;
-        color: #000000 !important;
+        color: #334155 !important; /* Đã đổi từ đen #000000 sang xám đậm dịu mắt */
         font-weight: 800 !important; 
-        font-size: 14.5px !important;
+        font-size: 14.5px !important; /* Giữ nguyên size tiêu đề */
         text-transform: uppercase !important;
         position: sticky !important; 
         top: 0 !important; 
@@ -158,9 +158,10 @@ st.markdown(
         overflow: hidden !important;       
     }
     
+    /* CHỮ TRONG BẢNG TO LÊN */
     .custom-table tbody td {
         padding: 10px 10px !important; 
-        font-size: 13.5px !important; 
+        font-size: 15px !important; /* Tăng chữ thân bảng lên 15px để dễ đọc */
         border-bottom: 1px solid rgba(0,0,0,0.05) !important;
         border-right: 1px solid rgba(0,0,0,0.05); 
         white-space: normal !important; 
@@ -837,9 +838,9 @@ table_styles = [
         "selector": "th",
         "props": [
             ("background-color", "#e9d8fd"),
-            ("color", "#000000"),
+            ("color", "#334155"),         # Màu tiêu đề đổi từ đen sang xám đậm (dịu mắt hơn)
             ("font-weight", "800"),
-            ("font-size", "14.5px"),
+            ("font-size", "14.5px"),      # Kích thước tiêu đề giữ nguyên
             ("text-transform", "uppercase"),
             ("text-align", "center"),     
             ("vertical-align", "middle"), 
@@ -860,16 +861,15 @@ for idx, col_name in enumerate(df_display.columns):
     table_styles.append({
         "selector": f"th.col{idx}, td.col{idx}",
         "props": [
-            ("width", "60px"),             # Đã điều chỉnh về 60px
-            ("max-width", "70px"),
-            ("min-width", "50px"),
+            ("width", "75px"),             
+            ("max-width", "85px"),
+            ("min-width", "70px"),
             ("white-space", "normal !important"),
             ("word-break", "break-word"),
-            ("font-size", "12.5px"),
+            ("font-size", "14px"),         # Chữ nội dung bên trong to lên 
             ("text-align", "center"), 
         ],
     })
-  # Ưu tiên kiểm tra nhóm 100px trước để "Chủ nhiệm dự án" ăn vào nhóm 100px thay vì nhóm "Dự án" 130px
   elif any(kw in col_str for kw in target_100_keywords):
     table_styles.append({
         "selector": f"th.col{idx}, td.col{idx}",
@@ -879,7 +879,7 @@ for idx, col_name in enumerate(df_display.columns):
             ("min-width", "90px"),
             ("white-space", "normal !important"), 
             ("word-break", "break-word"),
-            ("font-size", "13px"), 
+            ("font-size", "14.5px"),       # Chữ nội dung bên trong to lên
             ("text-align", "center"), 
         ],
     })
@@ -892,7 +892,7 @@ for idx, col_name in enumerate(df_display.columns):
             ("min-width", "120px"),
             ("white-space", "normal !important"), 
             ("word-break", "break-word"),
-            ("font-size", "13px"), 
+            ("font-size", "14.5px"),       # Chữ nội dung bên trong to lên
         ],
     })
   elif any(kw in col_str for kw in target_wrap_keywords):
@@ -904,7 +904,7 @@ for idx, col_name in enumerate(df_display.columns):
             ("min-width", "100px"),
             ("white-space", "normal !important"), 
             ("word-break", "break-word"),
-            ("font-size", "13px"), 
+            ("font-size", "14.5px"),       # Chữ nội dung bên trong to lên
             ("text-align", "center"), 
         ],
     })
