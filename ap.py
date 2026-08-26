@@ -207,7 +207,7 @@ st.markdown(
 )
 
 
-# ================= 2. ĐỌC DỮ LIỆU CÓ CACHE (LINK SHEET MỚI) =================
+# ================= 2. ĐỌC DỮ LIỆU CÓ CACHE =================
 @st.cache_data(ttl=60)
 def load_data():
   sheet_url = "https://docs.google.com/spreadsheets/d/1dOiPWgLE8o7YUeA6l_g_eF825PnkskRn/export?format=csv&gid=933693217"
@@ -831,7 +831,7 @@ def color_rows(row):
     return ["background-color: #adb5bd; color: #000;"] * len(row)
   return ["background-color: #ffffff; color: #000;"] * len(row)
 
-# --- CẬP NHẬT KIỂU DÁNG CĂN GIỮA VÀ THU NHỎ CỘT ---
+# --- CẬP NHẬT KIỂU DÁNG CĂN GIỮA VÀ ĐIỀU CHỈNH CỘT ---
 table_styles = [
     {
         "selector": "th",
@@ -841,17 +841,20 @@ table_styles = [
             ("font-weight", "800"),
             ("font-size", "14.5px"),
             ("text-transform", "uppercase"),
-            ("text-align", "center"),     # Căn giữa ngang cho tiêu đề
-            ("vertical-align", "middle"), # Căn giữa dọc cho tiêu đề
+            ("text-align", "center"),     
+            ("vertical-align", "middle"), 
         ],
     }
 ]
 
-# Nhóm 1: Thu nhỏ hẳn (1/2) cho các cột Chủ đầu tư, Hợp đồng, Hạng mục
-target_shrink_keywords = ["chủ đầu tư", "hợp đồng", "hđ", "plhđ", "cdt", "cđt", "hạng mục"]
+# Nhóm 1: Thu nhỏ hẳn (chỉ còn chủ đầu tư)
+target_shrink_keywords = ["chủ đầu tư", "cdt", "cđt"]
 
-# Nhóm 2: Thu nhỏ vừa đủ để ÉP CÁC CỘT DÀI RỚT XUỐNG 2 DÒNG
+# Nhóm 2: Ép các cột bị quá dài rớt xuống 2 dòng để tiết kiệm diện tích
 target_wrap_keywords = ["chuyên viên", "chủ nhiệm", "tình trạng"]
+
+# Nhóm 3: DỰ ÁN, HỢP ĐỒNG, HẠNG MỤC bằng kích thước nhau
+target_equal_keywords = ["dự án", "hợp đồng", "hđ", "plhđ", "hạng mục"]
 
 for idx, col_name in enumerate(df_display.columns):
   col_str = str(col_name).lower()
@@ -866,20 +869,33 @@ for idx, col_name in enumerate(df_display.columns):
             ("white-space", "normal !important"),
             ("word-break", "break-word"),
             ("font-size", "12.5px"),
-            ("text-align", "center"), # Ép data bên dưới cũng căn giữa
+            ("text-align", "center"), 
         ],
     })
+  # Đặt Nhóm 2 lên trước Nhóm 3 để "Chủ nhiệm dự án" không bị nhầm vào "Dự án"
   elif any(kw in col_str for kw in target_wrap_keywords):
     table_styles.append({
         "selector": f"th.col{idx}, td.col{idx}",
         "props": [
-            ("width", "125px"),        # Giới hạn kích thước vừa đủ cho 2 dòng
+            ("width", "125px"),        
             ("max-width", "140px"),
             ("min-width", "100px"),
             ("white-space", "normal !important"), 
             ("word-break", "break-word"),
             ("font-size", "13px"), 
-            ("text-align", "center"), # Ép data bên dưới cũng căn giữa
+            ("text-align", "center"), 
+        ],
+    })
+  elif any(kw in col_str for kw in target_equal_keywords):
+    table_styles.append({
+        "selector": f"th.col{idx}, td.col{idx}",
+        "props": [
+            ("width", "170px"),        # Đặt chung 1 kích thước cho Dự án, Hợp đồng, Hạng mục
+            ("max-width", "220px"),
+            ("min-width", "140px"),
+            ("white-space", "normal !important"), 
+            ("word-break", "break-word"),
+            ("font-size", "13px"), 
         ],
     })
 
