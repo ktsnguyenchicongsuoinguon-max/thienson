@@ -831,7 +831,7 @@ def color_rows(row):
     return ["background-color: #adb5bd; color: #000;"] * len(row)
   return ["background-color: #ffffff; color: #000;"] * len(row)
 
-# --- CẬP NHẬT KIỂU DÁNG CĂN GIỮA VÀ ĐIỀU CHỈNH CỘT ---
+# --- CẬP NHẬT KIỂU DÁNG CĂN GIỮA VÀ ĐIỀU CHỈNH CỘT CHI TIẾT THEO YÊU CẦU ---
 table_styles = [
     {
         "selector": "th",
@@ -847,14 +847,11 @@ table_styles = [
     }
 ]
 
-# Nhóm 1: Thu nhỏ hẳn (chỉ còn chủ đầu tư)
+# Các từ khóa phân nhóm cột:
+target_100_keywords = ["chuyên viên", "chủ nhiệm", "bắt đầu", "hoàn thành"]
+target_130_keywords = ["dự án", "hợp đồng", "hđ", "plhđ", "hạng mục"]
 target_shrink_keywords = ["chủ đầu tư", "cdt", "cđt"]
-
-# Nhóm 2: Ép các cột bị quá dài rớt xuống 2 dòng để tiết kiệm diện tích
-target_wrap_keywords = ["chuyên viên", "chủ nhiệm", "tình trạng"]
-
-# Nhóm 3: DỰ ÁN, HỢP ĐỒNG, HẠNG MỤC bằng kích thước nhau
-target_equal_keywords = ["dự án", "hợp đồng", "hđ", "plhđ", "hạng mục"]
+target_wrap_keywords = ["tình trạng"]
 
 for idx, col_name in enumerate(df_display.columns):
   col_str = str(col_name).lower()
@@ -872,7 +869,32 @@ for idx, col_name in enumerate(df_display.columns):
             ("text-align", "center"), 
         ],
     })
-  # Đặt Nhóm 2 lên trước Nhóm 3 để "Chủ nhiệm dự án" không bị nhầm vào "Dự án"
+  # Ưu tiên kiểm tra nhóm 100px trước để "Chủ nhiệm dự án" ăn vào nhóm 100px thay vì nhóm "Dự án" 130px
+  elif any(kw in col_str for kw in target_100_keywords):
+    table_styles.append({
+        "selector": f"th.col{idx}, td.col{idx}",
+        "props": [
+            ("width", "100px"),        
+            ("max-width", "115px"),
+            ("min-width", "90px"),
+            ("white-space", "normal !important"), 
+            ("word-break", "break-word"),
+            ("font-size", "13px"), 
+            ("text-align", "center"), 
+        ],
+    })
+  elif any(kw in col_str for kw in target_130_keywords):
+    table_styles.append({
+        "selector": f"th.col{idx}, td.col{idx}",
+        "props": [
+            ("width", "130px"),
+            ("max-width", "145px"),
+            ("min-width", "120px"),
+            ("white-space", "normal !important"), 
+            ("word-break", "break-word"),
+            ("font-size", "13px"), 
+        ],
+    })
   elif any(kw in col_str for kw in target_wrap_keywords):
     table_styles.append({
         "selector": f"th.col{idx}, td.col{idx}",
@@ -884,18 +906,6 @@ for idx, col_name in enumerate(df_display.columns):
             ("word-break", "break-word"),
             ("font-size", "13px"), 
             ("text-align", "center"), 
-        ],
-    })
-  elif any(kw in col_str for kw in target_equal_keywords):
-    table_styles.append({
-        "selector": f"th.col{idx}, td.col{idx}",
-        "props": [
-            ("width", "170px"),        # Đặt chung 1 kích thước cho Dự án, Hợp đồng, Hạng mục
-            ("max-width", "220px"),
-            ("min-width", "140px"),
-            ("white-space", "normal !important"), 
-            ("word-break", "break-word"),
-            ("font-size", "13px"), 
         ],
     })
 
