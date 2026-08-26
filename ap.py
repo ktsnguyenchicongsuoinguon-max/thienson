@@ -860,9 +860,9 @@ for idx, col_name in enumerate(df_display.columns):
     table_styles.append({
         "selector": f"th.col{idx}, td.col{idx}",
         "props": [
-            ("width", "95px"),
-            ("max-width", "110px"),
-            ("min-width", "75px"),
+            ("width", "60px"),             # Đã điều chỉnh về 60px
+            ("max-width", "70px"),
+            ("min-width", "50px"),
             ("white-space", "normal !important"),
             ("word-break", "break-word"),
             ("font-size", "12.5px"),
