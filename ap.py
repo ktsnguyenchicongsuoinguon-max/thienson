@@ -847,8 +847,8 @@ table_styles = [
     }
 ]
 
-# Nhóm 1: Thu nhỏ hẳn (1/2) cho các cột Chủ đầu tư, Hợp đồng
-target_shrink_keywords = ["chủ đầu tư", "hợp đồng", "hđ", "plhđ", "cdt", "cđt"]
+# Nhóm 1: Thu nhỏ hẳn (1/2) cho các cột Chủ đầu tư, Hợp đồng, Hạng mục
+target_shrink_keywords = ["chủ đầu tư", "hợp đồng", "hđ", "plhđ", "cdt", "cđt", "hạng mục"]
 
 # Nhóm 2: Thu nhỏ vừa đủ để ÉP CÁC CỘT DÀI RỚT XUỐNG 2 DÒNG
 target_wrap_keywords = ["chuyên viên", "chủ nhiệm", "tình trạng"]
