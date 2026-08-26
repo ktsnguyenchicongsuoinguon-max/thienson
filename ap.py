@@ -136,21 +136,28 @@ st.markdown(
         font-family: inherit; 
         margin: 0 !important;
     }
+    
+    /* === ĐÃ CẬP NHẬT: TIÊU ĐỀ BẢNG CĂN GIỮA VÀ TỐI ĐA 2 DÒNG === */
     .custom-table thead th {
         background-color: #e9d8fd !important;
         color: #000000 !important;
         font-weight: 800 !important; 
-        font-size: 15.5px !important;
+        font-size: 14.5px !important;
         text-transform: uppercase !important;
         position: sticky !important; 
         top: 0 !important; 
         z-index: 10 !important; 
-        padding: 12px 10px !important; 
-        text-align: left !important;
+        padding: 8px 5px !important; 
+        text-align: center !important;     /* Căn giữa ngang */
+        vertical-align: middle !important; /* Căn giữa dọc */
         border-bottom: 2px solid #d6bcfa !important; 
         border-right: 1px solid rgba(0,0,0,0.05) !important; 
-        white-space: normal !important; /* ĐÃ ĐỔI ĐỂ CHO PHÉP XUỐNG DÒNG */
+        white-space: normal !important; 
+        line-height: 1.3em !important;     /* Cố định độ cao dòng */
+        height: 3.5em !important;          /* Chiều cao tổng bằng khoảng 2 dòng + padding */
+        overflow: hidden !important;       /* Cắt bỏ nếu tràn quá 2 dòng */
     }
+    
     .custom-table tbody td {
         padding: 10px 10px !important; 
         font-size: 13.5px !important; 
@@ -200,7 +207,7 @@ st.markdown(
 )
 
 
-# ================= 2. ĐỌC DỮ LIỆU CÓ CACHE (CẬP NHẬT LINK MỚI) =================
+# ================= 2. ĐỌC DỮ LIỆU CÓ CACHE =================
 @st.cache_data(ttl=60)
 def load_data():
   sheet_url = "https://docs.google.com/spreadsheets/d/1dOiPWgLE8o7YUeA6l_g_eF825PnkskRn/export?format=csv&gid=933693217"
@@ -824,7 +831,7 @@ def color_rows(row):
     return ["background-color: #adb5bd; color: #000;"] * len(row)
   return ["background-color: #ffffff; color: #000;"] * len(row)
 
-# --- TÙY CHỈNH KÍCH THƯỚC CỘT (CHỦ ĐẦU TƯ & HỢP ĐỒNG BẰNG 1/2) ---
+# --- CẬP NHẬT KIỂU DÁNG CĂN GIỮA VÀ THU NHỎ CỘT ---
 table_styles = [
     {
         "selector": "th",
@@ -834,6 +841,8 @@ table_styles = [
             ("font-weight", "800"),
             ("font-size", "14.5px"),
             ("text-transform", "uppercase"),
+            ("text-align", "center"),     # Thêm căn giữa cho Pandas Styler
+            ("vertical-align", "middle"), # Thêm căn giữa dọc
         ],
     }
 ]
