@@ -79,17 +79,24 @@ st.markdown(
     }
     [data-testid="stSidebarUserContent"] { padding: 5px 20px 20px 20px !important; overflow: hidden !important; }
     
-    /* CĂN GIỮA HOÀN HẢO VÀ PHÓNG TO LOGO */
+    /* ÉP KHUNG VÀ ẢNH LOGO CĂN GIỮA TUYỆT ĐỐI */
     [data-testid="stSidebar"] div[data-testid="stImage"] {
         width: 100% !important;
         display: flex !important;
         justify-content: center !important;
+        align-items: center !important;
         margin-top: 5px !important;
         margin-bottom: 15px !important;
     }
+    [data-testid="stSidebar"] div[data-testid="stImage"] > div {
+        width: 100% !important;
+        display: flex !important;
+        justify-content: center !important;
+    }
     [data-testid="stSidebar"] img {
         width: 120% !important;
-        max-width: 130% !important;
+        max-width: 120% !important;
+        display: block !important;
         margin: 0 auto !important; 
         filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.25)) drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.15)) !important;
         transition: transform 0.3s ease !important;
@@ -105,7 +112,6 @@ st.markdown(
     }
     div.row-widget.stSelectbox, div.row-widget.stMultiSelect { margin-bottom: -5px !important; }
 
-    /* GIẢM PADDING-TOP XUỐNG CÒN 5PX ĐỂ ĐẨY NỘI DUNG LÊN TRÊN */
     .block-container { 
         background-color: rgba(255, 255, 255, 0.35) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
@@ -338,7 +344,6 @@ df = load_data().copy()
 
 # ================= 3. KHỐI SIDEBAR BỘ LỌC =================
 with st.sidebar:
-  # HIỂN THỊ LOGO TRÀN VIỀN
   st.image("logothienson.png", use_container_width=True)
 
   st.markdown(
